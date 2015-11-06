@@ -5,7 +5,7 @@
   "description": "A mod to renew your Session",
   "version": "1.1",
   "mcversion": "1.7.10",
-  "url": "",
+  "url": "http://minecraft.curseforge.com/projects/reauth",
   "updateUrl": "",
   "authorList": ["TechnicianLP"],
   "credits": "Mojang and the Forge and FML guys, for making this possible",

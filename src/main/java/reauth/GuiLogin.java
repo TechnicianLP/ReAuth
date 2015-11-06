@@ -59,7 +59,7 @@ public class GuiLogin extends GuiScreen {
 	public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
 		this.drawDefaultBackground();
 
-		this.drawCenteredString(this.fontRendererObj, "Username:", this.width / 2, this.basex, Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basex, Color.WHITE.getRGB());
 		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basex + 45, Color.WHITE.getRGB());
 		if (!(this.error.isEmpty() || this.error == null)) {
 			int color = this.error.startsWith("E") ? Color.RED.getRGB() : Color.GREEN.getRGB();
