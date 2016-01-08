@@ -24,19 +24,20 @@ import net.minecraft.client.gui.GuiYesNo;
 
 public class GuiLogin extends GuiScreen {
 
-	GuiTextField username;
-	GuiPasswordField pw;
-	GuiButton login;
-	GuiButton cancel;
-	GuiCheckBox save;
+	private GuiTextField username;
+	private GuiPasswordField pw;
+	private GuiButton login;
+	private GuiButton cancel;
+	private GuiButton offline;
+	private GuiCheckBox save;
 
-	GuiScreen prev;
+	private GuiScreen prev;
 
-	int basex;
+	private int basey;
 
-	String error = "";
+	private String error = "";
 
-	public GuiLogin(GuiScreen prev) {
+	protected GuiLogin(GuiScreen prev) {
 		this.mc = Minecraft.getMinecraft();
 		this.fontRendererObj = mc.fontRenderer;
 		this.prev = prev;
@@ -46,8 +47,13 @@ public class GuiLogin extends GuiScreen {
 	protected void actionPerformed(GuiButton b) {
 		switch (b.id) {
 		case 0:
-			if (!login())
-				break;
+			if (login())
+				this.mc.displayGuiScreen(prev);
+			break;
+		case 3:
+			if (playOffline())
+				this.mc.displayGuiScreen(prev);
+			break;
 		case 1:
 			this.mc.displayGuiScreen(prev);
 			break;
@@ -59,11 +65,11 @@ public class GuiLogin extends GuiScreen {
 	public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
 		this.drawDefaultBackground();
 
-		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basex, Color.WHITE.getRGB());
-		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basex + 45, Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey, Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45, Color.WHITE.getRGB());
 		if (!(this.error.isEmpty() || this.error == null)) {
 			int color = this.error.startsWith("E") ? Color.RED.getRGB() : Color.GREEN.getRGB();
-			this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basex - 15, color);
+			this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basey - 15, color);
 		}
 		this.username.drawTextBox();
 		this.pw.drawTextBox();
@@ -81,25 +87,33 @@ public class GuiLogin extends GuiScreen {
 	@Override
 	public void initGui() {
 		super.initGui();
-		this.basex = this.height / 2 - 110 / 2;
+		this.basey = this.height / 2 - 110 / 2;
 
-		this.username = new GuiTextField(this.fontRendererObj, this.width / 2 - 155, this.basex + 15, 2 * 155, 20);
-		this.username.setText(Main.username);
-		this.pw = new GuiPasswordField(this.fontRendererObj, this.width / 2 - 155, this.basex + 60, 2 * 155, 20);
+		this.username = new GuiTextField(this.fontRendererObj, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
+		this.username.setText(Secure.username);
+		this.pw = new GuiPasswordField(this.fontRendererObj, this.width / 2 - 155, this.basey + 60, 2 * 155, 20);
 		this.pw.setMaxStringLength(64);
-		this.pw.setText(Main.password);
-		this.login = new GuiButton(0, this.width / 2 - 155, this.basex + 105, 155, 20, "Login");
-		this.cancel = new GuiButton(1, this.width / 2 + 5, this.basex + 105, 155, 20, "Cancel");
-		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basex + 85, "Save Password to Config (WARNING: SECURITY RISK!)", false);
+		this.pw.setText(Secure.password);
+		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85, "Save Password to Config (WARNING: SECURITY RISK!)", false);
+	
+		if (!Main.OfflineModeEnabled) {
+			this.login = new GuiButton(0, this.width / 2 - 155, this.basey + 105, 153, 20, "Login");
+			this.cancel = new GuiButton(1, this.width / 2 + 2, this.basey + 105, 155, 20, "Cancel");
+			this.buttonList.add(this.login);
+			this.buttonList.add(this.cancel);
+		} else {
+			this.login = new GuiButton(0, this.width / 2 - 155, this.basey + 105, 100, 20, "Login");
+			this.offline = new GuiButton(3, this.width / 2 - 50, this.basey + 105, 100, 20, "Play Offline");
+			this.cancel = new GuiButton(1, this.width / 2 + 55, this.basey + 105, 100, 20, "Cancel");
+			this.buttonList.add(this.login);
+			this.buttonList.add(this.cancel);
+			this.buttonList.add(this.offline);
+		}
 
-		this.buttonList.add(this.login);
-		this.buttonList.add(this.cancel);
 		this.buttonList.add(this.save);
 
 		this.username.setFocused(true);
 
-		if (Main.sessionFound())
-			this.error = "SOld Accesstoken found, try to just hit \"Login\"";
 	}
 
 	@Override
@@ -127,28 +141,46 @@ public class GuiLogin extends GuiScreen {
 		this.pw.mouseClicked(x, y, b);
 	}
 
+	/**
+	 * used as an interface between this and the secure class
+	 * 
+	 * returns whether the login was successful
+	 */
 	private boolean login() {
-		boolean bol = true;
 		try {
-			Main.login(this.username.getText(), this.pw.getPW(), this.save.isChecked());
+			Secure.login(this.username.getText(), this.pw.getPW(), this.save.isChecked());
+			this.error = "SLogin successfull!";
+			return true;
 		} catch (AuthenticationException e) {
 			this.error = "ELogin failed: " + e.getMessage();
 			Main.log.error("Login failed:", e);
-			bol = false;
+			return false;
 		} catch (Exception e) {
 			this.error = "EError: Something went wrong!";
 			Main.log.error("Session could not be updated IN YOUR CLIENT because of access restrictions", e);
-			bol = false;
+			return false;
 		}
-		if (bol) {
-			this.error = "SLogin successfull!";
-		} else {
-			if (Main.sessionFound()) {
-				Main.ua.logOut();
-				this.login();
-			}
+	}
+
+	/** sets the name for playing offline */
+	private boolean playOffline() {
+		String username = this.username.getText();
+		if (!(username.length() >= 2 && username.length() <= 16)) {
+			this.error = "EError: Usernames have a lenght between 2 and 16";
+			return false;
 		}
-		return bol;
+		if (!username.matches("[A-Za-z0-9_]{2,16}")) {
+			this.error = "EError: Usernames have to be alphanumerical";
+			return false;
+		}
+		try {
+			Secure.offlineMode(username);
+			return true;
+		} catch (Exception e) {
+			this.error = "EError: Something went wrong!";
+			Main.log.error("Session could not be updated IN YOUR CLIENT because of access restrictions", e);
+			return false;
+		}
 	}
 
 }

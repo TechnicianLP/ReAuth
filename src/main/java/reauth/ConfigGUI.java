@@ -17,8 +17,10 @@ import net.minecraftforge.common.config.ConfigElement;
 
 public class ConfigGUI extends GuiConfig {
 
+	private static IConfigElement ce = new ConfigElement(Main.config.getCategory(Main.config.CATEGORY_GENERAL));
+
 	public ConfigGUI(GuiScreen parent) {
-		super(parent, ImmutableList.of((IConfigElement) new ConfigElement(Main.config.getCategory(Main.config.CATEGORY_GENERAL))), "ReAuth", false, false, "Config for ReAuth");
+		super(parent, ImmutableList.of(ce), "ReAuth", false, false, "Config for ReAuth");
 	}
 
 }

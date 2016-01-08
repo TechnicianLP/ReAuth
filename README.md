@@ -1,10 +1,12 @@
 # ReAuth
 A Mod to Re-Login to Mojang while Minecraft is still running
 
+Capabilities:
+ - Fixes the Problem of having to restart your Client when your Session is invalid
+ - Shows whether your Session is valid
+ - Change Accounts while Minecraft is running
+ - Change Username for playing offline (has to be enabled in config)
 
-
-This Mod fixes the Problem of having to restart your Client when your Session invalidates
-A nice sideeffect is that you can change Accounts while Minecraft is running
 
 The Mod is clientside only - it will not work in servers mods folder
 

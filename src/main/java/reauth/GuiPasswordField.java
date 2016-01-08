@@ -11,7 +11,7 @@ import net.minecraft.util.ChatAllowedCharacters;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class GuiPasswordField extends GuiTextField {
+class GuiPasswordField extends GuiTextField {
 
 	public GuiPasswordField(FontRenderer renderer, int posx, int posy, int x, int y) {
 		super(renderer, posx, posy, x, y);
