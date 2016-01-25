@@ -1,20 +1,15 @@
 package reauth;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.ChatAllowedCharacters;
-
-import org.lwjgl.opengl.GL11;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 class GuiPasswordField extends GuiTextField {
 
 	public GuiPasswordField(FontRenderer renderer, int posx, int posy, int x, int y) {
-		super(renderer, posx, posy, x, y);
+		super(1, renderer, posx, posy, x, y);
 	}
 
 	public void drawTextBox() {

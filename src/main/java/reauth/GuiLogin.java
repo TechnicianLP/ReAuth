@@ -1,26 +1,17 @@
 package reauth;
 
 import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.io.IOException;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
 
-import cpw.mods.fml.client.GuiDupesFound;
-import cpw.mods.fml.client.GuiModsMissing;
-import cpw.mods.fml.client.GuiOldSaveLoadConfirm;
-import cpw.mods.fml.client.config.GuiCheckBox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiControls;
-import net.minecraft.client.gui.GuiLabel;
-import net.minecraft.client.gui.GuiOptionButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.GuiYesNo;
+import net.minecraftforge.fml.client.config.GuiCheckBox;
 
 public class GuiLogin extends GuiScreen {
 
@@ -39,7 +30,7 @@ public class GuiLogin extends GuiScreen {
 
 	protected GuiLogin(GuiScreen prev) {
 		this.mc = Minecraft.getMinecraft();
-		this.fontRendererObj = mc.fontRenderer;
+		this.fontRendererObj = mc.fontRendererObj;
 		this.prev = prev;
 	}
 
@@ -65,11 +56,14 @@ public class GuiLogin extends GuiScreen {
 	public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
 		this.drawDefaultBackground();
 
-		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey, Color.WHITE.getRGB());
-		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45, Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey,
+				Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45,
+				Color.WHITE.getRGB());
 		if (!(this.error.isEmpty() || this.error == null)) {
 			int color = this.error.startsWith("E") ? Color.RED.getRGB() : Color.GREEN.getRGB();
-			this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basey - 15, color);
+			this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basey - 15,
+					color);
 		}
 		this.username.drawTextBox();
 		this.pw.drawTextBox();
@@ -89,13 +83,14 @@ public class GuiLogin extends GuiScreen {
 		super.initGui();
 		this.basey = this.height / 2 - 110 / 2;
 
-		this.username = new GuiTextField(this.fontRendererObj, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
+		this.username = new GuiTextField(0, this.fontRendererObj, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
 		this.username.setText(Secure.username);
 		this.pw = new GuiPasswordField(this.fontRendererObj, this.width / 2 - 155, this.basey + 60, 2 * 155, 20);
 		this.pw.setMaxStringLength(64);
 		this.pw.setText(Secure.password);
-		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85, "Save Password to Config (WARNING: SECURITY RISK!)", false);
-	
+		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85,
+				"Save Password to Config (WARNING: SECURITY RISK!)", false);
+
 		if (!Main.OfflineModeEnabled) {
 			this.login = new GuiButton(0, this.width / 2 - 155, this.basey + 105, 153, 20, "Login");
 			this.cancel = new GuiButton(1, this.width / 2 + 2, this.basey + 105, 155, 20, "Cancel");
@@ -117,7 +112,7 @@ public class GuiLogin extends GuiScreen {
 	}
 
 	@Override
-	protected void keyTyped(char c, int k) {
+	protected void keyTyped(char c, int k) throws IOException {
 		super.keyTyped(c, k);
 		this.username.textboxKeyTyped(c, k);
 		this.pw.textboxKeyTyped(c, k);
@@ -135,7 +130,7 @@ public class GuiLogin extends GuiScreen {
 	}
 
 	@Override
-	protected void mouseClicked(int x, int y, int b) {
+	protected void mouseClicked(int x, int y, int b) throws IOException {
 		super.mouseClicked(x, y, b);
 		this.username.mouseClicked(x, y, b);
 		this.pw.mouseClicked(x, y, b);

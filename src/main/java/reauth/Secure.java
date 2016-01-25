@@ -2,17 +2,9 @@ package reauth;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.network.NetHandlerLoginServer;
-import net.minecraft.util.CryptManager;
-import net.minecraft.util.Session;
-import sun.reflect.Reflection;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -24,10 +16,11 @@ import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
-import com.mojang.authlib.yggdrasil.request.RefreshRequest;
 import com.mojang.util.UUIDTypeAdapter;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Session;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 class Secure {
 
@@ -44,14 +37,16 @@ class Secure {
 	/** currently used to load the class */
 	protected static void init() {
 		String base = "reauth.";
-		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler", base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure");
+		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler",
+				base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure");
 		try {
 			Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
 			for (ClassInfo info : set)
 				if (!classes.contains(info.getName())) {
 					System.out.println(info.url().getFile());
 					System.out.println(info.url().getPath());
-					throw new RuntimeException("Detected unauthorized class trying to access reauth-data! Offender: " + info.url().getPath());
+					throw new RuntimeException("Detected unauthorized class trying to access reauth-data! Offender: "
+							+ info.url().getPath());
 				}
 		} catch (IOException e) {
 			throw new RuntimeException("Classnames could not be fetched!");
@@ -67,11 +62,12 @@ class Secure {
 	}
 
 	/** LOgs you in; replaces the Session in your client; and saves to config */
-	protected static void login(String user, String pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
+	protected static void login(String user, String pw, boolean savePassToConfig)
+			throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
 		/** set credentials */
 		Secure.yua.setUsername(user);
 		Secure.yua.setPassword(pw);
-		
+
 		/** login */
 		Secure.yua.logIn();
 
@@ -83,7 +79,7 @@ class Secure {
 		String access = Secure.yua.getAuthenticatedToken();
 		String type = Secure.yua.getUserType().getName();
 		Sessionutil.set(new Session(username, uuid, access, type));
-		
+
 		/** logout to discard the credentials in the object */
 		Secure.yua.logOut();
 
@@ -93,7 +89,8 @@ class Secure {
 		/** save password to config if desired */
 		if (savePassToConfig) {
 			Secure.password = pw;
-			Main.config.get(Main.config.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk").set(Secure.password);
+			Main.config.get(Main.config.CATEGORY_GENERAL, "password", "",
+					"Your Password in plaintext if chosen to save to disk").set(Secure.password);
 		}
 		Main.config.save();
 	}
@@ -114,7 +111,7 @@ class Secure {
 	/** checks online if the session is valid */
 	protected static boolean SessionValid() {
 		try {
-			GameProfile gp = Sessionutil.get().func_148256_e();
+			GameProfile gp = Sessionutil.get().getProfile();
 			String token = Sessionutil.get().getToken();
 			String id = UUID.randomUUID().toString();
 
@@ -136,7 +133,8 @@ class Secure {
 		 * as the Session field in Minecraft.class is static final we have to
 		 * access it via reflection
 		 */
-		private static Field sessionField = ReflectionHelper.findField(Minecraft.class, "session", "S", "field_71449_j");
+		private static Field sessionField = ReflectionHelper.findField(Minecraft.class, "session", "S",
+				"field_71449_j");
 
 		protected static Session get() throws IllegalArgumentException, IllegalAccessException {
 			return (Session) Sessionutil.sessionField.get(Minecraft.getMinecraft());
