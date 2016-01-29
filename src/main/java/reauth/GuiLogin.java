@@ -30,6 +30,7 @@ public class GuiLogin extends GuiScreen {
 	private GuiButton cancel;
 	private GuiButton offline;
 	private GuiCheckBox save;
+	private GuiButton config;
 
 	private GuiScreen prev;
 
@@ -56,6 +57,9 @@ public class GuiLogin extends GuiScreen {
 			break;
 		case 1:
 			this.mc.displayGuiScreen(prev);
+			break;
+		case 4:
+			this.mc.displayGuiScreen(new ConfigGUI(this));
 			break;
 		}
 
@@ -91,11 +95,15 @@ public class GuiLogin extends GuiScreen {
 
 		this.username = new GuiTextField(this.fontRendererObj, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
 		this.username.setText(Secure.username);
+		this.username.setFocused(true);
+
 		this.pw = new GuiPasswordField(this.fontRendererObj, this.width / 2 - 155, this.basey + 60, 2 * 155, 20);
 		this.pw.setMaxStringLength(64);
 		this.pw.setText(Secure.password);
+
 		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85, "Save Password to Config (WARNING: SECURITY RISK!)", false);
-	
+		this.buttonList.add(this.save);
+
 		if (!Main.OfflineModeEnabled) {
 			this.login = new GuiButton(0, this.width / 2 - 155, this.basey + 105, 153, 20, "Login");
 			this.cancel = new GuiButton(1, this.width / 2 + 2, this.basey + 105, 155, 20, "Cancel");
@@ -110,9 +118,8 @@ public class GuiLogin extends GuiScreen {
 			this.buttonList.add(this.offline);
 		}
 
-		this.buttonList.add(this.save);
-
-		this.username.setFocused(true);
+		this.config = new GuiButton(4, this.width - 80, this.height - 25, 75, 20, "Config");
+		this.buttonList.add(config);
 
 	}
 

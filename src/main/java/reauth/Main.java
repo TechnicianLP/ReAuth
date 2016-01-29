@@ -12,7 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
-@Mod(modid = "ReAuth", guiFactory = "reauth.GuiFactory")
+@Mod(modid = "ReAuth", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, acceptedMinecraftVersions = "[1.7.10]", version = "2.1")
 public class Main {
 
 	protected static final Logger log = LogManager.getLogger("ReAuth");
@@ -26,7 +26,6 @@ public class Main {
 	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent evt) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		MinecraftForge.EVENT_BUS.register(new GuiHandler());
-		FMLCommonHandler.instance().bus().register(this);
 
 		Main.config = new Configuration(evt.getSuggestedConfigurationFile());
 		Main.loadConfig();

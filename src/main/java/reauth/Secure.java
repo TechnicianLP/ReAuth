@@ -49,8 +49,6 @@ class Secure {
 			Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
 			for (ClassInfo info : set)
 				if (!classes.contains(info.getName())) {
-					System.out.println(info.url().getFile());
-					System.out.println(info.url().getPath());
 					throw new RuntimeException("Detected unauthorized class trying to access reauth-data! Offender: " + info.url().getPath());
 				}
 		} catch (IOException e) {
