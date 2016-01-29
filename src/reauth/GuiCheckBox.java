@@ -28,8 +28,8 @@ public class GuiCheckBox extends GuiButton {
 	 */
 	@Override
 	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
-		if (this.visible) {
-			this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition
+		if (this.drawButton) {
+			this.field_82253_i = mouseX >= this.xPosition && mouseY >= this.yPosition
 					&& mouseX < this.xPosition + this.boxWidth && mouseY < this.yPosition + this.height;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -41,9 +41,7 @@ public class GuiCheckBox extends GuiButton {
 			this.mouseDragged(mc, mouseX, mouseY);
 			int color = 14737632;
 
-			if (packedFGColour != 0) {
-				color = packedFGColour;
-			} else if (!this.enabled) {
+			if (!this.enabled) {
 				color = 10526880;
 			}
 
@@ -61,7 +59,7 @@ public class GuiCheckBox extends GuiButton {
 	 */
 	@Override
 	public boolean mousePressed(Minecraft p_146116_1_, int p_146116_2_, int p_146116_3_) {
-		if (this.enabled && this.visible && p_146116_2_ >= this.xPosition && p_146116_3_ >= this.yPosition
+		if (this.enabled && this.drawButton && p_146116_2_ >= this.xPosition && p_146116_3_ >= this.yPosition
 				&& p_146116_2_ < this.xPosition + this.width && p_146116_3_ < this.yPosition + this.height) {
 			this.isChecked = !this.isChecked;
 			return true;

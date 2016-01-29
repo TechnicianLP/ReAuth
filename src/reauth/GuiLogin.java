@@ -1,6 +1,7 @@
 package reauth;
 
 import java.awt.Color;
+import java.util.logging.Level;
 
 import org.lwjgl.input.Keyboard;
 
@@ -29,7 +30,7 @@ public class GuiLogin extends GuiScreen {
 
 	protected GuiLogin(GuiScreen prev) {
 		this.mc = Minecraft.getMinecraft();
-		this.fontRendererObj = mc.fontRenderer;
+		this.fontRenderer = mc.fontRenderer;
 		this.prev = prev;
 	}
 
@@ -58,14 +59,11 @@ public class GuiLogin extends GuiScreen {
 	public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
 		this.drawDefaultBackground();
 
-		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey,
-				Color.WHITE.getRGB());
-		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45,
-				Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRenderer, "Username/E-Mail:", this.width / 2, this.basey, Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRenderer, "Password:", this.width / 2, this.basey + 45, Color.WHITE.getRGB());
 		if (!(this.error.isEmpty() || this.error == null)) {
 			int color = this.error.startsWith("E") ? Color.RED.getRGB() : Color.GREEN.getRGB();
-			this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basey - 15,
-					color);
+			this.drawCenteredString(this.fontRenderer, this.error.substring(1), this.width / 2, this.basey - 15, color);
 		}
 		this.username.drawTextBox();
 		this.pw.drawTextBox();
@@ -85,16 +83,15 @@ public class GuiLogin extends GuiScreen {
 		super.initGui();
 		this.basey = this.height / 2 - 110 / 2;
 
-		this.username = new GuiTextField(this.fontRendererObj, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
+		this.username = new GuiTextField(this.fontRenderer, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
 		this.username.setText(Secure.username);
 		this.username.setFocused(true);
 
-		this.pw = new GuiPasswordField(this.fontRendererObj, this.width / 2 - 155, this.basey + 60, 2 * 155, 20);
+		this.pw = new GuiPasswordField(this.fontRenderer, this.width / 2 - 155, this.basey + 60, 2 * 155, 20);
 		this.pw.setMaxStringLength(64);
 		this.pw.setText(Secure.password);
 
-		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85,
-				"Save Password to Config (WARNING: SECURITY RISK!)", false);
+		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85, "Save Password to Config (WARNING: SECURITY RISK!)", false);
 		this.buttonList.add(this.save);
 
 		if (!Main.OfflineModeEnabled) {
@@ -152,11 +149,11 @@ public class GuiLogin extends GuiScreen {
 			return true;
 		} catch (AuthenticationException e) {
 			this.error = "ELogin failed: " + e.getMessage();
-			Main.log.error("Login failed:", e);
+			Main.log.log(Level.WARNING, "Login failed:", e);
 			return false;
 		} catch (Exception e) {
 			this.error = "EError: Something went wrong!";
-			Main.log.error("Session could not be updated IN YOUR CLIENT because of access restrictions", e);
+			Main.log.log(Level.WARNING, "Session could not be updated IN YOUR CLIENT because of access restrictions", e);
 			return false;
 		}
 	}
@@ -177,7 +174,7 @@ public class GuiLogin extends GuiScreen {
 			return true;
 		} catch (Exception e) {
 			this.error = "EError: Something went wrong!";
-			Main.log.error("Session could not be updated IN YOUR CLIENT because of access restrictions", e);
+			Main.log.log(Level.WARNING, "Session could not be updated IN YOUR CLIENT because of access restrictions", e);
 			return false;
 		}
 	}

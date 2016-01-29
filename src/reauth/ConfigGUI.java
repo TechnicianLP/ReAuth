@@ -29,11 +29,10 @@ public class ConfigGUI extends GuiScreen {
 
 		int y = this.height / 2;
 
-		// username = new GuiButton(0, this.width/2, y, 155, 20, "")
-		username = new GuiTextField(fontRendererObj, width / 2 - 100, y - 30, 255, 10);
+		username = new GuiTextField(fontRenderer, width / 2 - 100, y - 30, 255, 10);
 		username.setText(Secure.username);
 
-		password = new GuiTextField(fontRendererObj, width / 2 - 100, y - 15, 255, 10);
+		password = new GuiTextField(fontRenderer, width / 2 - 100, y - 15, 255, 10);
 		password.setText(Secure.password);
 
 		offline = new GuiCheckBox(1, width / 2 - 155, y, "Enable the Play-Offline Button", Main.OfflineModeEnabled);
@@ -69,11 +68,11 @@ public class ConfigGUI extends GuiScreen {
 
 		int y = this.height / 2;
 
-		this.drawString(fontRendererObj, "Username:", width / 2 - 155, y - 30, Color.WHITE.getRGB());
-		this.drawString(fontRendererObj, "Password:", width / 2 - 155, y - 15, Color.WHITE.getRGB());
+		this.drawString(fontRenderer, "Username:", width / 2 - 155, y - 30, Color.WHITE.getRGB());
+		this.drawString(fontRenderer, "Password:", width / 2 - 155, y - 15, Color.WHITE.getRGB());
 
 		GL11.glScalef(2f, 2f, 1f);
-		this.drawCenteredString(fontRendererObj, "Config for ReAuth", width / 4, 15, Color.WHITE.getRGB());
+		this.drawCenteredString(fontRenderer, "Config for ReAuth", width / 4, 15, Color.WHITE.getRGB());
 		GL11.glScalef(0.5f, 0.5f, 1f);
 
 		username.drawTextBox();
