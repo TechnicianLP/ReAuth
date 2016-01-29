@@ -5,6 +5,7 @@ import java.awt.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMultiplayer;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
@@ -45,7 +46,7 @@ public class GuiHandler {
 	public void ongui(DrawScreenEvent.Post e) {
 		if (e.gui instanceof GuiMultiplayer) {
 			e.gui.drawString(e.gui.mc.fontRendererObj, "Online:", 110, 10, Color.WHITE.getRGB());
-			e.gui.drawString(e.gui.mc.fontRendererObj, "§L" + validText, 145, 10, validColor);
+			e.gui.drawString(e.gui.mc.fontRendererObj, EnumChatFormatting.BOLD + validText, 145, 10, validColor);
 		}
 	}
 

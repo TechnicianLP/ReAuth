@@ -37,16 +37,12 @@ class Secure {
 	/** currently used to load the class */
 	protected static void init() {
 		String base = "reauth.";
-		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler",
-				base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure");
+		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler", base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure");
 		try {
 			Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
 			for (ClassInfo info : set)
 				if (!classes.contains(info.getName())) {
-					System.out.println(info.url().getFile());
-					System.out.println(info.url().getPath());
-					throw new RuntimeException("Detected unauthorized class trying to access reauth-data! Offender: "
-							+ info.url().getPath());
+					throw new RuntimeException("Detected unauthorized class trying to access reauth-data! Offender: " + info.url().getPath());
 				}
 		} catch (IOException e) {
 			throw new RuntimeException("Classnames could not be fetched!");
@@ -62,8 +58,7 @@ class Secure {
 	}
 
 	/** LOgs you in; replaces the Session in your client; and saves to config */
-	protected static void login(String user, String pw, boolean savePassToConfig)
-			throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
+	protected static void login(String user, String pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
 		/** set credentials */
 		Secure.yua.setUsername(user);
 		Secure.yua.setPassword(pw);
@@ -89,8 +84,7 @@ class Secure {
 		/** save password to config if desired */
 		if (savePassToConfig) {
 			Secure.password = pw;
-			Main.config.get(Main.config.CATEGORY_GENERAL, "password", "",
-					"Your Password in plaintext if chosen to save to disk").set(Secure.password);
+			Main.config.get(Main.config.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk").set(Secure.password);
 		}
 		Main.config.save();
 	}
@@ -101,11 +95,6 @@ class Secure {
 		Sessionutil.set(new Session(username, uuid.toString(), null, "legacy"));
 		Main.log.info("Username set! you can only pay on offline-mode servers now!");
 		Secure.username = username;
-	}
-
-	/** returns if the session may be valid */
-	protected static boolean sessionFound() {
-		return yua.isLoggedIn() && yua.canPlayOnline();
 	}
 
 	/** checks online if the session is valid */
@@ -133,8 +122,7 @@ class Secure {
 		 * as the Session field in Minecraft.class is static final we have to
 		 * access it via reflection
 		 */
-		private static Field sessionField = ReflectionHelper.findField(Minecraft.class, "session", "S",
-				"field_71449_j");
+		private static Field sessionField = ReflectionHelper.findField(Minecraft.class, "session", "S", "field_71449_j");
 
 		protected static Session get() throws IllegalArgumentException, IllegalAccessException {
 			return (Session) Sessionutil.sessionField.get(Minecraft.getMinecraft());
