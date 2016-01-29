@@ -1,26 +1,98 @@
 package reauth;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.awt.Color;
 
-import com.google.common.collect.ImmutableList;
+import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.client.IModGuiFactory;
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.IConfigElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.common.config.ConfigElement;
+import net.minecraft.client.gui.GuiTextField;
 
-public class ConfigGUI extends GuiConfig {
+public class ConfigGUI extends GuiScreen {
 
-	private static IConfigElement ce = new ConfigElement(Main.config.getCategory(Main.config.CATEGORY_GENERAL));
+	private GuiScreen prev;
 
-	public ConfigGUI(GuiScreen parent) {
-		super(parent, ImmutableList.of(ce), "ReAuth", false, false, "Config for ReAuth");
+	private GuiTextField username;
+	private GuiTextField password;
+	private GuiCheckBox offline;
+	private GuiButton ok;
+	private GuiButton cancel;
+
+	public ConfigGUI(GuiScreen g) {
+		prev = g;
 	}
 
+	@Override
+	public void initGui() {
+		super.initGui();
+
+		int y = this.height / 2;
+
+		// username = new GuiButton(0, this.width/2, y, 155, 20, "")
+		username = new GuiTextField(fontRendererObj, width / 2 - 100, y - 30, 255, 10);
+		username.setText(Secure.username);
+
+		password = new GuiTextField(fontRendererObj, width / 2 - 100, y - 15, 255, 10);
+		password.setText(Secure.password);
+
+		offline = new GuiCheckBox(1, width / 2 - 155, y, "Enable the Play-Offline Button", Main.OfflineModeEnabled);
+		this.buttonList.add(offline);
+
+		ok = new GuiButton(2, width / 2 - 155, height - 40, 155, 20, "Save");
+		this.buttonList.add(ok);
+
+		cancel = new GuiButton(3, width / 2, height - 40, 155, 20, "Cancel");
+		this.buttonList.add(cancel);
+	}
+
+	@Override
+	protected void actionPerformed(GuiButton b) {
+
+		switch (b.id) {
+		case 2:
+			Secure.username = username.getText();
+			Secure.password = password.getText();
+			Main.OfflineModeEnabled = offline.isChecked();
+			Main.saveConfig();
+		case 3:
+			this.mc.displayGuiScreen(prev);
+			break;
+		}
+
+		super.actionPerformed(b);
+	}
+
+	@Override
+	public void drawScreen(int par1, int par2, float par3) {
+		this.drawDefaultBackground();
+
+		int y = this.height / 2;
+
+		this.drawString(fontRendererObj, "Username:", width / 2 - 155, y - 30, Color.WHITE.getRGB());
+		this.drawString(fontRendererObj, "Password:", width / 2 - 155, y - 15, Color.WHITE.getRGB());
+
+		GL11.glScalef(2f, 2f, 1f);
+		this.drawCenteredString(fontRendererObj, "Config for ReAuth", width / 4, 15, Color.WHITE.getRGB());
+		GL11.glScalef(0.5f, 0.5f, 1f);
+
+		username.drawTextBox();
+		password.drawTextBox();
+
+		super.drawScreen(par1, par2, par3);
+	}
+
+	@Override
+	protected void keyTyped(char par1, int par2) {
+		username.textboxKeyTyped(par1, par2);
+		password.textboxKeyTyped(par1, par2);
+		super.keyTyped(par1, par2);
+	}
+
+	@Override
+	protected void mouseClicked(int par1, int par2, int par3) {
+		username.mouseClicked(par1, par2, par3);
+		password.mouseClicked(par1, par2, par3);
+		super.mouseClicked(par1, par2, par3);
+	}
 }

@@ -1,26 +1,15 @@
 package reauth;
 
 import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
 
-import cpw.mods.fml.client.GuiDupesFound;
-import cpw.mods.fml.client.GuiModsMissing;
-import cpw.mods.fml.client.GuiOldSaveLoadConfirm;
-import cpw.mods.fml.client.config.GuiCheckBox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiControls;
-import net.minecraft.client.gui.GuiLabel;
-import net.minecraft.client.gui.GuiOptionButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.GuiYesNo;
 
 public class GuiLogin extends GuiScreen {
 
@@ -69,11 +58,14 @@ public class GuiLogin extends GuiScreen {
 	public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
 		this.drawDefaultBackground();
 
-		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey, Color.WHITE.getRGB());
-		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45, Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey,
+				Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45,
+				Color.WHITE.getRGB());
 		if (!(this.error.isEmpty() || this.error == null)) {
 			int color = this.error.startsWith("E") ? Color.RED.getRGB() : Color.GREEN.getRGB();
-			this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basey - 15, color);
+			this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basey - 15,
+					color);
 		}
 		this.username.drawTextBox();
 		this.pw.drawTextBox();
@@ -101,7 +93,8 @@ public class GuiLogin extends GuiScreen {
 		this.pw.setMaxStringLength(64);
 		this.pw.setText(Secure.password);
 
-		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85, "Save Password to Config (WARNING: SECURITY RISK!)", false);
+		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85,
+				"Save Password to Config (WARNING: SECURITY RISK!)", false);
 		this.buttonList.add(this.save);
 
 		if (!Main.OfflineModeEnabled) {
@@ -120,7 +113,6 @@ public class GuiLogin extends GuiScreen {
 
 		this.config = new GuiButton(4, this.width - 80, this.height - 25, 75, 20, "Config");
 		this.buttonList.add(config);
-
 	}
 
 	@Override
