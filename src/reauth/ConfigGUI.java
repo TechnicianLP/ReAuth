@@ -36,13 +36,13 @@ public class ConfigGUI extends GuiScreen {
 		password.setText(Secure.password);
 
 		offline = new GuiCheckBox(1, width / 2 - 155, y, "Enable the Play-Offline Button", Main.OfflineModeEnabled);
-		this.controlList.add(offline);
+		this.buttonList.add(offline);
 
 		ok = new GuiButton(2, width / 2 - 155, height - 40, 155, 20, "Save");
-		this.controlList.add(ok);
+		this.buttonList.add(ok);
 
 		cancel = new GuiButton(3, width / 2, height - 40, 155, 20, "Cancel");
-		this.controlList.add(cancel);
+		this.buttonList.add(cancel);
 	}
 
 	@Override

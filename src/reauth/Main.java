@@ -1,27 +1,23 @@
 package reauth;
 
-import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.lwjgl.opengl.Display;
+import org.apache.commons.lang3.Validate;
 
-import cpw.mods.fml.common.IScheduledTickHandler;
-import cpw.mods.fml.common.ITickHandler;
+import cpw.mods.fml.client.CustomModLoadingErrorDisplayException;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.ReflectionHelper;
-import cpw.mods.fml.relauncher.Side;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMultiplayer;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
+import net.minecraftforge.event.ForgeSubscribe;
 
-@Mod(modid = "ReAuth", acceptedMinecraftVersions = "[1.4.7]", version = "2.1")
+@Mod(modid = "ReAuth", acceptedMinecraftVersions = "[1.6.4]", version = "2.1")
 public class Main {
 
 	protected static final Logger log = Logger.getLogger("ReAuth");
@@ -32,7 +28,7 @@ public class Main {
 	@Mod.Instance("ReAuth")
 	Main main;
 
-	@Mod.PreInit
+	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent evt) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
 		checkDependencies();
@@ -45,47 +41,20 @@ public class Main {
 		Secure.init();
 
 		Secure.fixSession();
+	}
 
-		/** Hacking the Gui ... as no Gui-Events are existent */
-		TickRegistry.registerTickHandler(new ITickHandler() {
-
-			Minecraft mc = Minecraft.getMinecraft();
-
-			@Override
-			public EnumSet<TickType> ticks() {
-				if (mc.currentScreen == null)
-					return EnumSet.noneOf(TickType.class);
-				return EnumSet.of(TickType.CLIENT);
-			}
-
-			@Override
-			public void tickStart(EnumSet<TickType> type, Object... tickData) {
-				if (mc.currentScreen instanceof GuiMultiplayer && !(mc.currentScreen instanceof GuiMultiplayerExtended)) {
-					GuiScreen gc = ReflectionHelper.getPrivateValue(GuiMultiplayer.class, (GuiMultiplayer) mc.currentScreen, "parentScreen", "c");
-					mc.displayGuiScreen(new GuiMultiplayerExtended(gc));
-				}
-			}
-
-			@Override
-			public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-				return;
-			}
-
-			@Override
-			public String getLabel() {
-				return "ReAuth";
-			}
-		}, Side.CLIENT);
+	@ForgeSubscribe
+	public void ongui(GuiOpenEvent e) {
+		if (e.gui instanceof GuiMultiplayer) {
+			e.gui = new GuiMultiplayerExtended(((GuiMultiplayer) e.gui).parentScreen);
+		}
 	}
 
 	/** checks if the required libraries are installed */
 	public void checkDependencies() {
 		boolean l4j = true;
 		boolean l4jc = true;
-		boolean gson = true;
 		boolean al = true;
-		boolean commonslang = true;
-		boolean commonsio = true;
 
 		try {
 			Class.forName("org.apache.logging.log4j.Logger");
@@ -101,27 +70,7 @@ public class Main {
 		} catch (ClassNotFoundException e) {
 			log.log(Level.INFO, "Log4J-Core missing!");
 		}
-		try {
-			Class.forName("com.google.gson.Gson");
-			log.log(Level.INFO, "Gson found!");
-			gson = false;
-		} catch (ClassNotFoundException e) {
-			log.log(Level.INFO, "Gson missing!");
-		}
-		try {
-			Class.forName("org.apache.commons.lang3.Validate");
-			log.log(Level.INFO, "Commons-Lang found!");
-			commonslang = false;
-		} catch (ClassNotFoundException e) {
-			log.log(Level.INFO, "Commons-Lang missing!");
-		}
-		try {
-			Class.forName("org.apache.commons.io.Charsets");
-			log.log(Level.INFO, "Commons-IO found!");
-			commonsio = false;
-		} catch (ClassNotFoundException e) {
-			log.log(Level.INFO, "Commons-IO missing!");
-		}
+
 		try {
 			Class.forName("com.mojang.authlib.Agent");
 			log.log(Level.INFO, "Authlib found!");
@@ -130,27 +79,20 @@ public class Main {
 			log.log(Level.INFO, "Authlib missing!");
 		}
 
-		if (l4j || l4jc || gson || commonslang || commonsio || al) {
+		if (l4j || l4jc || al) {
 			log.log(Level.SEVERE, "o----------------------------------------------o");
 			log.log(Level.SEVERE, "|                    ReAuth                    |");
 			log.log(Level.SEVERE, "o----------------------------------------------o");
 			log.log(Level.SEVERE, "| This Mod requires additional Files to work!  |");
 			log.log(Level.SEVERE, "| Download and drop them into your mods folder |");
 			log.log(Level.SEVERE, "o----------------------------------------------o");
+			if (al)
+				log.log(Level.SEVERE, "| https://libraries.minecraft.net/com/mojang/authlib/1.3/authlib-1.3.jar");
 			if (l4j)
 				log.log(Level.SEVERE, "| https://libraries.minecraft.net/org/apache/logging/log4j/log4j-api/2.0-beta9/log4j-api-2.0-beta9.jar");
 			if (l4jc)
 				log.log(Level.SEVERE, "| https://libraries.minecraft.net/org/apache/logging/log4j/log4j-core/2.0-beta9/log4j-core-2.0-beta9.jar");
-			if (gson)
-				log.log(Level.SEVERE, "| https://libraries.minecraft.net/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar");
-			if (commonslang)
-				log.log(Level.SEVERE, "| https://libraries.minecraft.net/org/apache/commons/commons-lang3/3.3.2/commons-lang3-3.3.2.jar");
-			if (commonsio)
-				log.log(Level.SEVERE, "| https://libraries.minecraft.net/commons-io/commons-io/2.4/commons-io-2.4.jar");
-			if (al)
-				log.log(Level.SEVERE, "| https://libraries.minecraft.net/com/mojang/authlib/1.3/authlib-1.3.jar");
 			log.log(Level.SEVERE, "o----------------------------------------------o");
-			Display.destroy();
 			System.exit(1);
 		}
 
@@ -159,9 +101,9 @@ public class Main {
 	/** (re-)loads config */
 	public static void loadConfig() {
 		Property pu = config.get(config.CATEGORY_GENERAL, "username", "", "Your Username");
-		Secure.username = pu.value;
+		Secure.username = pu.getString();
 		Property pp = config.get(config.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk");
-		Secure.password = pp.value;
+		Secure.password = pp.getString();
 		Property po = config.get(config.CATEGORY_GENERAL, "offlineModeEnabled", false, "Controls wheter a play-offline button is visble in the Re-Login screen");
 		Main.OfflineModeEnabled = po.getBoolean(false);
 		Main.config.save();
@@ -169,11 +111,11 @@ public class Main {
 
 	public static void saveConfig() {
 		Property pu = config.get(config.CATEGORY_GENERAL, "username", Secure.username, "Your Username");
-		pu.value = Secure.username;
+		pu.set(Secure.username);
 		Property pp = config.get(config.CATEGORY_GENERAL, "password", Secure.password, "Your Password in plaintext if chosen to save to disk");
-		pp.value = Secure.password;
+		pp.set(Secure.password);
 		Property po = config.get(config.CATEGORY_GENERAL, "offlineModeEnabled", Main.OfflineModeEnabled, "Controls wheter a play-offline button is visble in the Re-Login screen");
-		po.value = Boolean.toString(Main.OfflineModeEnabled);
+		po.set(Main.OfflineModeEnabled);
 		Main.config.save();
 	}
 

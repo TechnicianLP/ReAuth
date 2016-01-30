@@ -92,24 +92,24 @@ public class GuiLogin extends GuiScreen {
 		this.pw.setText(Secure.password);
 
 		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85, "Save Password to Config (WARNING: SECURITY RISK!)", false);
-		this.controlList.add(this.save);
+		this.buttonList.add(this.save);
 
 		if (!Main.OfflineModeEnabled) {
 			this.login = new GuiButton(0, this.width / 2 - 155, this.basey + 105, 153, 20, "Login");
 			this.cancel = new GuiButton(1, this.width / 2 + 2, this.basey + 105, 155, 20, "Cancel");
-			this.controlList.add(this.login);
-			this.controlList.add(this.cancel);
+			this.buttonList.add(this.login);
+			this.buttonList.add(this.cancel);
 		} else {
 			this.login = new GuiButton(0, this.width / 2 - 155, this.basey + 105, 100, 20, "Login");
 			this.offline = new GuiButton(3, this.width / 2 - 50, this.basey + 105, 100, 20, "Play Offline");
 			this.cancel = new GuiButton(1, this.width / 2 + 55, this.basey + 105, 100, 20, "Cancel");
-			this.controlList.add(this.login);
-			this.controlList.add(this.cancel);
-			this.controlList.add(this.offline);
+			this.buttonList.add(this.login);
+			this.buttonList.add(this.cancel);
+			this.buttonList.add(this.offline);
 		}
 
 		this.config = new GuiButton(4, this.width - 80, this.height - 25, 75, 20, "Config");
-		this.controlList.add(config);
+		this.buttonList.add(config);
 	}
 
 	@Override

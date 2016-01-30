@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.EnumChatFormatting;
 
 public class GuiMultiplayerExtended extends GuiMultiplayer {
 
@@ -20,7 +21,7 @@ public class GuiMultiplayerExtended extends GuiMultiplayer {
 	@Override
 	public void initGui() {
 		super.initGui();
-		controlList.add(new GuiButton(17325, 5, 5, 100, 20, "Re-Login"));
+		buttonList.add(new GuiButton(17325, 5, 5, 100, 20, "Re-Login"));
 
 		if (this.validator != null)
 			validator.interrupt();
@@ -43,7 +44,7 @@ public class GuiMultiplayerExtended extends GuiMultiplayer {
 	public void drawScreen(int par1, int par2, float par3) {
 		super.drawScreen(par1, par2, par3);
 		drawString(fontRenderer, "Online:", 110, 10, Color.WHITE.getRGB());
-		drawString(fontRenderer, "\u00a7" + "L" + validText, 145, 10, validColor);
+		drawString(fontRenderer, EnumChatFormatting.BOLD + validText, 145, 10, validColor);
 	}
 
 	@Override
