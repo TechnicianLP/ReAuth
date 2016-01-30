@@ -33,8 +33,8 @@ public class GuiCheckBox extends GuiButton {
 					&& mouseX < this.xPosition + this.boxWidth && mouseY < this.yPosition + this.height;
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			mc.getTextureManager().bindTexture(buttonTextures);
-			this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 46, 11, 11);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, mc.renderEngine.getTexture("/gui/gui.png"));
+            this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 46, 11, 11);
 			this.drawTexturedModalRect(this.xPosition, this.yPosition + 10, 0, 46, 11, 1);
 			this.drawTexturedModalRect(this.xPosition + 10, this.yPosition, 0, 46, 1, 11);
 
