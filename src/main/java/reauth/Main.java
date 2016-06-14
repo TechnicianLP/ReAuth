@@ -36,7 +36,7 @@ public class Main {
 
 	@SubscribeEvent
 	public void onConfigChanged(OnConfigChangedEvent evt) {
-		if (evt.getModID().equals("ReAuth")) {
+		if (evt.getModID().equals("reauth")) {
 			Main.loadConfig();
 		}
 	}
