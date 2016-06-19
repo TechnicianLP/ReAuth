@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = "ReAuth", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.8.0,1.8.9]")
+@Mod(modid = "reauth", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.9.0,1.9.4]")
 public class Main {
 
 	protected static final Logger log = LogManager.getLogger("ReAuth");
@@ -36,7 +36,7 @@ public class Main {
 
 	@SubscribeEvent
 	public void onConfigChanged(OnConfigChangedEvent evt) {
-		if (evt.modID.equals("ReAuth")) {
+		if (evt.getModID().equals("reauth")) {
 			Main.loadConfig();
 		}
 	}
