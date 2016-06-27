@@ -14,10 +14,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod(modid = "ReAuth", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.8.0,1.8.9]")
 public class Main {
-
 	protected static final Logger log = LogManager.getLogger("ReAuth");
 	protected static Configuration config;
-
 	protected static boolean OfflineModeEnabled;
 
 	@Mod.Instance("ReAuth")
@@ -47,9 +45,8 @@ public class Main {
 		Secure.username = pu.getString();
 		Property pp = config.get(config.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk");
 		Secure.password = pp.getString();
-		Property po = config.get(config.CATEGORY_GENERAL, "offlineModeEnabled", false, "Controls wheter a play-offline button is visble in the Re-Login screen");
+		Property po = config.get(config.CATEGORY_GENERAL, "offlineModeEnabled", false, "Controls whether a play-offline button is visble in the Re-Login screen");
 		Main.OfflineModeEnabled = po.getBoolean();
 		Main.config.save();
 	}
-
 }
