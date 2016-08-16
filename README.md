@@ -14,9 +14,7 @@ Just hit the "Re-Login" Button in the Multiplayermenu and enter your Logindata, 
 
 I know that entering your Logindata simply into a Mod might sound risky, but thats why i have the Source on GitHub as well as a link to a Java-Decompiler
 
-Modpacks:
-       You are free to include it in your Modpack, if it is free of charge, but Post/PM would be nice for my Statistics ....
-
- 
 -http://minecraft.curseforge.com/projects/reauth                                                                         
 -http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/wip-mods/2555554
+
+License: All Rights Reserved
