@@ -23,7 +23,6 @@ import net.minecraft.util.Session;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 class Secure {
-
 	/** Username/email */
 	protected static String username = "";
 	/** password if saved to config else empty */
@@ -54,10 +53,9 @@ class Secure {
 		yas = new YggdrasilAuthenticationService(Minecraft.getMinecraft().getProxy(), UUID.randomUUID().toString());
 		yua = (YggdrasilUserAuthentication) yas.createUserAuthentication(Agent.MINECRAFT);
 		ymss = (YggdrasilMinecraftSessionService) yas.createMinecraftSessionService();
-
 	}
 
-	/** LOgs you in; replaces the Session in your client; and saves to config */
+	/** Logs you in; replaces the Session in your client; and saves to config */
 	protected static void login(String user, String pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
 		/** set credentials */
 		Secure.yua.setUsername(user);
@@ -93,7 +91,7 @@ class Secure {
 		/**  */
 		UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(Charsets.UTF_8));
 		Sessionutil.set(new Session(username, uuid.toString(), null, "legacy"));
-		Main.log.info("Username set! you can only pay on offline-mode servers now!");
+		Main.log.info("Username set! You can only play on offline-mode servers now!");
 		Secure.username = username;
 	}
 
@@ -106,7 +104,7 @@ class Secure {
 
 			Secure.ymss.joinServer(gp, token, id);
 			if (Secure.ymss.hasJoinedServer(gp, id).isComplete()) {
-				Main.log.info("Session validation successfull");
+				Main.log.info("Session validation successful.");
 				return true;
 			}
 		} catch (Exception e) {
@@ -132,5 +130,4 @@ class Secure {
 			Sessionutil.sessionField.set(Minecraft.getMinecraft(), s);
 		}
 	}
-
 }
