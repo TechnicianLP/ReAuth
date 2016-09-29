@@ -37,7 +37,7 @@ class Secure {
 	/** currently used to load the class */
 	protected static void init() {
 		String base = "reauth.";
-		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler", base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure");
+		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler", base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure", base + "VersionChecker");
 		try {
 			Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
 			for (ClassInfo info : set)
@@ -47,6 +47,8 @@ class Secure {
 		} catch (IOException e) {
 			throw new RuntimeException("Classnames could not be fetched!");
 		}
+
+		VersionChecker.update();
 	}
 
 	static {
@@ -59,6 +61,9 @@ class Secure {
 
 	/** LOgs you in; replaces the Session in your client; and saves to config */
 	protected static void login(String user, String pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
+		if (!VersionChecker.isVersionAllowed())
+			throw new AuthenticationException("ReAuth has a critical update!");
+
 		/** set credentials */
 		Secure.yua.setUsername(user);
 		Secure.yua.setPassword(pw);
@@ -125,7 +130,7 @@ class Secure {
 		private static Field sessionField = ReflectionHelper.findField(Minecraft.class, "session", "S", "field_71449_j");
 
 		protected static Session get() throws IllegalArgumentException, IllegalAccessException {
-			return (Session) Sessionutil.sessionField.get(Minecraft.getMinecraft());
+			return Minecraft.getMinecraft().getSession();
 		}
 
 		protected static void set(Session s) throws IllegalArgumentException, IllegalAccessException {

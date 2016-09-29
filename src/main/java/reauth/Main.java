@@ -9,10 +9,12 @@ import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = "ReAuth", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.8.0,1.8.9]")
+@Mod(modid = "ReAuth", version = "3.2", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.8.0,1.8.9]", certificateFingerprint = "35787b2f97a740b13a05638ab0d20d2107e3a79e")
 public class Main {
 
 	protected static final Logger log = LogManager.getLogger("ReAuth");
@@ -22,6 +24,9 @@ public class Main {
 
 	@Mod.Instance("ReAuth")
 	Main main;
+
+	@Mod.Metadata
+	protected static ModMetadata meta;
 
 	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent evt) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
@@ -47,9 +52,31 @@ public class Main {
 		Secure.username = pu.getString();
 		Property pp = config.get(config.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk");
 		Secure.password = pp.getString();
-		Property po = config.get(config.CATEGORY_GENERAL, "offlineModeEnabled", false, "Controls wheter a play-offline button is visble in the Re-Login screen");
+
+		Property po = config.get(Configuration.CATEGORY_GENERAL, "offlineModeEnabled", false,
+				"Controls wheter a play-offline button is visble in the Re-Login screen");
 		Main.OfflineModeEnabled = po.getBoolean();
+		
+		Property ve = config.get(Configuration.CATEGORY_GENERAL, "validatorEnabled", true,
+				"Disables the Session Validator");
+		GuiHandler.enabled = ve.getBoolean();
+		
+		Property vb = config.get(Configuration.CATEGORY_GENERAL, "validatorBold", true,
+				"If the Session-Validator look weird disable this");
+		GuiHandler.bold = vb.getBoolean();
+		
 		Main.config.save();
+	}
+
+	@Mod.EventHandler
+	public void securityError(FMLFingerprintViolationEvent event) {
+		boolean dev = false;
+		if (dev) {
+			log.fatal("+-----------------------------------------------------------------------------------+");
+			log.fatal("|The Version of ReAuth is not signed! It was modified! Ignoring because of Dev-Mode!|");
+			log.fatal("+-----------------------------------------------------------------------------------+");
+		} else
+			throw new SecurityException("The Version of ReAuth is not signed! It is a modified version!");
 	}
 
 }
