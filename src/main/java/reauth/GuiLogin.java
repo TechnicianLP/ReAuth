@@ -1,26 +1,16 @@
 package reauth;
 
 import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
 
-import cpw.mods.fml.client.GuiDupesFound;
-import cpw.mods.fml.client.GuiModsMissing;
-import cpw.mods.fml.client.GuiOldSaveLoadConfirm;
 import cpw.mods.fml.client.config.GuiCheckBox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiControls;
-import net.minecraft.client.gui.GuiLabel;
-import net.minecraft.client.gui.GuiOptionButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.GuiYesNo;
 
 public class GuiLogin extends GuiScreen {
 
@@ -88,6 +78,7 @@ public class GuiLogin extends GuiScreen {
 		this.pw.drawTextBox();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
 		super.initGui();
@@ -121,6 +112,13 @@ public class GuiLogin extends GuiScreen {
 		this.config = new GuiButton(4, this.width - 80, this.height - 25, 75, 20, "Config");
 		this.buttonList.add(config);
 
+		if (!VersionChecker.isLatestVersion()) {
+			this.error = "SUpdate Avaliable!";
+		}
+		if (!VersionChecker.isVersionAllowed()) {
+			this.error = "ECritical Update Avaliable!";
+			this.login.enabled = false;
+		}
 	}
 
 	@Override

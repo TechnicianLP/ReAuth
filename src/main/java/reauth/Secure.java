@@ -2,17 +2,9 @@ package reauth;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.network.NetHandlerLoginServer;
-import net.minecraft.util.CryptManager;
-import net.minecraft.util.Session;
-import sun.reflect.Reflection;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -24,10 +16,12 @@ import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
-import com.mojang.authlib.yggdrasil.request.RefreshRequest;
 import com.mojang.util.UUIDTypeAdapter;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Session;
+import net.minecraftforge.common.config.Configuration;
 
 class Secure {
 
@@ -44,7 +38,7 @@ class Secure {
 	/** currently used to load the class */
 	protected static void init() {
 		String base = "reauth.";
-		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler", base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure");
+		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler", base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure", base + "VersionChecker");
 		try {
 			Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
 			for (ClassInfo info : set)
@@ -54,6 +48,8 @@ class Secure {
 		} catch (IOException e) {
 			throw new RuntimeException("Classnames could not be fetched!");
 		}
+
+		VersionChecker.update();
 	}
 
 	static {
@@ -66,10 +62,13 @@ class Secure {
 
 	/** LOgs you in; replaces the Session in your client; and saves to config */
 	protected static void login(String user, String pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
+		if (!VersionChecker.isVersionAllowed())
+			throw new AuthenticationException("ReAuth has a critical update!");
+
 		/** set credentials */
 		Secure.yua.setUsername(user);
 		Secure.yua.setPassword(pw);
-		
+
 		/** login */
 		Secure.yua.logIn();
 
@@ -81,17 +80,17 @@ class Secure {
 		String access = Secure.yua.getAuthenticatedToken();
 		String type = Secure.yua.getUserType().getName();
 		Sessionutil.set(new Session(username, uuid, access, type));
-		
+
 		/** logout to discard the credentials in the object */
 		Secure.yua.logOut();
 
 		/** save username to config */
 		Secure.username = user;
-		Main.config.get(Main.config.CATEGORY_GENERAL, "username", "", "Your Username").set(Secure.username);
+		Main.config.get(Configuration.CATEGORY_GENERAL, "username", "", "Your Username").set(Secure.username);
 		/** save password to config if desired */
 		if (savePassToConfig) {
 			Secure.password = pw;
-			Main.config.get(Main.config.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk").set(Secure.password);
+			Main.config.get(Configuration.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk").set(Secure.password);
 		}
 		Main.config.save();
 	}
@@ -102,11 +101,6 @@ class Secure {
 		Sessionutil.set(new Session(username, uuid.toString(), null, "legacy"));
 		Main.log.info("Username set! you can only pay on offline-mode servers now!");
 		Secure.username = username;
-	}
-
-	/** returns if the session may be valid */
-	protected static boolean sessionFound() {
-		return yua.isLoggedIn() && yua.canPlayOnline();
 	}
 
 	/** checks online if the session is valid */
@@ -137,7 +131,7 @@ class Secure {
 		private static Field sessionField = ReflectionHelper.findField(Minecraft.class, "session", "S", "field_71449_j");
 
 		protected static Session get() throws IllegalArgumentException, IllegalAccessException {
-			return (Session) Sessionutil.sessionField.get(Minecraft.getMinecraft());
+			return Minecraft.getMinecraft().getSession();
 		}
 
 		protected static void set(Session s) throws IllegalArgumentException, IllegalAccessException {
