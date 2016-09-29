@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.URL;
-import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.List;
 import java.util.Random;
@@ -16,24 +15,20 @@ import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import com.mojang.authlib.Agent;
-import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.multiplayer.NetClientHandler;
-import net.minecraft.network.NetServerHandler;
 import net.minecraft.util.CryptManager;
 import net.minecraft.util.Session;
+import net.minecraftforge.common.Configuration;
 
 class Secure {
 
@@ -50,7 +45,7 @@ class Secure {
 	/** checks for clases that do not belong into this package */
 	protected static void init() {
 		String base = "reauth.";
-		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiCheckBox", base + "GuiLogin", base + "GuiMultiplayerExtended", base + "GuiPasswordField", base + "Main", base + "Secure");
+		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiCheckBox", base + "GuiLogin", base + "GuiMultiplayerExtended", base + "GuiPasswordField", base + "Main", base + "Secure", base + "VersionChecker");
 		try {
 			Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
 			for (ClassInfo info : set)
@@ -67,8 +62,7 @@ class Secure {
 		YggdrasilAuthenticationService yas = new YggdrasilAuthenticationService(Minecraft.getMinecraft().getProxy(), UUID.randomUUID().toString());
 		yua = (YggdrasilUserAuthentication) yas.createUserAuthentication(Agent.MINECRAFT);
 
-		
-		/** create a serverhash for the seessionvalidator*/
+		/** create a serverhash for the seessionvalidator */
 		String id = Long.toString(new Random().nextLong(), 16);
 		PublicKey pub = CryptManager.createNewKeyPair().getPublic();
 		SecretKey sec = CryptManager.createNewSharedKey();
@@ -77,6 +71,9 @@ class Secure {
 
 	/** LOgs you in; replaces the Session in your client; and saves to config */
 	protected static void login(String user, String pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
+		if (!VersionChecker.isVersionAllowed())
+			throw new AuthenticationException("ReAuth has a critical update!");
+		
 		/** set credentials */
 		Secure.yua.setUsername(user);
 		Secure.yua.setPassword(pw);
@@ -96,22 +93,21 @@ class Secure {
 
 		/** save username to config */
 		Secure.username = user;
-		Main.config.get(Main.config.CATEGORY_GENERAL, "username", "", "Your Username").set(Secure.username);
+		Main.config.get(Configuration.CATEGORY_GENERAL, "username", "", "Your Username").set(Secure.username);
 		/** save password to config if desired */
 		if (savePassToConfig) {
 			Secure.password = pw;
-			Main.config.get(Main.config.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk").set(Secure.password);
+			Main.config.get(Configuration.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk").set(Secure.password);
 		}
 		Main.config.save();
 	}
 
 	protected static void offlineMode(String username) throws IllegalArgumentException, IllegalAccessException {
-		UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(Charsets.UTF_8));
 		Sessionutil.set(new Session(username, "NotValid"));
 		Main.log.info("Username set! you can only pay on offline-mode servers now!");
 		Secure.username = username;
 	}
-	
+
 	/**
 	 * checks online if the session is valid (uses code from
 	 * {@link NetClientHandler#sendSessionRequest})
@@ -128,7 +124,7 @@ class Secure {
 			if ("ok".equalsIgnoreCase(answer)) {
 				Main.log.info("Session validation successfull");
 				return true;
-			} 
+			}
 		} catch (Exception e) {
 			Main.log.info("Session validation failed: " + e.getMessage());
 			return false;

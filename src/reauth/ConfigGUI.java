@@ -4,7 +4,6 @@ import java.awt.Color;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -19,10 +18,14 @@ public class ConfigGUI extends GuiScreen {
 	private GuiButton ok;
 	private GuiButton cancel;
 
+	private GuiCheckBox validatorBold;
+	private GuiCheckBox validatorEnabled;
+
 	public ConfigGUI(GuiScreen g) {
 		prev = g;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
 		super.initGui();
@@ -43,22 +46,28 @@ public class ConfigGUI extends GuiScreen {
 
 		cancel = new GuiButton(3, width / 2, height - 40, 155, 20, "Cancel");
 		this.buttonList.add(cancel);
+
+		validatorBold = new GuiCheckBox(4, width / 2 - 155, y + 15, "Session-Validator Bold", GuiMultiplayerExtended.bold);
+		this.buttonList.add(validatorBold);
+
+		validatorEnabled = new GuiCheckBox(5, width / 2 - 155, y + 30, "Enable Session-Validator", GuiMultiplayerExtended.enabled);
+		this.buttonList.add(validatorEnabled);
 	}
 
 	@Override
 	protected void actionPerformed(GuiButton b) {
-
 		switch (b.id) {
 		case 2:
 			Secure.username = username.getText();
 			Secure.password = password.getText();
 			Main.OfflineModeEnabled = offline.isChecked();
+			GuiMultiplayerExtended.bold = validatorBold.isChecked();
+			GuiMultiplayerExtended.enabled = validatorEnabled.isChecked();
 			Main.saveConfig();
 		case 3:
 			this.mc.displayGuiScreen(prev);
 			break;
 		}
-
 		super.actionPerformed(b);
 	}
 
