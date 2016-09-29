@@ -80,6 +80,7 @@ public class GuiLogin extends GuiScreen {
 		this.pw.drawTextBox();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
 		super.initGui();
@@ -113,6 +114,14 @@ public class GuiLogin extends GuiScreen {
 
 		this.config = new GuiButton(4, this.width - 80, this.height - 25, 75, 20, "Config");
 		this.buttonList.add(config);
+		
+		if (!VersionChecker.isLatestVersion()) {
+			this.error = "SUpdate Avaliable!";
+		}
+		if (!VersionChecker.isVersionAllowed()) {
+			this.error = "ECritical Update Avaliable!";
+			this.login.enabled = false;
+		}
 	}
 
 	@Override
