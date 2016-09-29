@@ -1,9 +1,7 @@
 package reauth;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.Proxy;
 import java.net.URL;
@@ -13,13 +11,11 @@ import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
-import com.google.common.base.Charsets;
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.util.CryptManager;
@@ -56,6 +52,9 @@ class Secure {
 
 	/** LOgs you in; replaces the Session in your client; and saves to config */
 	protected static void login(String user, String pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
+		if (!VersionChecker.isVersionAllowed())
+			throw new AuthenticationException("ReAuth has a critical update!");
+
 		/** set credentials */
 		Secure.yua.setUsername(user);
 		Secure.yua.setPassword(pw);
@@ -83,7 +82,6 @@ class Secure {
 	}
 
 	protected static void offlineMode(String username) throws IllegalArgumentException, IllegalAccessException {
-		UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(Charsets.UTF_8));
 		Minecraft.getMinecraft().session = new Session(username, "NotValid");
 		Main.log.info("Username set! you can only pay on offline-mode servers now!");
 		Secure.username = username;

@@ -6,10 +6,11 @@ import java.util.logging.Logger;
 
 import org.lwjgl.opengl.Display;
 
-import cpw.mods.fml.common.IScheduledTickHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.event.FMLFingerprintViolationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -21,7 +22,7 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 
-@Mod(modid = "ReAuth", acceptedMinecraftVersions = "[1.4.7]", version = "2.1")
+@Mod(modid = "ReAuth", acceptedMinecraftVersions = "[1.4.7]", version = "3.2", certificateFingerprint = "35787b2f97a740b13a05638ab0d20d2107e3a79e")
 public class Main {
 
 	protected static final Logger log = Logger.getLogger("ReAuth");
@@ -31,6 +32,9 @@ public class Main {
 
 	@Mod.Instance("ReAuth")
 	Main main;
+
+	@Mod.Metadata
+	protected static ModMetadata meta;
 
 	@Mod.PreInit
 	public void preinit(FMLPreInitializationEvent evt) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
@@ -60,9 +64,12 @@ public class Main {
 
 			@Override
 			public void tickStart(EnumSet<TickType> type, Object... tickData) {
-				if (mc.currentScreen instanceof GuiMultiplayer && !(mc.currentScreen instanceof GuiMultiplayerExtended)) {
-					GuiScreen gc = ReflectionHelper.getPrivateValue(GuiMultiplayer.class, (GuiMultiplayer) mc.currentScreen, "parentScreen", "c");
+				GuiScreen gui = mc.currentScreen;
+				if (gui instanceof GuiMultiplayer && !(gui instanceof GuiMultiplayerExtended)) {
+					GuiScreen gc = ReflectionHelper.getPrivateValue(GuiMultiplayer.class, (GuiMultiplayer) gui, "parentScreen", "c");
 					mc.displayGuiScreen(new GuiMultiplayerExtended(gc));
+					if (VersionChecker.shouldRun())
+						VersionChecker.update();
 				}
 			}
 
@@ -158,23 +165,50 @@ public class Main {
 
 	/** (re-)loads config */
 	public static void loadConfig() {
-		Property pu = config.get(config.CATEGORY_GENERAL, "username", "", "Your Username");
+		Property pu = config.get(Configuration.CATEGORY_GENERAL, "username", "", "Your Username");
 		Secure.username = pu.value;
-		Property pp = config.get(config.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk");
+		Property pp = config.get(Configuration.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk");
 		Secure.password = pp.value;
-		Property po = config.get(config.CATEGORY_GENERAL, "offlineModeEnabled", false, "Controls wheter a play-offline button is visble in the Re-Login screen");
+
+		Property po = config.get(Configuration.CATEGORY_GENERAL, "offlineModeEnabled", false, "Controls wheter a play-offline button is visble in the Re-Login screen");
 		Main.OfflineModeEnabled = po.getBoolean(false);
+
+		Property ve = config.get(Configuration.CATEGORY_GENERAL, "validatorEnabled", true, "Disables the Session Validator");
+		GuiMultiplayerExtended.enabled = ve.getBoolean(true);
+
+		Property vb = config.get(Configuration.CATEGORY_GENERAL, "validatorBold", true, "If the Session-Validator look weird disable this");
+		GuiMultiplayerExtended.bold = vb.getBoolean(true);
+
 		Main.config.save();
 	}
 
 	public static void saveConfig() {
-		Property pu = config.get(config.CATEGORY_GENERAL, "username", Secure.username, "Your Username");
+		Property pu = config.get(Configuration.CATEGORY_GENERAL, "username", Secure.username, "Your Username");
 		pu.value = Secure.username;
-		Property pp = config.get(config.CATEGORY_GENERAL, "password", Secure.password, "Your Password in plaintext if chosen to save to disk");
+		Property pp = config.get(Configuration.CATEGORY_GENERAL, "password", Secure.password, "Your Password in plaintext if chosen to save to disk");
 		pp.value = Secure.password;
-		Property po = config.get(config.CATEGORY_GENERAL, "offlineModeEnabled", Main.OfflineModeEnabled, "Controls wheter a play-offline button is visble in the Re-Login screen");
+
+		Property po = config.get(Configuration.CATEGORY_GENERAL, "offlineModeEnabled", Main.OfflineModeEnabled, "Controls wheter a play-offline button is visble in the Re-Login screen");
 		po.value = Boolean.toString(Main.OfflineModeEnabled);
+
+		Property ve = config.get(Configuration.CATEGORY_GENERAL, "validatorEnabled", true, "Disables the Session Validator");
+		ve.value = Boolean.toString(GuiMultiplayerExtended.enabled);
+
+		Property vb = config.get(Configuration.CATEGORY_GENERAL, "validatorBold", true, "If the Session-Validator look weird disable this");
+		vb.value = Boolean.toString(GuiMultiplayerExtended.bold);
+
 		Main.config.save();
+	}
+
+	@Mod.FingerprintWarning
+	public void securityError(FMLFingerprintViolationEvent event) {
+		boolean dev = false;
+		if (dev) {
+			log.log(Level.SEVERE, "+-----------------------------------------------------------------------------------+");
+			log.log(Level.SEVERE, "|The Version of ReAuth is not signed! It was modified! Ignoring because of Dev-Mode!|");
+			log.log(Level.SEVERE, "+-----------------------------------------------------------------------------------+");
+		} else
+			throw new SecurityException("The Version of ReAuth is not signed! It is a modified version!");
 	}
 
 }

@@ -9,18 +9,28 @@ import net.minecraft.client.gui.GuiScreen;
 
 public class GuiMultiplayerExtended extends GuiMultiplayer {
 
-	private String validText = "?";
-	private int validColor = Color.GRAY.getRGB();
+	private String validText;
+	private int validColor;
 	private Thread validator;
+
+	public static boolean enabled = true;
+	public static boolean bold = true;
 
 	public GuiMultiplayerExtended(GuiScreen par1GuiScreen) {
 		super(par1GuiScreen);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
 		super.initGui();
 		controlList.add(new GuiButton(17325, 5, 5, 100, 20, "Re-Login"));
+
+		if (!enabled)
+			return;
+
+		validText = "?";
+		validColor = Color.GRAY.getRGB();
 
 		if (this.validator != null)
 			validator.interrupt();
@@ -36,14 +46,15 @@ public class GuiMultiplayerExtended extends GuiMultiplayer {
 			}
 		}, "Session-Validator");
 		validator.start();
-
 	}
 
 	@Override
 	public void drawScreen(int par1, int par2, float par3) {
 		super.drawScreen(par1, par2, par3);
+		if (!enabled)
+			return;
 		drawString(fontRenderer, "Online:", 110, 10, Color.WHITE.getRGB());
-		drawString(fontRenderer, "\u00a7" + "L" + validText, 145, 10, validColor);
+		drawString(fontRenderer, (bold ? "\u00a7L" : "") + validText, 145, 10, validColor);
 	}
 
 	@Override
