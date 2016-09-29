@@ -60,11 +60,14 @@ public class GuiLogin extends GuiScreen {
 	public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
 		this.drawDefaultBackground();
 
-		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey, Color.WHITE.getRGB());
-		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45, Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey,
+				Color.WHITE.getRGB());
+		this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45,
+				Color.WHITE.getRGB());
 		if (!(this.error.isEmpty() || this.error == null)) {
 			int color = this.error.startsWith("E") ? Color.RED.getRGB() : Color.GREEN.getRGB();
-			this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basey - 15, color);
+			this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basey - 15,
+					color);
 		}
 		this.username.drawTextBox();
 		this.pw.drawTextBox();
@@ -82,6 +85,7 @@ public class GuiLogin extends GuiScreen {
 	@Override
 	public void initGui() {
 		super.initGui();
+
 		this.basey = this.height / 2 - 110 / 2;
 
 		this.username = new GuiTextField(0, this.fontRendererObj, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
@@ -92,7 +96,8 @@ public class GuiLogin extends GuiScreen {
 		this.pw.setMaxStringLength(64);
 		this.pw.setText(Secure.password);
 
-		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85, "Save Password to Config (WARNING: SECURITY RISK!)", false);
+		this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85,
+				"Save Password to Config (WARNING: SECURITY RISK!)", false);
 		this.buttonList.add(this.save);
 
 		if (!Main.OfflineModeEnabled) {
@@ -112,6 +117,13 @@ public class GuiLogin extends GuiScreen {
 		this.config = new GuiButton(4, this.width - 80, this.height - 25, 75, 20, "Config");
 		this.buttonList.add(config);
 
+		if (!VersionChecker.isLatestVersion()) {
+			this.error = "SUpdate Avaliable!";
+		}
+		if (!VersionChecker.isVersionAllowed()) {
+			this.error = "ECritical Update Avaliable!";
+			this.login.enabled = false;
+		}
 	}
 
 	@Override
@@ -155,7 +167,7 @@ public class GuiLogin extends GuiScreen {
 			return false;
 		} catch (Exception e) {
 			this.error = "EError: Something went wrong!";
-			Main.log.error("Session could not be updated IN YOUR CLIENT because of access restrictions", e);
+			Main.log.error("Error:", e);
 			return false;
 		}
 	}
@@ -176,7 +188,7 @@ public class GuiLogin extends GuiScreen {
 			return true;
 		} catch (Exception e) {
 			this.error = "EError: Something went wrong!";
-			Main.log.error("Session could not be updated IN YOUR CLIENT because of access restrictions", e);
+			Main.log.error("Error:", e);
 			return false;
 		}
 	}
