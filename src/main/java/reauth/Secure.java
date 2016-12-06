@@ -1,11 +1,5 @@
 package reauth;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.ClassPath;
@@ -17,11 +11,16 @@ import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 import com.mojang.util.UUIDTypeAdapter;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 class Secure {
 
@@ -72,7 +71,7 @@ class Secure {
 		/** login */
 		Secure.yua.logIn();
 
-		Main.log.info("Login successfull!");
+		Main.log.info("Login successful!");
 
 		/** put together the new Session with the auth-data */
 		String username = Secure.yua.getSelectedProfile().getName();
@@ -99,7 +98,7 @@ class Secure {
 		/**  */
 		UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(Charsets.UTF_8));
 		Sessionutil.set(new Session(username, uuid.toString(), null, "legacy"));
-		Main.log.info("Username set! you can only pay on offline-mode servers now!");
+		Main.log.info("Offline Username set!");
 		Secure.username = username;
 	}
 
@@ -111,8 +110,8 @@ class Secure {
 			String id = UUID.randomUUID().toString();
 
 			Secure.ymss.joinServer(gp, token, id);
-			if (Secure.ymss.hasJoinedServer(gp, id).isComplete()) {
-				Main.log.info("Session validation successfull");
+			if (Secure.ymss.hasJoinedServer(gp, id, null).isComplete()) {
+				Main.log.info("Session validation successful");
 				return true;
 			}
 		} catch (Exception e) {

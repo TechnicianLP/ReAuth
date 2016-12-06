@@ -13,15 +13,15 @@ import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = "ReAuth", version = "3.2", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.9,1.10.2]", certificateFingerprint = "35787b2f97a740b13a05638ab0d20d2107e3a79e")
-public class Main {
+@Mod(modid = "reauth", name = "ReAuth", version = "3.3", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.11]", certificateFingerprint = "cac6b8578b012cf31142c980b01c13ddb795846c")
+public final class Main {
 
 	protected static final Logger log = LogManager.getLogger("ReAuth");
 	protected static Configuration config;
 
 	protected static boolean OfflineModeEnabled;
 
-	@Mod.Instance("ReAuth")
+	@Mod.Instance("reauth")
 	protected static Main main;
 
 	@Mod.Metadata
@@ -40,31 +40,33 @@ public class Main {
 
 	@SubscribeEvent
 	public void onConfigChanged(OnConfigChangedEvent evt) {
-		if (evt.getModID().equals("ReAuth")) {
+		if (evt.getModID().equals("reauth")) {
 			Main.loadConfig();
 		}
 	}
 
-	/** (re-)loads config */
+	/**
+	 * (re-)loads config
+	 */
 	private static void loadConfig() {
 		Property pu = config.get(Configuration.CATEGORY_GENERAL, "username", "", "Your Username");
 		Secure.username = pu.getString();
 		Property pp = config.get(Configuration.CATEGORY_GENERAL, "password", "",
 				"Your Password in plaintext if chosen to save to disk");
 		Secure.password = pp.getString();
-		
+
 		Property po = config.get(Configuration.CATEGORY_GENERAL, "offlineModeEnabled", false,
-				"Controls wheter a play-offline button is visble in the Re-Login screen");
+				"Controls whether a play-offline button is visible in the Re-Login screen");
 		Main.OfflineModeEnabled = po.getBoolean();
-		
+
 		Property ve = config.get(Configuration.CATEGORY_GENERAL, "validatorEnabled", true,
 				"Disables the Session Validator");
 		GuiHandler.enabled = ve.getBoolean();
-		
+
 		Property vb = config.get(Configuration.CATEGORY_GENERAL, "validatorBold", true,
 				"If the Session-Validator look weird disable this");
 		GuiHandler.bold = vb.getBoolean();
-		
+
 		Main.config.save();
 	}
 

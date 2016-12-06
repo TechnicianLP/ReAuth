@@ -24,7 +24,7 @@ class GuiPasswordField extends GuiTextField {
 		return super.getText().replaceAll(".", "\u25CF");
 	}
 
-	public String getPW() {
+	String getPW() {
 		return super.getText();
 	}
 
