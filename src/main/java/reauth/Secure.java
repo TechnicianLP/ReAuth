@@ -25,17 +25,25 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 class Secure {
 
-	/** Username/email */
+	/**
+	 * Username/email
+	 */
 	protected static String username = "";
-	/** password if saved to config else empty */
+	/**
+	 * password if saved to config else empty
+	 */
 	protected static String password = "";
 
-	/** Mojang authentificationservice */
+	/**
+	 * Mojang authentificationservice
+	 */
 	private static final YggdrasilAuthenticationService yas;
 	private static final YggdrasilUserAuthentication yua;
 	private static final YggdrasilMinecraftSessionService ymss;
 
-	/** currently used to load the class */
+	/**
+	 * currently used to load the class
+	 */
 	protected static void init() {
 		String base = "reauth.";
 		List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler", base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure",
@@ -60,7 +68,9 @@ class Secure {
 		ymss = (YggdrasilMinecraftSessionService) yas.createMinecraftSessionService();
 	}
 
-	/** LOgs you in; replaces the Session in your client; and saves to config */
+	/**
+	 * LOgs you in; replaces the Session in your client; and saves to config
+	 */
 	protected static void login(String user, String pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
 		if (!VersionChecker.isVersionAllowed())
 			throw new AuthenticationException("ReAuth has a critical update!");
@@ -72,7 +82,7 @@ class Secure {
 		/** login */
 		Secure.yua.logIn();
 
-		Main.log.info("Login successfull!");
+		Main.log.info("Login successful!");
 
 		/** put together the new Session with the auth-data */
 		String username = Secure.yua.getSelectedProfile().getName();
@@ -99,11 +109,13 @@ class Secure {
 		/**  */
 		UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(Charsets.UTF_8));
 		Sessionutil.set(new Session(username, uuid.toString(), null, "legacy"));
-		Main.log.info("Username set! you can only pay on offline-mode servers now!");
+		Main.log.info("Offline Username set!");
 		Secure.username = username;
 	}
 
-	/** checks online if the session is valid */
+	/**
+	 * checks online if the session is valid
+	 */
 	protected static boolean SessionValid() {
 		try {
 			GameProfile gp = Sessionutil.get().getProfile();
@@ -112,7 +124,7 @@ class Secure {
 
 			Secure.ymss.joinServer(gp, token, id);
 			if (Secure.ymss.hasJoinedServer(gp, id).isComplete()) {
-				Main.log.info("Session validation successfull");
+				Main.log.info("Session validation successful");
 				return true;
 			}
 		} catch (Exception e) {

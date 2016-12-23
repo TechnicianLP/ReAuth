@@ -118,10 +118,10 @@ public class GuiLogin extends GuiScreen {
 		this.buttonList.add(config);
 
 		if (!VersionChecker.isLatestVersion()) {
-			this.error = "SUpdate Avaliable!";
+			this.error = "SUpdate Available!";
 		}
 		if (!VersionChecker.isVersionAllowed()) {
-			this.error = "ECritical Update Avaliable!";
+			this.error = "ECritical Update Available!";
 			this.login.enabled = false;
 		}
 	}
@@ -159,7 +159,7 @@ public class GuiLogin extends GuiScreen {
 	private boolean login() {
 		try {
 			Secure.login(this.username.getText(), this.pw.getPW(), this.save.isChecked());
-			this.error = "SLogin successfull!";
+			this.error = "SLogin successful!";
 			return true;
 		} catch (AuthenticationException e) {
 			this.error = "ELogin failed: " + e.getMessage();
@@ -176,11 +176,11 @@ public class GuiLogin extends GuiScreen {
 	private boolean playOffline() {
 		String username = this.username.getText();
 		if (!(username.length() >= 2 && username.length() <= 16)) {
-			this.error = "EError: Usernames have a lenght between 2 and 16";
+			this.error = "EError: Username needs a length between 2 and 16";
 			return false;
 		}
 		if (!username.matches("[A-Za-z0-9_]{2,16}")) {
-			this.error = "EError: Usernames have to be alphanumerical";
+			this.error = "EError: Username has to be alphanumerical";
 			return false;
 		}
 		try {

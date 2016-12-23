@@ -13,7 +13,7 @@ public class ConfigGUI extends GuiConfig {
 	private static IConfigElement ce = new ConfigElement(Main.config.getCategory(Configuration.CATEGORY_GENERAL));
 
 	public ConfigGUI(GuiScreen parent) {
-		super(parent, ImmutableList.of(ce), "ReAuth", false, false, "Config for ReAuth");
+		super(parent, ImmutableList.of(ce), "reauth", "reauth", false, false, "Config for ReAuth", "");
 	}
 
 }

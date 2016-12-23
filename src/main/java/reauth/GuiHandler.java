@@ -45,7 +45,7 @@ public class GuiHandler {
 						validColor = Color.RED.getRGB();
 					}
 				}
-			});
+			}, "Session-Validator");
 			validator.start();
 		}
 

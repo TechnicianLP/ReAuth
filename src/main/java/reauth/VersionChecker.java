@@ -72,7 +72,7 @@ class VersionChecker implements Runnable {
 	}
 
 	public static void update() {
-		Thread t = new Thread(new VersionChecker(), "ReAuth-VersinChecker");
+		Thread t = new Thread(new VersionChecker(), "ReAuth-VersionChecker");
 		t.setDaemon(true);
 		t.start();
 	}
