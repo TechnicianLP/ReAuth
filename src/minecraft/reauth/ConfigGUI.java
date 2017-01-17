@@ -8,7 +8,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 
-public class ConfigGUI extends GuiScreen {
+class ConfigGUI extends GuiScreen {
 
 	private GuiScreen prev;
 
@@ -21,11 +21,10 @@ public class ConfigGUI extends GuiScreen {
 	private GuiCheckBox validatorBold;
 	private GuiCheckBox validatorEnabled;
 
-	public ConfigGUI(GuiScreen g) {
+	ConfigGUI(GuiScreen g) {
 		prev = g;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
 		super.initGui();

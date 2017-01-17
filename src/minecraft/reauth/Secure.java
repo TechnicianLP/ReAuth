@@ -39,11 +39,11 @@ class Secure {
 	}
 
 	static {
-		/** initialize the authservices */
+		/* initialize the authservices */
 		YggdrasilAuthenticationService yas = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
 		yua = (YggdrasilUserAuthentication) yas.createUserAuthentication(Agent.MINECRAFT);
 
-		/** create a serverhash for the seessionvalidator */
+		/* create a serverhash for the seessionvalidator */
 		String id = Long.toString(new Random().nextLong(), 16);
 		PublicKey pub = CryptManager.createNewKeyPair().getPublic();
 		SecretKey sec = CryptManager.createNewSharedKey();
@@ -55,35 +55,35 @@ class Secure {
 		if (!VersionChecker.isVersionAllowed())
 			throw new AuthenticationException("ReAuth has a critical update!");
 
-		/** set credentials */
+		/* set credentials */
 		Secure.yua.setUsername(user);
 		Secure.yua.setPassword(pw);
 
-		/** login */
+		/* login */
 		Secure.yua.logIn();
 
-		Main.log.info("Login successfull!");
+		Main.log.info("Login successful!");
 
-		/** put together the new Session with the auth-data */
+		/* put together the new Session with the auth-data */
 		String username = Secure.yua.getSelectedProfile().getName();
 		String access = Secure.yua.getAuthenticatedToken();
 		Minecraft.getMinecraft().session = new Session(username, access);
 
-		/** logout to discard the credentials in the object */
+		/* logout to discard the credentials in the object */
 		Secure.yua.logOut();
 
-		/** save username to config */
+		/* save username to config */
 		Secure.username = user;
-		/** save password to config if desired */
+		/* save password to config if desired */
 		if (savePassToConfig) {
 			Secure.password = pw;
 		}
 		Main.saveConfig();
 	}
 
-	protected static void offlineMode(String username) throws IllegalArgumentException, IllegalAccessException {
+	static void offlineMode(String username) throws IllegalArgumentException, IllegalAccessException {
 		Minecraft.getMinecraft().session = new Session(username, "NotValid");
-		Main.log.info("Username set! you can only pay on offline-mode servers now!");
+		Main.log.info("Offline Username set!");
 		Secure.username = username;
 	}
 
@@ -91,7 +91,7 @@ class Secure {
 	 * checks online if the session is valid (uses code from
 	 * {@link NetClientHandler#sendSessionRequest})
 	 */
-	protected static boolean SessionValid() {
+	static boolean SessionValid() {
 		try {
 			Session s = Minecraft.getMinecraft().session;
 			String base = "http://session.minecraft.net/game/joinserver.jsp?user=%s&sessionId=%s&serverId=%s";
@@ -113,7 +113,7 @@ class Secure {
 	}
 
 	/** Fixes Sessions with null entries to avoid crashing */
-	protected static void fixSession() {
+	static void fixSession() {
 		Minecraft mc = Minecraft.getMinecraft();
 		try {
 			Session s = mc.session;

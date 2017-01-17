@@ -28,10 +28,9 @@ class VersionChecker implements Runnable {
 		InputStream in = null;
 		try {
 			in = new URL(url).openStream();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			Main.log.log(Level.SEVERE, "Looking for Updates - Failed", e);
+			return;
 		}
 
 		try {
@@ -60,23 +59,23 @@ class VersionChecker implements Runnable {
 		run = System.currentTimeMillis() - (long) ((1000 * 60 * 60) * 0.75);
 	}
 
-	public static boolean isLatestVersion() {
+	static boolean isLatestVersion() {
 		return isLatestVersion;
 	}
 
-	public static String getLatestVersion() {
+	static String getLatestVersion() {
 		return versionInfo[0];
 	}
 
-	public static boolean isVersionAllowed() {
+	static boolean isVersionAllowed() {
 		return isVersionAllowed;
 	}
 
-	public static boolean shouldRun() {
+	static boolean shouldRun() {
 		return System.currentTimeMillis() - run > (1000 * 60 * 60);
 	}
 
-	public static void update() {
+	static void update() {
 		Thread t = new Thread(new VersionChecker(), "ReAuth-VersinChecker");
 		t.setDaemon(true);
 		t.start();
