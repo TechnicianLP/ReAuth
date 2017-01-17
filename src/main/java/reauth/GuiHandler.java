@@ -1,9 +1,6 @@
 package reauth;
 
-import java.awt.Color;
-
 import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -13,17 +10,19 @@ import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import java.awt.*;
+
 public class GuiHandler {
 
     private String validText;
     private int validColor;
     private Thread validator;
 
-    public static boolean enabled = true;
-    public static boolean bold = true;
+    static boolean enabled = true;
+    static boolean bold = true;
 
     @SubscribeEvent
-    public void ongui(InitGuiEvent.Post e) {
+    public void open(InitGuiEvent.Post e) {
         if (e.getGui() instanceof GuiMultiplayer) {
             e.getButtonList().add(new GuiButton(17325, 5, 5, 100, 20, "Re-Login"));
 
@@ -49,13 +48,18 @@ public class GuiHandler {
             validator.start();
         }
 
+        if (e.getGui() instanceof GuiMainMenu) {
+            //Support for Custom Main Menu
+            e.getButtonList().add(new GuiButton(17325, -50, -50, 20, 20, "ReAuth"));
+        }
+
         if (e.getGui() instanceof GuiMultiplayer || e.getGui() instanceof GuiMainMenu)
             if (VersionChecker.shouldRun())
                 VersionChecker.update();
     }
 
     @SubscribeEvent
-    public void ongui(DrawScreenEvent.Post e) {
+    public void draw(DrawScreenEvent.Post e) {
         if (e.getGui() instanceof GuiMultiplayer) {
             if (!enabled)
                 return;
@@ -65,7 +69,7 @@ public class GuiHandler {
     }
 
     @SubscribeEvent
-    public void ongui(ActionPerformedEvent.Post e) {
+    public void action(ActionPerformedEvent.Post e) {
         if (e.getGui() instanceof GuiMultiplayer && e.getButton().id == 17325) {
             Minecraft.getMinecraft().displayGuiScreen(new GuiLogin(Minecraft.getMinecraft().currentScreen));
         }
