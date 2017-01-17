@@ -1,9 +1,9 @@
 [
 {
-  "modid": "ReAuth",
+  "modid": "reauth",
   "name": "ReAuth",
   "description": "A Mod to renew your Session",
-  "version": "3.2",
+  "version": "3.4",
   "mcversion": "[1.8.0,1.8.9]",
   "url": "http://minecraft.curseforge.com/projects/reauth",
   "updateUrl": "",
