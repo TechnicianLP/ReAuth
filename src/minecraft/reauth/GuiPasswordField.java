@@ -8,7 +8,7 @@ import net.minecraft.client.gui.GuiTextField;
 @SideOnly(Side.CLIENT)
 class GuiPasswordField extends GuiTextField {
 
-	public GuiPasswordField(FontRenderer renderer, int posx, int posy, int x, int y) {
+	GuiPasswordField(FontRenderer renderer, int posx, int posy, int x, int y) {
 		super(renderer, posx, posy, x, y);
 	}
 
@@ -24,7 +24,7 @@ class GuiPasswordField extends GuiTextField {
 		return super.getText().replaceAll(".", "\u25CF");
 	}
 
-	public String getPW() {
+	String getPW() {
 		return super.getText();
 	}
 

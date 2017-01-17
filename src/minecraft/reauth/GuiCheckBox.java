@@ -11,11 +11,11 @@ import net.minecraft.client.gui.GuiButton;
  * 
  * @author bspkrs
  */
-public class GuiCheckBox extends GuiButton {
+class GuiCheckBox extends GuiButton {
 	private boolean isChecked;
 	private int boxWidth;
 
-	public GuiCheckBox(int id, int xPos, int yPos, String displayString, boolean isChecked) {
+	GuiCheckBox(int id, int xPos, int yPos, String displayString, boolean isChecked) {
 		super(id, xPos, yPos, displayString);
 		this.isChecked = isChecked;
 		this.boxWidth = 11;

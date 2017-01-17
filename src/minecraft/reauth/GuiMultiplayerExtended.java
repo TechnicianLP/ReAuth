@@ -8,20 +8,19 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.EnumChatFormatting;
 
-public class GuiMultiplayerExtended extends GuiMultiplayer {
+class GuiMultiplayerExtended extends GuiMultiplayer {
 
 	private String validText;
 	private int validColor;
 	private Thread validator;
 
-	public static boolean enabled = true;
-	public static boolean bold = true;
+	static boolean enabled = true;
+	static boolean bold = true;
 
-	public GuiMultiplayerExtended(GuiScreen par1GuiScreen) {
+	GuiMultiplayerExtended(GuiScreen par1GuiScreen) {
 		super(par1GuiScreen);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
 		super.initGui();
