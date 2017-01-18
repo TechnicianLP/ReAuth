@@ -59,7 +59,7 @@ public class GuiHandler {
     }
 
     @SubscribeEvent
-    public void ongui(DrawScreenEvent.Post e) {
+    public void draw(DrawScreenEvent.Post e) {
         if (e.gui instanceof GuiMultiplayer) {
             if (!enabled)
                 return;
@@ -69,8 +69,8 @@ public class GuiHandler {
     }
 
     @SubscribeEvent
-    public void ongui(ActionPerformedEvent.Post e) {
-        if (e.gui instanceof GuiMultiplayer && e.button.id == 17325) {
+    public void action(ActionPerformedEvent.Post e) {
+        if ((e.gui instanceof GuiMultiplayer || e.gui instanceof GuiMainMenu) && e.button.id == 17325) {
             Minecraft.getMinecraft().displayGuiScreen(new GuiLogin(Minecraft.getMinecraft().currentScreen));
         }
     }
