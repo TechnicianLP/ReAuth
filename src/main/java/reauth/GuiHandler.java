@@ -70,7 +70,7 @@ public class GuiHandler {
 
     @SubscribeEvent
     public void action(ActionPerformedEvent.Post e) {
-        if (e.gui instanceof GuiMultiplayer && e.button.id == 17325) {
+        if ((e.gui instanceof GuiMultiplayer || e.gui instanceof GuiMainMenu) && e.button.id == 17325) {
             Minecraft.getMinecraft().displayGuiScreen(new GuiLogin(Minecraft.getMinecraft().currentScreen));
         }
     }
