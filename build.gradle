@@ -1,0 +1,103 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url = "http://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+apply plugin: 'net.minecraftforge.gradle.forge'
+//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+
+version = "3.5.0"
+group = "reauth.Main" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "ReAuth"
+
+sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
+minecraft {
+    version = "1.12-14.21.0.2321"
+    runDir = "run"
+
+    mappings = "snapshot_20161220"
+}
+
+dependencies {
+}
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        // replace version and mcversion
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    // copy everything else except the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+
+import groovy.swing.SwingBuilder
+
+import java.awt.*
+
+task signJar(type: Exec, dependsOn: reobfJar) {
+    onlyIf {
+        project.hasProperty('keyStore')
+    }
+    ext {
+        storePass = null
+        keyPass = null
+    }
+    executable = "jarsigner"
+    args(["-signedJar", jar.archivePath, jar.archivePath, project.keyStoreAlias, "-tsa", project.tsa, "-keystore", project.keyStore])
+    doFirst {
+        if (storePass != null && storePass?.trim())
+            args(["-storepass", storePass])
+        if (keyPass != null && keyPass?.trim())
+            args(["-keypass", keyPass])
+    }
+}
+
+build.dependsOn signJar
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(':signJar')) {
+        if (System.console() == null) {
+            new SwingBuilder().edt {
+                dialog(modal: true, title: 'KeyStore Passwords', alwaysOnTop: true, resizable: false, locationRelativeTo: null, show: true, size: [300, 150]) {
+                    panel(layout: new BorderLayout(5, 5)) {
+                        def store
+                        def key
+                        vbox(constraints: BorderLayout.CENTER) {
+                            label(text: "Keystore:",)
+                            store = passwordField()
+                            label(text: "Key:")
+                            key = passwordField()
+                        }
+                        button(defaultButton: true, text: 'OK', constraints: BorderLayout.SOUTH, actionPerformed: {
+                            signJar.storePass = new String(store.password)
+                            signJar.keyPass = new String(key.password)
+                            dispose()
+                        })
+                    }
+                }
+            }
+        } else {
+            signJar.storePass = new String(System.console().readPassword("\nKeyStore Password: "))
+            signJar.keyPass = new String(System.console().readPassword("\nKey Password: "))
+        }
+    }
+}
