@@ -8,7 +8,7 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 
 public class GuiLogin extends GuiScreen {

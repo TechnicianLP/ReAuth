@@ -4,7 +4,7 @@
   "name": "ReAuth",
   "description": "A Mod to renew your Session",
   "version": "3.5.0",
-  "mcversion": "[1.11,1.12]",
+  "mcversion": "[1.12]",
   "url": "http://minecraft.curseforge.com/projects/reauth",
   "updateUrl": "",
   "authorList": ["TechnicianLP"],

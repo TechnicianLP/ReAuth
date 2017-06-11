@@ -16,7 +16,7 @@ import java.net.URL;
 class VersionChecker implements Runnable {
 
     private static final String url = "https://raw.githubusercontent.com/TechnicianLP/ReAuth/master/version.json";
-    private static final String group = "1.11";
+    private static final String group = "1.12";
 
     private static boolean isLatestVersion = true;
     private static String latestMessage = (char) 167 + "aUpdate Available!";
