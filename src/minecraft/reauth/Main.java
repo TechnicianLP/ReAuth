@@ -1,12 +1,5 @@
 package reauth;
 
-import java.io.File;
-import java.util.EnumSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.lwjgl.opengl.Display;
-
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModMetadata;
@@ -14,6 +7,7 @@ import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLFingerprintViolationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.FMLRelaunchLog;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
@@ -22,11 +16,24 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
+import org.lwjgl.opengl.Display;
 
-@Mod(modid = "reauth", name = "ReAuth", acceptedMinecraftVersions = "[1.4.7]", version = "3.4", certificateFingerprint = "cac6b8578b012cf31142c980b01c13ddb795846c")
+import java.io.File;
+import java.util.EnumSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+@Mod(modid = "reauth", name = "ReAuth", acceptedMinecraftVersions = "[1.4.7]", version = "3.5.0", certificateFingerprint = "aa395513cd0890f9c69d4229ac5d779667421c85")
 public class Main {
 
-    static final Logger log = Logger.getLogger("ReAuth");
+    static final Logger log;
+
+    static {
+        String name = "ReAuth";
+        FMLRelaunchLog.makeLog(name);
+        log = Logger.getLogger(name);
+    }
+
     static Configuration config;
 
     static boolean OfflineModeEnabled = false;
@@ -38,8 +45,7 @@ public class Main {
     protected static ModMetadata meta;
 
     @Mod.PreInit
-    public void preInit(FMLPreInitializationEvent evt) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-
+    public void preInit(FMLPreInitializationEvent evt) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InterruptedException {
         checkDependencies();
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -93,7 +99,7 @@ public class Main {
     /**
      * checks if the required libraries are installed
      */
-    private void checkDependencies() {
+    private void checkDependencies() throws InterruptedException {
         boolean l4j = true;
         boolean l4jc = true;
         boolean gson = true;
