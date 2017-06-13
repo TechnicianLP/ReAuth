@@ -17,7 +17,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import net.minecraftforge.event.ForgeSubscribe;
 
-@Mod(modid = "reauth", name = "ReAuth", acceptedMinecraftVersions = "[1.6.4]", version = "3.4", certificateFingerprint = "cac6b8578b012cf31142c980b01c13ddb795846c")
+@Mod(modid = "reauth", name = "ReAuth", acceptedMinecraftVersions = "[1.6.4]", version = "3.5.0", certificateFingerprint = "aa395513cd0890f9c69d4229ac5d779667421c85")
 public class Main {
 
     static final Logger log = Logger.getLogger("ReAuth");
