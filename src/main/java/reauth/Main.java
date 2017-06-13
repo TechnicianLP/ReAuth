@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-@Mod(modid = "reauth", name = "ReAuth", version = "3.4.1", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.8.0,1.8.9]", certificateFingerprint = "cac6b8578b012cf31142c980b01c13ddb795846c")
+@Mod(modid = "reauth", name = "ReAuth", version = "3.5.0", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.8.0,1.8.9]", certificateFingerprint = "aa395513cd0890f9c69d4229ac5d779667421c85")
 public class Main {
 
     static final Logger log = LogManager.getLogger("ReAuth");
@@ -33,7 +33,7 @@ public class Main {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent evt) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         MinecraftForge.EVENT_BUS.register(new GuiHandler());
-        FMLCommonHandler.instance().bus().register(this);
+        MinecraftForge.EVENT_BUS.register(this);
 
         //Moved ReAuth config out of /config
         File config = new File(Minecraft.getMinecraft().mcDataDir, ".ReAuth.cfg");
