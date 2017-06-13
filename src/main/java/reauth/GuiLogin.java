@@ -8,7 +8,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class GuiLogin extends GuiScreen {
 
@@ -24,7 +24,7 @@ public class GuiLogin extends GuiScreen {
 
     private int basey;
 
-    private String error = "";
+    private String message = "";
 
     GuiLogin(GuiScreen prev) {
         this.mc = Minecraft.getMinecraft();
@@ -57,11 +57,12 @@ public class GuiLogin extends GuiScreen {
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
         this.drawDefaultBackground();
 
-        this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey, Color.WHITE.getRGB());
-        this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45, Color.WHITE.getRGB());
-        if (!(this.error == null || this.error.isEmpty())) {
-            int color = this.error.startsWith("E") ? Color.RED.getRGB() : Color.GREEN.getRGB();
-            this.drawCenteredString(this.fontRendererObj, this.error.substring(1), this.width / 2, this.basey - 15, color);
+        this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey,
+                Color.WHITE.getRGB());
+        this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45,
+                Color.WHITE.getRGB());
+        if (!(this.message == null || this.message.isEmpty())) {
+            this.drawCenteredString(this.fontRendererObj, this.message, this.width / 2, this.basey - 15, 0xFFFFFF);
         }
         this.username.drawTextBox();
         this.pw.drawTextBox();
@@ -79,6 +80,7 @@ public class GuiLogin extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
+
         this.basey = this.height / 2 - 110 / 2;
 
         this.username = new GuiTextField(this.fontRendererObj, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
@@ -111,10 +113,10 @@ public class GuiLogin extends GuiScreen {
         this.buttonList.add(config);
 
         if (!VersionChecker.isLatestVersion()) {
-            this.error = "SUpdate Avaliable!";
+            this.message = VersionChecker.getUpdateMessage();
         }
         if (!VersionChecker.isVersionAllowed()) {
-            this.error = "ECritical Update Avaliable!";
+            this.message = VersionChecker.getUpdateMessage();
             this.login.enabled = false;
         }
     }
@@ -152,15 +154,15 @@ public class GuiLogin extends GuiScreen {
     private boolean login() {
         try {
             Secure.login(this.username.getText(), this.pw.getPW(), this.save.isChecked());
-            this.error = "SLogin successfull!";
+            this.message = (char) 167 + "aLogin successful!";
             return true;
         } catch (AuthenticationException e) {
-            this.error = "ELogin failed: " + e.getMessage();
+            this.message = (char) 167 + "4Login failed: " + e.getMessage();
             Main.log.error("Login failed:", e);
             return false;
         } catch (Exception e) {
-            this.error = "EError: Something went wrong!";
-            Main.log.error("Session could not be updated IN YOUR CLIENT because of access restrictions", e);
+            this.message = (char) 167 + "4Error: Something went wrong!";
+            Main.log.error("Error:", e);
             return false;
         }
     }
@@ -171,19 +173,19 @@ public class GuiLogin extends GuiScreen {
     private boolean playOffline() {
         String username = this.username.getText();
         if (!(username.length() >= 2 && username.length() <= 16)) {
-            this.error = "EError: Usernames have a lenght between 2 and 16";
+            this.message = (char) 167 + "4Error: Username needs a length between 2 and 16";
             return false;
         }
         if (!username.matches("[A-Za-z0-9_]{2,16}")) {
-            this.error = "EError: Usernames have to be alphanumerical";
+            this.message = (char) 167 + "4Error: Username has to be alphanumerical";
             return false;
         }
         try {
             Secure.offlineMode(username);
             return true;
         } catch (Exception e) {
-            this.error = "EError: Something went wrong!";
-            Main.log.error("Session could not be updated IN YOUR CLIENT because of access restrictions", e);
+            this.message = (char) 167 + "4Error: Something went wrong!";
+            Main.log.error("Error:", e);
             return false;
         }
     }
