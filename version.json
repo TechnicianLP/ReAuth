@@ -1,7 +1,7 @@
 {
   "1.12": {
-    "latest": "3.5.0",
-    "latest-message": "Changed VersionChecker",
+    "latest": "3.5.1",
+    "latest-message": "Fixed crash with latest Forge",
     "allowed": "[3.2,)",
     "allowed-message": "Version too old"
   },
