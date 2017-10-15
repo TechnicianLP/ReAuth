@@ -45,7 +45,9 @@ class Secure {
      */
     static void init() {
         String base = "reauth.";
-        List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler", base + "GuiLogin", base + "GuiPasswordField", base + "Main", base + "Secure", base + "VersionChecker");
+        List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler",
+                base + "GuiLogin", base + "GuiPasswordField", base + "Main",
+                base + "Secure", base + "VersionChecker", base + "CachedProperty");
         try {
             Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
             for (ClassInfo info : set)
@@ -146,6 +148,7 @@ class Secure {
 
         static void set(Session s) throws IllegalArgumentException, IllegalAccessException {
             Sessionutil.sessionField.set(Minecraft.getMinecraft(), s);
+            GuiHandler.invalidateStatus();
         }
     }
 

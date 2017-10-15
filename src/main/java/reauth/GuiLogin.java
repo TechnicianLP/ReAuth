@@ -29,7 +29,7 @@ public class GuiLogin extends GuiScreen {
 
     GuiLogin(GuiScreen prev) {
         this.mc = Minecraft.getMinecraft();
-        this.fontRendererObj = mc.fontRendererObj;
+        this.fontRenderer = mc.fontRenderer;
         this.prev = prev;
     }
 
@@ -58,12 +58,12 @@ public class GuiLogin extends GuiScreen {
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
         this.drawDefaultBackground();
 
-        this.drawCenteredString(this.fontRendererObj, "Username/E-Mail:", this.width / 2, this.basey,
+        this.drawCenteredString(this.fontRenderer, "Username/E-Mail:", this.width / 2, this.basey,
                 Color.WHITE.getRGB());
-        this.drawCenteredString(this.fontRendererObj, "Password:", this.width / 2, this.basey + 45,
+        this.drawCenteredString(this.fontRenderer, "Password:", this.width / 2, this.basey + 45,
                 Color.WHITE.getRGB());
         if (!(this.message == null || this.message.isEmpty())) {
-            this.drawCenteredString(this.fontRendererObj, this.message, this.width / 2, this.basey - 15, 0xFFFFFF);
+            this.drawCenteredString(this.fontRenderer, this.message, this.width / 2, this.basey - 15, 0xFFFFFF);
         }
         this.username.drawTextBox();
         this.pw.drawTextBox();
@@ -81,15 +81,16 @@ public class GuiLogin extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
+        Keyboard.enableRepeatEvents(true);
 
         this.basey = this.height / 2 - 110 / 2;
 
-        this.username = new GuiTextField(0, this.fontRendererObj, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
+        this.username = new GuiTextField(0, this.fontRenderer, this.width / 2 - 155, this.basey + 15, 2 * 155, 20);
         this.username.setMaxStringLength(512);
         this.username.setText(Secure.username);
         this.username.setFocused(true);
 
-        this.pw = new GuiPasswordField(this.fontRendererObj, this.width / 2 - 155, this.basey + 60, 2 * 155, 20);
+        this.pw = new GuiPasswordField(this.fontRenderer, this.width / 2 - 155, this.basey + 60, 2 * 155, 20);
         this.pw.setMaxStringLength(512);
         this.pw.setText(Secure.password);
 
@@ -191,4 +192,9 @@ public class GuiLogin extends GuiScreen {
         }
     }
 
+    @Override
+    public void onGuiClosed() {
+        super.onGuiClosed();
+        Keyboard.enableRepeatEvents(false);
+    }
 }

@@ -10,7 +10,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = "3.5.1"
+version = "3.5.2"
 group = "reauth.Main" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ReAuth"
 
@@ -20,10 +20,10 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12-14.21.1.2387"
+    version = "1.12.2-14.23.0.2512"
     runDir = "run"
 
-    mappings = "snapshot_20161220"
+    mappings = "snapshot_20171015"
 }
 
 dependencies {
