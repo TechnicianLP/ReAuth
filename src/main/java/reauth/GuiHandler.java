@@ -13,39 +13,20 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-import java.awt.*;
-
-@Mod.EventBusSubscriber(Side.CLIENT)
 public class GuiHandler {
-
-    /**
-     * Cache the Status for 5 Minutes
-     */
-    private static final CachedProperty<ValidationStatus> status = new CachedProperty<>(1000 * 60 * 5, ValidationStatus.Unknown);
-    private static Thread validator;
 
     static boolean enabled = true;
     static boolean bold = true;
 
     @SubscribeEvent
-    public static void open(InitGuiEvent.Post e) {
+    public void open(InitGuiEvent.Post e) {
         boolean run = false;
         if (e.getGui() instanceof GuiMultiplayer) {
             e.getButtonList().add(new GuiButton(17325, 5, 5, 100, 20, "Re-Login"));
             run = true;
 
-            if (enabled && !status.check()) {
-                if (validator != null)
-                    validator.interrupt();
-                validator = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        status.set(Secure.SessionValid() ? ValidationStatus.Valid : ValidationStatus.Invalid);
-                    }
-                }, "Session-Validator");
-                validator.setDaemon(true);
-                validator.start();
-            }
+            if (enabled)
+                Secure.checkSessionValidity();
         } else if (e.getGui() instanceof GuiMainMenu) {
             run = true;
             // Support for Custom Main Menu (add button outside of viewport)
@@ -57,41 +38,25 @@ public class GuiHandler {
     }
 
     @SubscribeEvent
-    public static void draw(DrawScreenEvent.Post e) {
+    public void draw(DrawScreenEvent.Post e) {
         if (enabled && e.getGui() instanceof GuiMultiplayer) {
             e.getGui().drawString(e.getGui().mc.fontRendererObj, "Online:", 110, 10, 0xFFFFFFFF);
-            ValidationStatus state = status.get();
+            Secure.ValidationStatus state = Secure.getSessionValidity();
             e.getGui().drawString(e.getGui().mc.fontRendererObj, (bold ? ChatFormatting.BOLD : "") + state.text, 145, 10, state.color);
         }
     }
 
     @SubscribeEvent
-    public static void action(ActionPerformedEvent.Post e) {
+    public void action(ActionPerformedEvent.Post e) {
         if ((e.getGui() instanceof GuiMainMenu || e.getGui() instanceof GuiMultiplayer) && e.getButton().id == 17325) {
             Minecraft.getMinecraft().displayGuiScreen(new GuiLogin(Minecraft.getMinecraft().currentScreen));
         }
     }
 
     @SubscribeEvent
-    public static void action(ActionPerformedEvent.Pre e) {
+    public void action(ActionPerformedEvent.Pre e) {
         if (enabled && e.getGui() instanceof GuiMultiplayer && e.getButton().id == 8 && GuiScreen.isShiftKeyDown()) {
-            status.invalidate();
-        }
-    }
-
-    static void invalidateStatus() {
-        status.invalidate();
-    }
-
-    private enum ValidationStatus {
-        Unknown("?", Color.GRAY.getRGB()), Valid("\u2714", Color.GREEN.getRGB()), Invalid("\u2718", Color.RED.getRGB());
-
-        private final String text;
-        private final int color;
-
-        ValidationStatus(String text, int color) {
-            this.text = text;
-            this.color = color;
+            Secure.invalidateCache();
         }
     }
 }

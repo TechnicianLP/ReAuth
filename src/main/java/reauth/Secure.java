@@ -16,6 +16,7 @@ import net.minecraft.util.Session;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -41,13 +42,19 @@ class Secure {
     private static final YggdrasilMinecraftSessionService ymss;
 
     /**
+     * Cache the Status for 5 Minutes
+     */
+    private static final CachedProperty<ValidationStatus> status = new CachedProperty<>(1000 * 60 * 5, ValidationStatus.Unknown);
+    private static Thread validator;
+
+    /**
      * currently used to load the class
      */
     static void init() {
         String base = "reauth.";
         List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler",
                 base + "GuiLogin", base + "GuiPasswordField", base + "Main",
-                base + "Secure", base + "VersionChecker", base+ "CachedProperty");
+                base + "Secure", base + "VersionChecker", base + "CachedProperty");
         try {
             Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
             for (ClassInfo info : set)
@@ -106,7 +113,7 @@ class Secure {
     }
 
     static void offlineMode(String username) throws IllegalArgumentException, IllegalAccessException {
-		/* Create offline uuid */
+        /* Create offline uuid */
         UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(Charsets.UTF_8));
         Sessionutil.set(new Session(username, uuid.toString(), null, "legacy"));
         Main.log.info("Offline Username set!");
@@ -116,23 +123,44 @@ class Secure {
     /**
      * checks online if the session is valid
      */
-    static boolean SessionValid() {
-        try {
-            GameProfile gp = Sessionutil.get().getProfile();
-            String token = Sessionutil.get().getToken();
-            String id = UUID.randomUUID().toString();
+    static void checkSessionValidity() {
+        if (!status.check()) {
+            if (validator != null)
+                validator.interrupt();
+            validator = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        GameProfile gp = Sessionutil.get().getProfile();
+                        String token = Sessionutil.get().getToken();
+                        String id = UUID.randomUUID().toString();
 
-            Secure.ymss.joinServer(gp, token, id);
-            if (Secure.ymss.hasJoinedServer(gp, id).isComplete()) {
-                Main.log.info("Session validation successful");
-                return true;
-            }
-        } catch (Exception e) {
-            Main.log.info("Session validation failed: " + e.getMessage());
-            return false;
+                        Secure.ymss.joinServer(gp, token, id);
+                        if (Secure.ymss.hasJoinedServer(gp, id).isComplete()) {
+                            Main.log.info("Session validation successful");
+                            status.set(ValidationStatus.Valid);
+                            return;
+                        }
+                    } catch (Exception e) {
+                        Main.log.info("Session validation failed: " + e.getMessage());
+                        status.set(ValidationStatus.Invalid);
+                        return;
+                    }
+                    Main.log.info("Session validation failed!");
+                    status.set(ValidationStatus.Invalid);
+                }
+            }, "Session-Validator");
+            validator.setDaemon(true);
+            validator.start();
         }
-        Main.log.info("Session validation failed!");
-        return false;
+    }
+
+    static ValidationStatus getSessionValidity(){
+        return status.get();
+    }
+
+    static void invalidateCache(){
+        status.invalidate();
     }
 
     static class Sessionutil {
@@ -148,8 +176,19 @@ class Secure {
 
         static void set(Session s) throws IllegalArgumentException, IllegalAccessException {
             Sessionutil.sessionField.set(Minecraft.getMinecraft(), s);
-            GuiHandler.invalidateStatus();
+            status.invalidate();
         }
     }
 
+    enum ValidationStatus {
+        Unknown("?", Color.GRAY.getRGB()), Valid("\u2714", Color.GREEN.getRGB()), Invalid("\u2718", Color.RED.getRGB());
+
+        final String text;
+        final int color;
+
+        ValidationStatus(String text, int color) {
+            this.text = text;
+            this.color = color;
+        }
+    }
 }

@@ -34,6 +34,7 @@ public final class Main {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent evt) {
+        MinecraftForge.EVENT_BUS.register(new GuiHandler());
         MinecraftForge.EVENT_BUS.register(this);
 
         //Moved ReAuth config out of /config
