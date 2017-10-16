@@ -81,6 +81,7 @@ public class GuiLogin extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
+        Keyboard.enableRepeatEvents(true);
 
         this.basey = this.height / 2 - 110 / 2;
 
@@ -191,4 +192,9 @@ public class GuiLogin extends GuiScreen {
         }
     }
 
+    @Override
+    public void onGuiClosed() {
+        super.onGuiClosed();
+        Keyboard.enableRepeatEvents(false);
+    }
 }

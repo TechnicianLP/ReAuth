@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-@Mod(modid = "reauth", name = "ReAuth", version = "3.5.0", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.11,1.11.2]", certificateFingerprint = "aa395513cd0890f9c69d4229ac5d779667421c85")
+@Mod(modid = "reauth", name = "ReAuth", version = "3.5.2", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.11,1.11.2]", certificateFingerprint = "daba0ec4df71b6da841768c49fb873def208a1e3")
 public final class Main {
 
     static final Logger log = LogManager.getLogger("ReAuth");
@@ -31,7 +31,6 @@ public final class Main {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent evt) {
-        MinecraftForge.EVENT_BUS.register(new GuiHandler());
         MinecraftForge.EVENT_BUS.register(this);
 
         //Moved ReAuth config out of /config
