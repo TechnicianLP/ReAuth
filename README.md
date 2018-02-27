@@ -12,6 +12,8 @@ The Mod is clientside only - it will not work in servers mods folder
 
 Just hit the "Re-Login" Button in the Multiplayermenu and enter your Logindata, after that you will be able to login on your Servers
 
+An invisible Login-Button is available in the MainMenu to be wrapped by CustomMainMenu (Button-ID 17325)(1.7.10+)
+
 I know that entering your Logindata simply into a Mod might sound risky, but thats why i have the Source here
 
 -http://minecraft.curseforge.com/projects/reauth                                                                         
