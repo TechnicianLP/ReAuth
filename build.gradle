@@ -49,9 +49,30 @@ processResources {
 }
 
 
+import com.google.common.base.Charsets
+import com.google.common.io.Files
 import groovy.swing.SwingBuilder
 
 import java.awt.*
+import java.util.function.Consumer
+
+// this task replace lines that end with "// @Replace(<code>)" with <code> when building
+// this allows for different behaviour in dev environment (ie disabled signature checks)
+task replaceSourceMain(type: DefaultTask, dependsOn: sourceMainJava) {
+    doLast {
+        project.fileTree(sourceMainJava.output).matching {
+            include '**/*.java'
+        }.forEach(new Consumer<File>() {
+            @Override
+            void accept(File file) {
+                String text = Files.toString(file, Charsets.UTF_8)
+                text = text.replaceAll('.*// ?@[Rr]eplace\\((.*)\\)', '$1')
+                Files.write(text, file, Charsets.UTF_8)
+            }
+        })
+    }
+}
+compileJava.dependsOn(replaceSourceMain)
 
 task signJar(type: Exec, dependsOn: reobfJar) {
     onlyIf {
@@ -62,7 +83,9 @@ task signJar(type: Exec, dependsOn: reobfJar) {
         keyPass = null
     }
     executable = "jarsigner"
-    args(["-signedJar", jar.archivePath, jar.archivePath, project.keyStoreAlias, "-tsa", project.tsa, "-keystore", project.keyStore])
+    args(["-signedJar", jar.archivePath, jar.archivePath, project.keyStoreAlias,
+          "-tsa", project.tsa,
+          "-keystore", project.keyStore])
     doFirst {
         if (storePass != null && storePass?.trim())
             args(["-storepass", storePass])
@@ -70,14 +93,14 @@ task signJar(type: Exec, dependsOn: reobfJar) {
             args(["-keypass", keyPass])
     }
 }
-
 build.dependsOn signJar
 
 gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(':signJar')) {
         if (System.console() == null) {
             new SwingBuilder().edt {
-                dialog(modal: true, title: 'KeyStore Passwords', alwaysOnTop: true, resizable: false, locationRelativeTo: null, show: true, size: [300, 150]) {
+                dialog(modal: true, title: 'KeyStore Passwords', alwaysOnTop: true, resizable: false,
+                        locationRelativeTo: null, show: true, size: [300, 150]) {
                     panel(layout: new BorderLayout(5, 5)) {
                         def store
                         def key

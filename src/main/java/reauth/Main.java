@@ -76,13 +76,10 @@ public final class Main {
 
     @Mod.EventHandler
     public void securityError(FMLFingerprintViolationEvent event) {
-        boolean dev = false;
-        if (dev) {
-            log.fatal("+-----------------------------------------------------------------------------------+");
-            log.fatal("|The Version of ReAuth is not signed! It was modified! Ignoring because of Dev-Mode!|");
-            log.fatal("+-----------------------------------------------------------------------------------+");
-        } else
-            throw new SecurityException("The Version of ReAuth is not signed! It is a modified version!");
+        log.fatal("+-----------------------------------------------------------------------------------+");// @Replace()
+        log.fatal("|The Version of ReAuth is not signed! It was modified! Ignoring because of Dev-Mode!|");// @Replace()
+        log.fatal("+-----------------------------------------------------------------------------------+");// @Replace()
+        // @Replace(throw new SecurityException("The Version of ReAuth is not signed! It is a modified version!");)
     }
 
 }
