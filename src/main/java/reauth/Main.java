@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-@Mod(modid = "reauth", name = "ReAuth", version = "3.5.2", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.12]", certificateFingerprint = "daba0ec4df71b6da841768c49fb873def208a1e3")
+@Mod(modid = "reauth", name = "ReAuth", version = "3.6.0", guiFactory = "reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.12]", certificateFingerprint = "daba0ec4df71b6da841768c49fb873def208a1e3")
 public final class Main {
 
     static final Logger log = LogManager.getLogger("ReAuth");
@@ -60,7 +60,7 @@ public final class Main {
         Secure.username = username.getString();
 
         Property password = config.get(Configuration.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk");
-        Secure.password = password.getString();
+        Secure.password = password.getString().toCharArray();
 
         Property offline = config.get(Configuration.CATEGORY_GENERAL, "offlineModeEnabled", false, "Enables play-offline button");
         Main.OfflineModeEnabled = offline.getBoolean();

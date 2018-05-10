@@ -91,8 +91,7 @@ final class GuiLogin extends GuiScreen {
         this.username.setFocused(true);
 
         this.pw = new GuiPasswordField(this.fontRenderer, this.width / 2 - 155, this.basey + 60, 2 * 155, 20);
-        this.pw.setMaxStringLength(512);
-        this.pw.setText(Secure.password);
+        this.pw.setPassword(Secure.password);
 
         this.save = new GuiCheckBox(2, this.width / 2 - 155, this.basey + 85, "Save Password to Config (WARNING: SECURITY RISK!)", false);
         this.buttonList.add(this.save);
@@ -195,6 +194,7 @@ final class GuiLogin extends GuiScreen {
     @Override
     public void onGuiClosed() {
         super.onGuiClosed();
+        this.pw.setPassword(new char[0]);
         Keyboard.enableRepeatEvents(false);
     }
 }

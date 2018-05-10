@@ -31,7 +31,7 @@ final class Secure {
     /**
      * password if saved to config else empty
      */
-    static String password = "";
+    static char[] password = new char[0];
 
     /**
      * Mojang authentificationservice
@@ -52,10 +52,10 @@ final class Secure {
             Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
             for (ClassInfo info : set)
                 if (!classes.contains(info.getName())) {
-                    throw new RuntimeException("Detected unauthorized class trying to access reauth-data! Offender: " + info.url().getPath());
+                    throw new RuntimeException("Detected unexpected class in ReAuth package! Offender: " + info.url().getPath());
                 }
         } catch (IOException e) {
-            throw new RuntimeException("Classnames could not be fetched!");
+            throw new RuntimeException("Classnames could not be fetched!", e);
         }
 
         VersionChecker.update();
@@ -71,13 +71,13 @@ final class Secure {
     /**
      * Logs you in; replaces the Session in your client; and saves to config
      */
-    static void login(String user, String pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
+    static void login(String user, char[] pw, boolean savePassToConfig) throws AuthenticationException, IllegalArgumentException, IllegalAccessException {
         if (!VersionChecker.isVersionAllowed())
             throw new AuthenticationException("ReAuth has a critical update!");
 
         /* set credentials */
         Secure.yua.setUsername(user);
-        Secure.yua.setPassword(pw);
+        Secure.yua.setPassword(new String(pw));
 
         /* login */
         Secure.yua.logIn();
@@ -100,7 +100,8 @@ final class Secure {
         /* save password to config if desired */
         if (savePassToConfig) {
             Secure.password = pw;
-            Main.config.get(Configuration.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk").set(Secure.password);
+            Main.config.get(Configuration.CATEGORY_GENERAL, "password", "",
+                    "Your Password in plaintext if chosen to save to disk").set(new String(Secure.password));
         }
         Main.config.save();
     }
