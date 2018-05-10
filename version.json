@@ -1,7 +1,7 @@
 {
   "1.12": {
-    "latest": "3.5.2",
-    "latest-message": "A few improvements",
+    "latest": "3.6.0",
+    "latest-message": "Improved Password-Field",
     "allowed": "[3.2,)",
     "allowed-message": "Version too old"
   },
