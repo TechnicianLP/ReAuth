@@ -1,4 +1,4 @@
-package reauth;
+package technicianlp.reauth;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;

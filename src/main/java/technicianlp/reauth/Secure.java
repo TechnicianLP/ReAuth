@@ -1,4 +1,4 @@
-package reauth;
+package technicianlp.reauth;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -44,12 +44,12 @@ final class Secure {
      * currently used to load the class
      */
     static void init() {
-        String base = "reauth.";
+        String base = "technicianlp.reauth.";
         List<String> classes = ImmutableList.of(base + "ConfigGUI", base + "GuiFactory", base + "GuiHandler",
                 base + "GuiLogin", base + "GuiPasswordField", base + "Main",
                 base + "Secure", base + "VersionChecker", base + "CachedProperty");
         try {
-            Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("reauth");
+            Set<ClassInfo> set = ClassPath.from(Secure.class.getClassLoader()).getTopLevelClassesRecursive("technicianlp.reauth");
             for (ClassInfo info : set)
                 if (!classes.contains(info.getName())) {
                     throw new RuntimeException("Detected unexpected class in ReAuth package! Offender: " + info.url().getPath());

@@ -1,4 +1,4 @@
-package reauth;
+package technicianlp.reauth;
 
 final class CachedProperty<T> {
     private T value;

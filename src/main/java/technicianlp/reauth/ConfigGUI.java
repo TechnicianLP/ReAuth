@@ -1,4 +1,4 @@
-package reauth;
+package technicianlp.reauth;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiScreen;

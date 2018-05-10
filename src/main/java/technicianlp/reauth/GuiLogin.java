@@ -1,4 +1,4 @@
-package reauth;
+package technicianlp.reauth;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
 import net.minecraft.client.Minecraft;

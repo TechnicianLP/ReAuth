@@ -1,4 +1,4 @@
-package reauth;
+package technicianlp.reauth;
 
 import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.client.Minecraft;

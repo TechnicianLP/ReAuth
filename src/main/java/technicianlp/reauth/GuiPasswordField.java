@@ -1,4 +1,4 @@
-package reauth;
+package technicianlp.reauth;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
