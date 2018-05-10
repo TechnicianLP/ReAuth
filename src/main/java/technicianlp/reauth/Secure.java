@@ -109,7 +109,7 @@ final class Secure {
     static void offlineMode(String username) throws IllegalArgumentException, IllegalAccessException {
         /* Create offline uuid */
         UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(Charsets.UTF_8));
-        Sessionutil.set(new Session(username, uuid.toString(), null, "legacy"));
+        Sessionutil.set(new Session(username, uuid.toString(), "invalid", "legacy"));
         Main.log.info("Offline Username set!");
         Secure.username = username;
     }

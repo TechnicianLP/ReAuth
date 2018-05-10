@@ -18,10 +18,12 @@ final class GuiPasswordField extends GuiTextField {
         this.setMaxStringLength(512);
     }
 
-    private char[] password;
+    private char[] password = new char[0];
 
     final char[] getPW() {
-        return password;
+        char[] pw = new char[password.length];
+        System.arraycopy(password,0,pw,0,password.length);
+        return pw;
     }
 
     public final boolean textboxKeyTyped(char typedChar, int keyCode) {
@@ -65,6 +67,7 @@ final class GuiPasswordField extends GuiTextField {
             System.arraycopy(password, selEnd, newPW, selStart + input.length, password.length - selEnd);
 
         setPassword(newPW);
+        Arrays.fill(newPW, 'f');
         this.moveCursorBy(selStart - this.getSelectionEnd() + l);
     }
 
@@ -89,6 +92,7 @@ final class GuiPasswordField extends GuiTextField {
                 System.arraycopy(password, end, newPW, start, password.length - end);
 
             setPassword(newPW);
+            Arrays.fill(newPW,'f');
             if (direction)
                 this.moveCursorBy(num);
         }
@@ -96,7 +100,8 @@ final class GuiPasswordField extends GuiTextField {
 
     final void setPassword(char[] password) {
         Arrays.fill(this.password, 'f');
-        this.password = password;
+        this.password = new char[password.length];
+        System.arraycopy(password, 0, this.password, 0, password.length);
         updateText();
     }
 
