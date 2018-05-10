@@ -7,7 +7,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.IConfigElement;
 
-class ConfigGUI extends GuiConfig {
+final class ConfigGUI extends GuiConfig {
 
     private static IConfigElement ce = new ConfigElement(Main.config.getCategory(Configuration.CATEGORY_GENERAL));
 

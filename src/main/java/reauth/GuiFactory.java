@@ -6,7 +6,7 @@ import net.minecraftforge.fml.client.IModGuiFactory;
 
 import java.util.Set;
 
-public class GuiFactory implements IModGuiFactory {
+public final class GuiFactory implements IModGuiFactory {
 
     public void initialize(Minecraft minecraftInstance) {
     }

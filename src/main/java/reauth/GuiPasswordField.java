@@ -6,7 +6,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-class GuiPasswordField extends GuiTextField {
+final class GuiPasswordField extends GuiTextField {
 
     GuiPasswordField(FontRenderer renderer, int posx, int posy, int x, int y) {
         super(1, renderer, posx, posy, x, y);

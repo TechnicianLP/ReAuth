@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-class Secure {
+final class Secure {
 
     /**
      * Username/email
@@ -135,14 +135,14 @@ class Secure {
         return false;
     }
 
-    static class Sessionutil {
+    static final class Sessionutil {
         /**
          * as the Session field in Minecraft.class is final we have to access it
          * via reflection
          */
         private static Field sessionField = ReflectionHelper.findField(Minecraft.class, "session", "S", "field_71449_j");
 
-        static Session get() throws IllegalArgumentException, IllegalAccessException {
+        static Session get() {
             return Minecraft.getMinecraft().getSession();
         }
 

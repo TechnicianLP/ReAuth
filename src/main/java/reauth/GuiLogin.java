@@ -11,7 +11,7 @@ import org.lwjgl.input.Keyboard;
 import java.awt.Color;
 import java.io.IOException;
 
-public class GuiLogin extends GuiScreen {
+final class GuiLogin extends GuiScreen {
 
     private GuiTextField username;
     private GuiPasswordField pw;

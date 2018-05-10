@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-class VersionChecker implements Runnable {
+final class VersionChecker implements Runnable {
 
     private static final String url = "https://raw.githubusercontent.com/TechnicianLP/ReAuth/master/version.json";
     private static final String group = "1.12";

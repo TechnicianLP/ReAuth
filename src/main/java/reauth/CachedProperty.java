@@ -1,6 +1,6 @@
 package reauth;
 
-class CachedProperty<T> {
+final class CachedProperty<T> {
     private T value;
     private final T invalid;
     private boolean valid;

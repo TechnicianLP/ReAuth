@@ -16,7 +16,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.awt.Color;
 
 @Mod.EventBusSubscriber(modid = "reauth", value = Side.CLIENT)
-public class GuiHandler {
+public final class GuiHandler {
 
     /**
      * Cache the Status for 5 Minutes
