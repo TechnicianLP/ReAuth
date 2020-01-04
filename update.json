@@ -1,7 +1,10 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/reauth",
   "promos": {
-    "1.14.4-latest": "",
-    "1.14.4-recomended": ""
+    "1.14.4-latest": "3.7.0",
+    "1.14.4-recommended": "3.7.0"
+  },
+  "1.14.4": {
+    "3.7.0": "Port to 1.14"
   }
 }
