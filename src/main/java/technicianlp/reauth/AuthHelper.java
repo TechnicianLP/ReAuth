@@ -1,19 +1,29 @@
 package technicianlp.reauth;
 
 import com.mojang.authlib.Agent;
+import com.mojang.authlib.AuthenticationService;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
+import com.mojang.authlib.yggdrasil.request.ValidateRequest;
+import com.mojang.authlib.yggdrasil.response.Response;
 import com.mojang.util.UUIDTypeAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
+import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class AuthHelper extends YggdrasilUserAuthentication {
+
+    /**
+     * Time for which the Validity gets cached (5 Minutes)
+     */
+    private static final long cacheTime = 5 * 1000 * 60;
 
     // Reflective Field access to private (final) Fields
     private static Field sessionField;
@@ -34,13 +44,18 @@ public class AuthHelper extends YggdrasilUserAuthentication {
      */
     private SessionStatus status = SessionStatus.Unknown;
     private long lastCheck = 0;
+
     /**
-     * Time for which the Validity gets cached (5 Minutes)
+     * A secondary Authentication Service used for the login,
+     * this is required as a Validation-Request cannot have a clientToken,
+     * but a Login-Request requires it.
      */
-    private final long cacheTime = 5 * 1000 * 60;
+    private YggdrasilAuthenticationService loginService;
+    private boolean returnLoginService = false;
 
     public AuthHelper() {
-        super(new YggdrasilAuthenticationService(Minecraft.getInstance().getProxy(), UUID.randomUUID().toString()), Agent.MINECRAFT);
+        super(new YggdrasilAuthenticationService(Minecraft.getInstance().getProxy(), null), Agent.MINECRAFT);
+        loginService = new YggdrasilAuthenticationService(Minecraft.getInstance().getProxy(), UUID.randomUUID().toString());
     }
 
     /**
@@ -76,15 +91,26 @@ public class AuthHelper extends YggdrasilUserAuthentication {
         lastCheck = System.currentTimeMillis();
     }
 
+    @Override
+    public YggdrasilAuthenticationService getAuthenticationService() {
+        if (returnLoginService) {
+            return loginService;
+        }
+        return super.getAuthenticationService();
+    }
+
     /**
      * Login with the Supplied Username and Password
      * Password is saved to config if {@code savePassword} is true
      **/
-    public void login(String user, String password, boolean savePassword) throws AuthenticationException {
+    public void login(String user, char[] password, boolean savePassword) throws AuthenticationException {
         setUsername(user);
-        setPassword(password);
+        String pw = new String(password);
+        setPassword(pw);
         try {
+            returnLoginService = true;
             logInWithPassword();
+            returnLoginService = false;
 
             String username = getSelectedProfile().getName();
             String uuid = UUIDTypeAdapter.fromUUID(getSelectedProfile().getId());
@@ -98,11 +124,10 @@ public class AuthHelper extends YggdrasilUserAuthentication {
 
             setSession(session);
 
-            Main.config.setCredentials(user, savePassword ? password : "");
-        } catch (AuthenticationException e) {
-            throw e;
+            Main.config.setCredentials(user, savePassword ? pw : "");
         } finally {
             logOut();
+            returnLoginService = false;
         }
     }
 
@@ -139,26 +164,19 @@ public class AuthHelper extends YggdrasilUserAuthentication {
     }
 
     public enum SessionStatus {
-        Valid("valid", 0xFF00FF00),
-        Unknown("unknown", 0xFF808080),
-        Refreshing("unknown", 0xFF808080),
-        Invalid("invalid", 0xFFFF0000);
+        Valid("valid"),
+        Unknown("unknown"),
+        Refreshing("unknown"),
+        Invalid("invalid");
 
         private final String translationKey;
-        private final int color;
 
-        SessionStatus(String translationKey, int color) {
+        SessionStatus(String translationKey) {
             this.translationKey = "reauth.status." + translationKey;
-            this.color = color;
         }
 
         public String getTranslationKey() {
             return translationKey;
         }
-
-        public int getColor() {
-            return color;
-        }
     }
-
 }

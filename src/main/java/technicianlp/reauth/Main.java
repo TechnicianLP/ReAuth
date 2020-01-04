@@ -45,7 +45,6 @@ public final class Main {
     @SubscribeEvent
     public static void setup(FMLCommonSetupEvent event) {
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
-
 //        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (mc, sc) -> );
     }
 
@@ -53,13 +52,4 @@ public final class Main {
     public static void setup(ModConfig.ModConfigEvent event) {
         config.setConfig(event.getConfig());
     }
-
-//    @Mod.EventHandler
-//    public void securityError(FMLFingerprintViolationEvent event) {
-//        log.fatal("+-----------------------------------------------------------------------------------+");// @Replace()
-//        log.fatal("|The Version of ReAuth is not signed! It was modified! Ignoring because of Dev-Mode!|");// @Replace()
-//        log.fatal("+-----------------------------------------------------------------------------------+");// @Replace()
-//        // @Replace(throw new SecurityException("The Version of ReAuth is not signed! It is a modified version!");)
-//    }
-
 }

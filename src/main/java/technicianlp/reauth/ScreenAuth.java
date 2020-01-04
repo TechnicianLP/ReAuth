@@ -15,7 +15,7 @@ import java.awt.Color;
 final class ScreenAuth extends Screen {
 
     private TextFieldWidget username;
-    private TextFieldWidget pw;
+    private PasswordFieldWidget pw;
     private Button confirm;
     private Button cancel;
     private CheckboxButton save;
@@ -54,13 +54,9 @@ final class ScreenAuth extends Screen {
         this.save = new CheckboxButton(this.width / 2 - 155, this.baseY + 85, 2 * 155, 20, I18n.format("reauth.gui.auth.checkbox"), !pw.getText().isEmpty());
         addButton(this.save);
 
-        this.confirm = new Button(this.width / 2 - 155, this.baseY + 110, 153, 20, "", (b) -> {
-            doLogin();
-        });
+        this.confirm = new Button(this.width / 2 - 155, this.baseY + 110, 153, 20, "", (b) -> doLogin());
         addButton(confirm);
-        this.cancel = new Button(this.width / 2 + 2, this.baseY + 110, 155, 20, I18n.format("gui.cancel"), (b) -> {
-            this.getMinecraft().displayGuiScreen(prev);
-        });
+        this.cancel = new Button(this.width / 2 + 2, this.baseY + 110, 155, 20, I18n.format("gui.cancel"), (b) -> this.getMinecraft().displayGuiScreen(prev));
         addButton(cancel);
 
         this.config = new Button(this.width - 80, this.height - 25, 75, 20, I18n.format("reauth.gui.auth.config"), (b) -> {
@@ -68,7 +64,7 @@ final class ScreenAuth extends Screen {
             Main.config.setCredentials("", "");
             onClose();
         });
-        addButton(config);
+//        addButton(config);
     }
 
     @Override
@@ -145,7 +141,7 @@ final class ScreenAuth extends Screen {
             LoginType type = getLoginType();
             switch (type) {
                 case Online:
-                    Main.auth.login(this.username.getText(), this.pw.getText(), this.save.func_212942_a());
+                    Main.auth.login(this.username.getText(), this.pw.getPW(), this.save.func_212942_a());
                     break;
                 case Offline:
                     Main.auth.offline(this.username.getText());
