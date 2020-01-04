@@ -8,6 +8,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.fml.VersionChecker;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.Color;
@@ -41,12 +42,12 @@ final class ScreenAuth extends Screen {
 
         this.username = new TextFieldWidget(this.font, this.width / 2 - 155, this.baseY + 15, 2 * 155, 20, I18n.format("reauth.gui.auth.username"));
         this.username.setMaxStringLength(512);
-        this.username.setText(Main.config.getUsername());
+        this.username.setText(ReAuth.config.getUsername());
         addButton(username);
 
         this.pw = new PasswordFieldWidget(this.font, this.width / 2 - 155, this.baseY + 60, 2 * 155, 20, I18n.format("reauth.gui.auth.password"));
         this.pw.setMaxStringLength(Short.MAX_VALUE);
-        this.pw.setText(Main.config.getPassword());
+        this.pw.setText(ReAuth.config.getPassword());
         addButton(this.pw);
 
         focus(username.getText().isEmpty() ? username : pw);
@@ -61,10 +62,19 @@ final class ScreenAuth extends Screen {
 
         this.config = new Button(this.width - 80, this.height - 25, 75, 20, I18n.format("reauth.gui.auth.config"), (b) -> {
 //            this.getMinecraft().displayGuiScreen(new ConfigGUI(this));
-            Main.config.setCredentials("", "");
+            ReAuth.config.setCredentials("", "");
             onClose();
         });
 //        addButton(config);
+
+        VersionChecker.CheckResult result = VersionChecker.getResult(ReAuth.modInfo);
+        if (result.status == VersionChecker.Status.OUTDATED || result.status == VersionChecker.Status.BETA_OUTDATED) {
+            // Cannot be null but is marked as such :(
+            @SuppressWarnings("ConstantConditions")
+            String msg = result.changes.get(result.target);
+            if (msg != null)
+                message = I18n.format("reauth.gui.auth.update", msg);
+        }
     }
 
     @Override
@@ -141,10 +151,10 @@ final class ScreenAuth extends Screen {
             LoginType type = getLoginType();
             switch (type) {
                 case Online:
-                    Main.auth.login(this.username.getText(), this.pw.getPW(), this.save.func_212942_a());
+                    ReAuth.auth.login(this.username.getText(), this.pw.getPW(), this.save.func_212942_a());
                     break;
                 case Offline:
-                    Main.auth.offline(this.username.getText());
+                    ReAuth.auth.offline(this.username.getText());
                     break;
                 default:
                     return;
@@ -153,10 +163,10 @@ final class ScreenAuth extends Screen {
             success = true;
         } catch (AuthenticationException e) {
             this.message = I18n.format("reauth.login.fail", e.getMessage());
-            Main.log.error("Login failed:", e);
+            ReAuth.log.error("Login failed:", e);
         } catch (Exception e) {
             this.message = I18n.format("reauth.login.error", e.getMessage());
-            Main.log.error("Error:", e);
+            ReAuth.log.error("Error:", e);
         }
         if (success)
             onClose();

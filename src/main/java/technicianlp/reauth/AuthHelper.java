@@ -1,21 +1,16 @@
 package technicianlp.reauth;
 
 import com.mojang.authlib.Agent;
-import com.mojang.authlib.AuthenticationService;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
-import com.mojang.authlib.yggdrasil.request.ValidateRequest;
-import com.mojang.authlib.yggdrasil.response.Response;
 import com.mojang.util.UUIDTypeAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
-import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.UUID;
 
 public class AuthHelper extends YggdrasilUserAuthentication {
@@ -124,7 +119,7 @@ public class AuthHelper extends YggdrasilUserAuthentication {
 
             setSession(session);
 
-            Main.config.setCredentials(user, savePassword ? pw : "");
+            ReAuth.config.setCredentials(user, savePassword ? pw : "");
         } finally {
             logOut();
             returnLoginService = false;
@@ -138,8 +133,8 @@ public class AuthHelper extends YggdrasilUserAuthentication {
     public void offline(String username) {
         UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8));
         setSession(new Session(username, uuid.toString(), "invalid", "legacy"));
-        Main.log.info("Offline Username set!");
-        Main.config.setCredentials(username, "");
+        ReAuth.log.info("Offline Username set!");
+        ReAuth.config.setCredentials(username, "");
     }
 
     private void setToken(String accessToken) {

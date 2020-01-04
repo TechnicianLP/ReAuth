@@ -1,12 +1,12 @@
 modLoader="javafml"
 loaderVersion="[28,)"
-issueTrackerURL="http://my.issue.tracker/"
+issueTrackerURL="https://github.com/TechnicianLP/ReAuth/issues"
 
 [[mods]]
 modId="reauth"
 version="${file.jarVersion}"
 displayName="ReAuth"
-updateJSONURL="http://myurl.me/"
+updateJSONURL="https://raw.githubusercontent.com/TechnicianLP/ReAuth/master/update.json"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/reauth"
 authors="TechnicianLP"
 description="A Mod to renew your Session"

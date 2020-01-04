@@ -33,7 +33,7 @@ public final class GuiHandler {
     @SubscribeEvent
     public static void onDrawGui(DrawScreenEvent.Post e) {
         if (e.getGui() instanceof MultiplayerScreen) {
-            AuthHelper.SessionStatus state = Main.auth.getSessionStatus(false);
+            AuthHelper.SessionStatus state = ReAuth.auth.getSessionStatus(false);
             e.getGui().drawString(e.getGui().getMinecraft().fontRenderer, I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
         }
     }
@@ -44,7 +44,7 @@ public final class GuiHandler {
     @SubscribeEvent
     public static void onOpenGui(GuiOpenEvent e) {
         if (Minecraft.getInstance().currentScreen instanceof MultiplayerScreen && e.getGui() instanceof MultiplayerScreen && Screen.hasShiftDown()) {
-            Main.auth.getSessionStatus(true);
+            ReAuth.auth.getSessionStatus(true);
         }
     }
 }

@@ -9,6 +9,7 @@
   "reauth.gui.auth.confirm.offline": "Play Offline",
   "reauth.gui.auth.text1": "Username/E-Mail:",
   "reauth.gui.auth.text2": "Password:",
+  "reauth.gui.auth.update": "§9Update available: %s",
   "reauth.gui.button": "ReAuth Login",
   "reauth.status.valid": "Online: §l§a✔",
   "reauth.status.invalid": "Online: §l§c✘",
