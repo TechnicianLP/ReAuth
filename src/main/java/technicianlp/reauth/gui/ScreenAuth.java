@@ -1,4 +1,4 @@
-package technicianlp.reauth;
+package technicianlp.reauth.gui;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -10,10 +10,12 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.VersionChecker;
 import org.lwjgl.glfw.GLFW;
+import technicianlp.reauth.AuthHelper;
+import technicianlp.reauth.ReAuth;
 
 import java.awt.Color;
 
-final class ScreenAuth extends Screen {
+public final class ScreenAuth extends Screen {
 
     private TextFieldWidget username;
     private PasswordFieldWidget pw;
@@ -28,7 +30,7 @@ final class ScreenAuth extends Screen {
 
     private String message = "";
 
-    ScreenAuth(Screen prev) {
+    public ScreenAuth(Screen prev) {
         super(new TranslationTextComponent("reauth.gui.auth.title"));
         this.prev = prev;
     }

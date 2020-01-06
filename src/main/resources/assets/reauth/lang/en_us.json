@@ -1,4 +1,5 @@
 {
+  "reauth.open": "Open ReAuth",
   "reauth.gui.auth.title": "ReAuthentication Screen",
   "reauth.gui.auth.username": "Username",
   "reauth.gui.auth.password": "Password",

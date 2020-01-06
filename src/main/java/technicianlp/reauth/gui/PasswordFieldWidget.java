@@ -1,4 +1,4 @@
-package technicianlp.reauth;
+package technicianlp.reauth.gui;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -7,7 +7,7 @@ import net.minecraft.util.SharedConstants;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import org.lwjgl.glfw.GLFW;
+import technicianlp.reauth.ReAuth;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -30,18 +30,18 @@ final class PasswordFieldWidget extends TextFieldWidget {
         return pw;
     }
 
-//    @Override
-//    public String getMessage() {
-//        System.out.println(new String(password));
-//        return super.getMessage();
-//    }
-
+    /**
+     * Prevent Cut/Copy; actual logic handled by super
+     */
     public final boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!this.isFocused() || Screen.isCopy(keyCode) || Screen.isCut(keyCode))
-            return false; // Prevent Cut/Copy
-        return super.keyPressed(keyCode, scanCode, modifiers); // combos handled by super
+            return false;
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    /**
+     * Vanilla filters out "§" therefore a custom filter is use (see {@link #isAllowedCharacter(char)}) to allow those
+     */
     @Override
     public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
         if (!this.func_212955_f()) {
@@ -54,6 +54,9 @@ final class PasswordFieldWidget extends TextFieldWidget {
         }
     }
 
+    /**
+     * Modified version of {@link TextFieldWidget#writeText(String)} to allow for displayed text to differ and make the password be array based
+     */
     public final void writeText(String rawInput) {
         int selectionEnd = getSelectionEnd();
         int selStart = Math.min(this.getCursorPosition(), selectionEnd);
@@ -76,6 +79,9 @@ final class PasswordFieldWidget extends TextFieldWidget {
         this.setSelectionPos(getCursorPosition());
     }
 
+    /**
+     * Modified version of {@link TextFieldWidget#deleteFromCursor(int)} to allow for displayed text to differ and make the password be array based
+     */
     @Override
     public final void deleteFromCursor(int num) {
         if (password.length == 0)
@@ -101,26 +107,27 @@ final class PasswordFieldWidget extends TextFieldWidget {
         }
     }
 
+    /**
+     * clear old password and update displayed Text
+     */
     final void setPassword(char[] password) {
         Arrays.fill(this.password, 'f');
         this.password = password;
         updateText();
     }
 
-    public int getSelectionEnd() {
-        try {
-            return (int) selectionEnd.get(this);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Failed Reflective Access", e);
-        }
-    }
-
+    /**
+     * Redirect Setter to {@link #setPassword(char[])}
+     */
     @Override
     public final void setText(String textIn) {
         setPassword(textIn.toCharArray());
         updateText();
     }
 
+    /**
+     * Sets the actually displayed Text to all dots
+     */
     private void updateText() {
         char[] chars = new char[password.length];
         Arrays.fill(chars, '\u25CF');
@@ -150,5 +157,12 @@ final class PasswordFieldWidget extends TextFieldWidget {
      */
     private boolean isAllowedCharacter(char in) {
         return in == 0xa7 || SharedConstants.isAllowedCharacter(in);
+    }
+
+    /**
+     * Getter due to the field being private in super
+     */
+    public int getSelectionEnd() {
+        return ReAuth.getField(selectionEnd, this);
     }
 }

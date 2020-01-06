@@ -14,14 +14,16 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Field;
+
 @Mod("reauth")
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class ReAuth {
 
-    static final Logger log = LogManager.getLogger("ReAuth");
-    static final Configuration config;
-    static final AuthHelper auth;
-    static IModInfo modInfo;
+    public static final Logger log = LogManager.getLogger("ReAuth");
+    public static final Configuration config;
+    public static final AuthHelper auth;
+    public static IModInfo modInfo;
 
     static {
         if (FMLEnvironment.dist == Dist.CLIENT) {
@@ -54,5 +56,14 @@ public final class ReAuth {
     @SubscribeEvent
     public static void setup(ModConfig.ModConfigEvent event) {
         config.setConfig(event.getConfig());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E> E getField(Field field, Object object) {
+        try {
+            return (E) field.get(object);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed Reflective Access", e);
+        }
     }
 }
