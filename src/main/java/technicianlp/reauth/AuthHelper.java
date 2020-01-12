@@ -12,8 +12,9 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
-public class AuthHelper extends YggdrasilUserAuthentication {
+public final class AuthHelper extends YggdrasilUserAuthentication {
 
     /**
      * Time for which the Validity gets cached (5 Minutes)
@@ -47,6 +48,11 @@ public class AuthHelper extends YggdrasilUserAuthentication {
      */
     private YggdrasilAuthenticationService loginService;
     private boolean returnLoginService = false;
+
+    /**
+     * Pattern for valid Minecraft Names according to Wiki
+     * */
+    private Pattern namePattern = Pattern.compile("[A-Za-z0-9_]{2,16}");
 
     public AuthHelper() {
         super(new YggdrasilAuthenticationService(Minecraft.getInstance().getProxy(), null), Agent.MINECRAFT);
@@ -119,7 +125,7 @@ public class AuthHelper extends YggdrasilUserAuthentication {
 
             setSession(session);
 
-            ReAuth.config.setCredentials(user, savePassword ? pw : "");
+            ReAuth.config.setCredentials(username, user, savePassword ? pw : "");
         } finally {
             logOut();
             returnLoginService = false;
@@ -134,7 +140,7 @@ public class AuthHelper extends YggdrasilUserAuthentication {
         UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8));
         setSession(new Session(username, uuid.toString(), "invalid", "legacy"));
         ReAuth.log.info("Offline Username set!");
-        ReAuth.config.setCredentials(username, "");
+        ReAuth.config.setCredentials(username, "", "");
     }
 
     private void setToken(String accessToken) {
@@ -156,6 +162,10 @@ public class AuthHelper extends YggdrasilUserAuthentication {
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Failed Reflective Access", e);
         }
+    }
+
+    public boolean isValidName(String username) {
+        return namePattern.matcher(username).matches();
     }
 
     public enum SessionStatus {

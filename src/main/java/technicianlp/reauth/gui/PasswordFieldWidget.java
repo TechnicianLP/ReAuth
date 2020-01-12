@@ -4,15 +4,12 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.SharedConstants;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import technicianlp.reauth.ReAuth;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-@OnlyIn(Dist.CLIENT)
 final class PasswordFieldWidget extends TextFieldWidget {
 
     private static final Field selectionEnd = ObfuscationReflectionHelper.findField(TextFieldWidget.class, "field_146223_s");

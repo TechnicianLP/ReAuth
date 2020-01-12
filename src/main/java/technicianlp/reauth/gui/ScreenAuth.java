@@ -64,7 +64,7 @@ public final class ScreenAuth extends Screen {
 
         this.config = new Button(this.width - 80, this.height - 25, 75, 20, I18n.format("reauth.gui.auth.config"), (b) -> {
 //            this.getMinecraft().displayGuiScreen(new ConfigGUI(this));
-            ReAuth.config.setCredentials("", "");
+            ReAuth.config.setCredentials("", "", "");
             onClose();
         });
 //        addButton(config);
@@ -91,7 +91,7 @@ public final class ScreenAuth extends Screen {
 
         LoginType status = getLoginType();
         this.confirm.setMessage(I18n.format(status.getTranslation()));
-        this.confirm.active = status.active;
+        this.confirm.active = status.isActive();
 
         super.render(mouseX, mouseY, partialTicks);
     }
@@ -133,7 +133,7 @@ public final class ScreenAuth extends Screen {
         if (user.isEmpty()) {
             return LoginType.None;
         } else if (this.pw.getText().isEmpty()) {
-            if (user.matches("[A-Za-z0-9_]{2,16}")) {
+            if (ReAuth.auth.isValidName(user)) {
                 return LoginType.Offline;
             } else {
                 return LoginType.None;
@@ -188,7 +188,7 @@ public final class ScreenAuth extends Screen {
     @Override
     public void removed() {
         super.removed();
-//        this.pw.setPassword(new char[0]);
+        this.pw.setPassword(new char[0]);
         getMinecraft().keyboardListener.enableRepeatEvents(false);
     }
 
