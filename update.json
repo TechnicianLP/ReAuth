@@ -1,11 +1,17 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/reauth",
   "promos": {
-    "1.14.4-latest": "3.8.0",
-    "1.14.4-recommended": "3.8.0"
+    "1.14.4-latest": "3.8.1",
+    "1.14.4-recommended": "3.8.1",
+    "1.15.2-latest": "3.8.1",
+    "1.15.2-recommended": "3.8.1"
   },
   "1.14.4": {
+    "3.8.1": "Fixed Credentials saving for Mojangs Java Version",
     "3.8.0": "Encrypted Credentials saving",
     "3.7.0": "Port to 1.14"
+  },
+  "1.15.2": {
+    "3.8.1": "Fixed Credentials saving for Mojangs Java Version"
   }
 }

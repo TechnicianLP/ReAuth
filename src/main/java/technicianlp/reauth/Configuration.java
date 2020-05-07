@@ -5,6 +5,7 @@ import net.minecraftforge.fml.config.ModConfig;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -48,10 +49,14 @@ public final class Configuration {
 
         spec = builder.build();
 
-        try {
-            this.crypto = new Crypto();
-        } catch (GeneralSecurityException e) {
-            ReAuth.log.error("Unable to locate cryptographic algorithms. Credentials cannot be saved", e);
+        if (!Boolean.getBoolean("mods.reauth.disableCrypto")) {
+            try {
+                this.crypto = new Crypto();
+            } catch (GeneralSecurityException e) {
+                ReAuth.log.error("Unable to locate cryptographic algorithms. Credentials cannot be saved", e);
+            }
+        } else {
+            ReAuth.log.error("Crypto disabled by commandline");
         }
     }
 
@@ -159,5 +164,12 @@ public final class Configuration {
         if (!password.isEmpty() && crypto != null)
             return crypto.decryptString(password);
         return "";
+    }
+
+    /**
+     * Is Cryptography available
+     */
+    public boolean hasCrypto() {
+        return crypto != null;
     }
 }

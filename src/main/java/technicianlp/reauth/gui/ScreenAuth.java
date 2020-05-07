@@ -55,7 +55,9 @@ public final class ScreenAuth extends Screen {
         focus(username.getText().isEmpty() ? username : pw);
 
         this.save = new CheckboxButton(this.width / 2 - 155, this.baseY + 85, 2 * 155, 20, I18n.format("reauth.gui.auth.checkbox"), !pw.getText().isEmpty());
-        addButton(this.save);
+        if (ReAuth.config.hasCrypto()) {
+            addButton(this.save);
+        }
 
         this.confirm = new Button(this.width / 2 - 155, this.baseY + 110, 153, 20, "", (b) -> doLogin());
         addButton(confirm);
@@ -89,6 +91,10 @@ public final class ScreenAuth extends Screen {
             this.drawCenteredString(this.font, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
         }
 
+        if (!ReAuth.config.hasCrypto()) {
+            this.drawString(this.font, I18n.format("reauth.gui.auth.noCrypto"), this.width / 2 - 155, this.baseY + 90, Color.WHITE.getRGB());
+        }
+
         LoginType status = getLoginType();
         this.confirm.setMessage(I18n.format(status.getTranslation()));
         this.confirm.active = status.isActive();
@@ -105,7 +111,7 @@ public final class ScreenAuth extends Screen {
             ((TextFieldWidget) old).setFocused2(false);
         if (widget != null)
             widget.setFocused2(true);
-        func_212928_a(widget);
+        setFocusedDefault(widget);
     }
 
     @Override
@@ -153,7 +159,7 @@ public final class ScreenAuth extends Screen {
             LoginType type = getLoginType();
             switch (type) {
                 case Online:
-                    ReAuth.auth.login(this.username.getText(), this.pw.getPW(), this.save.func_212942_a());
+                    ReAuth.auth.login(this.username.getText(), this.pw.getPW(), this.save.isChecked());
                     break;
                 case Offline:
                     ReAuth.auth.offline(this.username.getText());

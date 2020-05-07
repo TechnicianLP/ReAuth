@@ -7,6 +7,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Base64;
@@ -27,8 +28,23 @@ final class Crypto {
     private byte[] hash;
 
     public Crypto() throws GeneralSecurityException {
+        if (Cipher.getMaxAllowedKeyLength("AES") < 256) {
+            removeJceRestriction();
+        }
         aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
         pbkdf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+    }
+
+    private void removeJceRestriction() throws NoSuchAlgorithmException {
+        ReAuth.log.warn("Cryptography is restricted in this Java installation");
+        ReAuth.log.warn("Please complain to Mojang for shipping a 5 year old Java version");
+        new JceWorkaround().removeCryptographyRestrictions();
+        if (Cipher.getMaxAllowedKeyLength("AES") < 256) {
+            ReAuth.log.error("Failed to remove cryptography restriction - saving credentials will not be available");
+            throw new NoSuchAlgorithmException("AES 256 unsupported by JVM");
+        } else {
+            ReAuth.log.info("Cryptography restriction removed successfully");
+        }
     }
 
     private byte[] crypt(int mode, byte[] secret) throws GeneralSecurityException {

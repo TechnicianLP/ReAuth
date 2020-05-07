@@ -41,7 +41,7 @@ final class PasswordFieldWidget extends TextFieldWidget {
      */
     @Override
     public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
-        if (!this.func_212955_f()) {
+        if (!this.canWrite()) {
             return false;
         } else if (isAllowedCharacter(p_charTyped_1_)) {
             this.writeText(Character.toString(p_charTyped_1_));
@@ -72,7 +72,7 @@ final class PasswordFieldWidget extends TextFieldWidget {
             System.arraycopy(password, selEnd, newPW, selStart + input.length, password.length - selEnd);
 
         setPassword(newPW);
-        this.func_212422_f(selStart + input.length);
+        this.clampCursorPosition(selStart + input.length);
         this.setSelectionPos(getCursorPosition());
     }
 
