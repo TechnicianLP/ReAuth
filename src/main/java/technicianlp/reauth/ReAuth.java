@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 
 @Mod(modid = "reauth", name = "ReAuth", version = "3.6.0", guiFactory = "technicianlp.reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.12]", certificateFingerprint = "daba0ec4df71b6da841768c49fb873def208a1e3")
-public final class Main {
+public final class ReAuth {
 
     static final Logger log = LogManager.getLogger("ReAuth");
     static Configuration config;
@@ -24,7 +24,7 @@ public final class Main {
     static boolean OfflineModeEnabled;
 
     @Mod.Instance("reauth")
-    static Main main;
+    static ReAuth main;
 
     @Mod.Metadata
     static ModMetadata meta;
@@ -39,8 +39,8 @@ public final class Main {
         if (evt.getSuggestedConfigurationFile().exists() && !config.exists())
             evt.getSuggestedConfigurationFile().renameTo(config);
         //initialize config
-        Main.config = new Configuration(config);
-        Main.loadConfig();
+        ReAuth.config = new Configuration(config);
+        ReAuth.loadConfig();
 
         Secure.init();
     }
@@ -48,7 +48,7 @@ public final class Main {
     @SubscribeEvent
     public void onConfigChanged(OnConfigChangedEvent evt) {
         if (evt.getModID().equals("reauth")) {
-            Main.loadConfig();
+            ReAuth.loadConfig();
         }
     }
 
@@ -71,15 +71,15 @@ public final class Main {
         Property bold = config.get(Configuration.CATEGORY_GENERAL, "validatorBold", true, "If the Session-Validator look weird disable this");
         GuiHandler.bold = bold.getBoolean();
 
-        Main.config.save();
+        ReAuth.config.save();
     }
 
     @Mod.EventHandler
     public void securityError(FMLFingerprintViolationEvent event) {
-        log.fatal("+-----------------------------------------------------------------------------------+");// @Replace()
-        log.fatal("|The Version of ReAuth is not signed! It was modified! Ignoring because of Dev-Mode!|");// @Replace()
-        log.fatal("+-----------------------------------------------------------------------------------+");// @Replace()
-        // @Replace(throw new SecurityException("The Version of ReAuth is not signed! It is a modified version!");)
+//        log.fatal("+-----------------------------------------------------------------------------------+");
+//        log.fatal("|The Version of ReAuth is not signed! It was modified! Ignoring because of Dev-Mode!|");
+//        log.fatal("+-----------------------------------------------------------------------------------+");
+        throw new SecurityException("The Version of ReAuth is not signed! It is a modified version!");
     }
 
 }
