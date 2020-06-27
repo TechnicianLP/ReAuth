@@ -20,7 +20,7 @@ archivesBaseName = "${ModName}-${MCVersion}"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200507-1.15.1'
+    mappings channel: 'snapshot', version: '20200514-1.16'
 
     runs {
         client {
@@ -60,7 +60,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.1.77'
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.20'
 }
 
 jar {
@@ -82,55 +82,55 @@ import groovy.swing.SwingBuilder
 
 import java.awt.*
 
-task signJar(type: Exec, dependsOn: assemble) {
-    onlyIf {
-        project.hasProperty('keyStore')
-    }
-    ext {
-        storePass = null
-        keyPass = null
-    }
-    executable = "jarsigner"
-    args(["-signedJar", jar.archivePath, jar.archivePath, project.keyStoreAlias,
-          "-tsa", project.tsa,
-          "-keystore", project.keyStore])
-    doFirst {
-        if (storePass != null && storePass?.trim())
-            args(["-storepass", storePass])
-        if (keyPass != null && keyPass?.trim())
-            args(["-keypass", keyPass])
-    }
-}
-build.dependsOn signJar
+//task signJar(type: Exec, dependsOn: assemble) {
+//    onlyIf {
+//        project.hasProperty('keyStore')
+//    }
+//    ext {
+//        storePass = null
+//        keyPass = null
+//    }
+//    executable = "jarsigner"
+//    args(["-signedJar", jar.archivePath, jar.archivePath, project.keyStoreAlias,
+//          "-tsa", project.tsa,
+//          "-keystore", project.keyStore])
+//    doFirst {
+//        if (storePass != null && storePass?.trim())
+//            args(["-storepass", storePass])
+//        if (keyPass != null && keyPass?.trim())
+//            args(["-keypass", keyPass])
+//    }
+//}
+//build.dependsOn signJar
 
-gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(':signJar')) {
-        if (System.console() == null) {
-            new SwingBuilder().edt {
-                dialog(modal: true, title: 'KeyStore Passwords', alwaysOnTop: true, resizable: false,
-                        locationRelativeTo: null, show: true, size: [300, 150]) {
-                    panel(layout: new BorderLayout(5, 5)) {
-                        def store
-                        def key
-                        vbox(constraints: BorderLayout.CENTER) {
-                            label(text: "Keystore:",)
-                            store = passwordField()
-                            label(text: "Key:")
-                            key = passwordField()
-                        }
-                        button(defaultButton: true, text: 'OK', constraints: BorderLayout.SOUTH, actionPerformed: {
-                            signJar.storePass = new String(store.password)
-                            signJar.keyPass = new String(key.password)
-                            dispose()
-                        })
-                    }
-                }
-            }
-        } else {
-            signJar.storePass = new String(System.console().readPassword("\nKeyStore Password: "))
-            signJar.keyPass = new String(System.console().readPassword("\nKey Password: "))
-        }
-    }
-}
+//gradle.taskGraph.whenReady { taskGraph ->
+//    if (taskGraph.hasTask(':signJar')) {
+//        if (System.console() == null) {
+//            new SwingBuilder().edt {
+//                dialog(modal: true, title: 'KeyStore Passwords', alwaysOnTop: true, resizable: false,
+//                        locationRelativeTo: null, show: true, size: [300, 150]) {
+//                    panel(layout: new BorderLayout(5, 5)) {
+//                        def store
+//                        def key
+//                        vbox(constraints: BorderLayout.CENTER) {
+//                            label(text: "Keystore:",)
+//                            store = passwordField()
+//                            label(text: "Key:")
+//                            key = passwordField()
+//                        }
+//                        button(defaultButton: true, text: 'OK', constraints: BorderLayout.SOUTH, actionPerformed: {
+//                            signJar.storePass = new String(store.password)
+//                            signJar.keyPass = new String(key.password)
+//                            dispose()
+//                        })
+//                    }
+//                }
+//            }
+//        } else {
+//            signJar.storePass = new String(System.console().readPassword("\nKeyStore Password: "))
+//            signJar.keyPass = new String(System.console().readPassword("\nKey Password: "))
+//        }
+//    }
+//}
 
 

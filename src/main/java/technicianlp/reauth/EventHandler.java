@@ -31,16 +31,16 @@ public final class EventHandler {
         Screen screen = event.getGui();
         if (screen instanceof MultiplayerScreen) {
             // Add Button to MultiplayerScreen
-            event.addWidget(new Button(5, 5, 100, 20, I18n.format("reauth.gui.button"), (b) -> openAuthenticationScreen(screen)));
+            event.addWidget(new Button(5, 5, 100, 20, new TranslationTextComponent("reauth.gui.button"), (b) -> openAuthenticationScreen(screen)));
         } else if (screen instanceof MainMenuScreen) {
             // Support for Custom Main Menu (add button outside of viewport)
-            event.addWidget(new Button(-50, -50, 20, 20, I18n.format("reauth.gui.button"), (b) -> openAuthenticationScreen(screen)));
+            event.addWidget(new Button(-50, -50, 20, 20, new TranslationTextComponent("reauth.gui.button"), (b) -> openAuthenticationScreen(screen)));
         } else if (screen instanceof DisconnectedScreen) {
             // Change DisconnectedScreen if its reason is an invalid session
-            if ("connect.failed".equals(getTranslationKey(screen.getTitle()))) {
+            if ("connect.failed".equals(getTranslationKey(screen.func_231171_q_()))) {
                 if (getTranslationKey(ReAuth.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
                     Widget menu = event.getWidgetList().get(0);
-                    event.addWidget(new Button(menu.x, menu.y + 25, 200, 20, I18n.format("reauth.open"),
+                    event.addWidget(new Button(menu.field_230690_l_, menu.field_230691_m_ + 25, 200, 20, new TranslationTextComponent("reauth.open"),
                             (b) -> openAuthenticationScreen(ReAuth.getField(previousScreen, screen))));
                 }
             }
@@ -62,7 +62,7 @@ public final class EventHandler {
     public static void onDrawGui(DrawScreenEvent.Post e) {
         if (e.getGui() instanceof MultiplayerScreen) {
             AuthHelper.SessionStatus state = ReAuth.auth.getSessionStatus(false);
-            e.getGui().drawString(e.getGui().getMinecraft().fontRenderer, I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
+            e.getGui().func_238476_c_(e.getMatrixStack(), e.getGui().getMinecraft().fontRenderer, I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
         }
     }
 
@@ -71,7 +71,7 @@ public final class EventHandler {
      */
     @SubscribeEvent
     public static void onOpenGui(GuiOpenEvent e) {
-        if (e.getGui() instanceof MultiplayerScreen && Minecraft.getInstance().currentScreen instanceof MultiplayerScreen && Screen.hasShiftDown()) {
+        if (e.getGui() instanceof MultiplayerScreen && Minecraft.getInstance().currentScreen instanceof MultiplayerScreen && Screen.func_231173_s_()) {
             ReAuth.auth.getSessionStatus(true);
         }
     }

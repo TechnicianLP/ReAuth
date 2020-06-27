@@ -1,6 +1,7 @@
 package technicianlp.reauth.gui;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -28,7 +29,7 @@ public final class ScreenAuth extends Screen {
 
     private int baseY;
 
-    private String message = "";
+    private TranslationTextComponent message = new TranslationTextComponent("");
 
     public ScreenAuth(Screen prev) {
         super(new TranslationTextComponent("reauth.gui.auth.title"));
@@ -36,38 +37,38 @@ public final class ScreenAuth extends Screen {
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void func_231160_c_() {
+        super.func_231160_c_();
         getMinecraft().keyboardListener.enableRepeatEvents(true);
 
-        this.baseY = this.height / 2 - 110 / 2;
+        this.baseY = this.field_230709_l_ / 2 - 110 / 2;
 
-        this.username = new TextFieldWidget(this.font, this.width / 2 - 155, this.baseY + 15, 2 * 155, 20, I18n.format("reauth.gui.auth.username"));
+        this.username = new TextFieldWidget(this.field_230712_o_, this.field_230708_k_ / 2 - 155, this.baseY + 15, 2 * 155, 20, new TranslationTextComponent("reauth.gui.auth.username"));
         this.username.setMaxStringLength(512);
         this.username.setText(ReAuth.config.getUsername());
-        addButton(username);
+        func_230480_a_(username);
 
-        this.pw = new PasswordFieldWidget(this.font, this.width / 2 - 155, this.baseY + 60, 2 * 155, 20, I18n.format("reauth.gui.auth.password"));
+        this.pw = new PasswordFieldWidget(this.field_230712_o_, this.field_230708_k_ / 2 - 155, this.baseY + 60, 2 * 155, 20, new TranslationTextComponent("reauth.gui.auth.password"));
         this.pw.setMaxStringLength(Short.MAX_VALUE);
         this.pw.setText(ReAuth.config.getPassword());
-        addButton(this.pw);
+        func_230480_a_(this.pw);
 
         focus(username.getText().isEmpty() ? username : pw);
 
-        this.save = new CheckboxButton(this.width / 2 - 155, this.baseY + 85, 2 * 155, 20, I18n.format("reauth.gui.auth.checkbox"), !pw.getText().isEmpty());
+        this.save = new CheckboxButton(this.field_230708_k_ / 2 - 155, this.baseY + 85, 2 * 155, 20, new TranslationTextComponent("reauth.gui.auth.checkbox"), !pw.getText().isEmpty());
         if (ReAuth.config.hasCrypto()) {
-            addButton(this.save);
+            func_230480_a_(this.save);
         }
 
-        this.confirm = new Button(this.width / 2 - 155, this.baseY + 110, 153, 20, "", (b) -> doLogin());
-        addButton(confirm);
-        this.cancel = new Button(this.width / 2 + 2, this.baseY + 110, 155, 20, I18n.format("gui.cancel"), (b) -> this.getMinecraft().displayGuiScreen(prev));
-        addButton(cancel);
+        this.confirm = new Button(this.field_230708_k_ / 2 - 155, this.baseY + 110, 153, 20, new TranslationTextComponent("gui.confirm"), (b) -> doLogin());
+        func_230480_a_(confirm);
+        this.cancel = new Button(this.field_230708_k_ / 2 + 2, this.baseY + 110, 155, 20, new TranslationTextComponent("gui.cancel"), (b) -> this.getMinecraft().displayGuiScreen(prev));
+        func_230480_a_(cancel);
 
-        this.config = new Button(this.width - 80, this.height - 25, 75, 20, I18n.format("reauth.gui.auth.config"), (b) -> {
+        this.config = new Button(this.field_230708_k_ - 80, this.field_230709_l_ - 25, 75, 20, new TranslationTextComponent("reauth.gui.auth.config"), (b) -> {
 //            this.getMinecraft().displayGuiScreen(new ConfigGUI(this));
             ReAuth.config.setCredentials("", "", "");
-            onClose();
+            func_231164_f_();
         });
 //        addButton(config);
 
@@ -77,36 +78,36 @@ public final class ScreenAuth extends Screen {
             @SuppressWarnings("ConstantConditions")
             String msg = result.changes.get(result.target);
             if (msg != null)
-                message = I18n.format("reauth.gui.auth.update", msg);
+                message = new TranslationTextComponent("reauth.gui.auth.update", msg);
         }
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground();
+    public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        this.func_230446_a_(matrixStack);
 
-        this.drawCenteredString(this.font, I18n.format("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
-        this.drawCenteredString(this.font, I18n.format("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
-        if (!this.message.isEmpty()) {
-            this.drawCenteredString(this.font, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
+        this.func_238472_a_(matrixStack, this.field_230712_o_, new TranslationTextComponent("reauth.gui.auth.text1"), this.field_230708_k_ / 2, this.baseY, Color.WHITE.getRGB());
+        this.func_238472_a_(matrixStack, this.field_230712_o_, new TranslationTextComponent("reauth.gui.auth.text2"), this.field_230708_k_ / 2, this.baseY + 45, Color.WHITE.getRGB());
+        if (!this.message.getKey().equals("")) {
+            this.func_238472_a_(matrixStack, this.field_230712_o_, this.message, this.field_230708_k_ / 2, this.baseY - 15, 0xFFFFFF);
         }
 
         if (!ReAuth.config.hasCrypto()) {
-            this.drawString(this.font, I18n.format("reauth.gui.auth.noCrypto"), this.width / 2 - 155, this.baseY + 90, Color.WHITE.getRGB());
+            this.func_238475_b_(matrixStack, this.field_230712_o_, new TranslationTextComponent("reauth.gui.auth.noCrypto"), this.field_230708_k_ / 2 - 155, this.baseY + 90, Color.WHITE.getRGB());
         }
 
         LoginType status = getLoginType();
-        this.confirm.setMessage(I18n.format(status.getTranslation()));
-        this.confirm.active = status.isActive();
+        this.confirm.func_238482_a_(new TranslationTextComponent(status.getTranslation()));
+        this.confirm.field_230693_o_ = status.isActive();
 
-        super.render(mouseX, mouseY, partialTicks);
+        super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     /**
      * Sets the focus to the given TextFieldWidget
      */
     private void focus(TextFieldWidget widget) {
-        IGuiEventListener old = getFocused();
+        IGuiEventListener old = func_241217_q_();
         if (old instanceof TextFieldWidget)
             ((TextFieldWidget) old).setFocused2(false);
         if (widget != null)
@@ -115,9 +116,9 @@ public final class ScreenAuth extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int p_keyPressed_2_, int p_keyPressed_3_) {
+    public boolean func_231046_a_(int keyCode, int p_keyPressed_2_, int p_keyPressed_3_) {
         if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
-            IGuiEventListener focus = getFocused();
+            IGuiEventListener focus = func_241217_q_();
             if (focus == username) {
                 focus(pw);
                 return true;
@@ -126,7 +127,7 @@ public final class ScreenAuth extends Screen {
                 return true;
             }
         }
-        return super.keyPressed(keyCode, p_keyPressed_2_, p_keyPressed_3_);
+        return super.func_231046_a_(keyCode, p_keyPressed_2_, p_keyPressed_3_);
     }
 
     /**
@@ -167,24 +168,24 @@ public final class ScreenAuth extends Screen {
                 default:
                     return;
             }
-            this.message = I18n.format("reauth.login.success");
+            this.message = new TranslationTextComponent("reauth.login.success");
             success = true;
         } catch (AuthenticationException e) {
-            this.message = I18n.format("reauth.login.fail", e.getMessage());
+            this.message = new TranslationTextComponent("reauth.login.fail", e.getMessage());
             ReAuth.log.error("Login failed:", e);
         } catch (Exception e) {
-            this.message = I18n.format("reauth.login.error", e.getMessage());
+            this.message = new TranslationTextComponent("reauth.login.error", e.getMessage());
             ReAuth.log.error("Error:", e);
         }
         if (success)
-            onClose();
+            func_231164_f_();
     }
 
     /**
      * Method called to request this Screen to close itself (unfortunate MCP name)
      */
     @Override
-    public void onClose() {
+    public void func_231175_as__() {
         this.getMinecraft().displayGuiScreen(prev);
     }
 
@@ -192,8 +193,8 @@ public final class ScreenAuth extends Screen {
      * Called once this Screen is closed (unfortunate MCP name)
      */
     @Override
-    public void removed() {
-        super.removed();
+    public void func_231164_f_() {
+        super.func_231164_f_();
         this.pw.setPassword(new char[0]);
         getMinecraft().keyboardListener.enableRepeatEvents(false);
     }

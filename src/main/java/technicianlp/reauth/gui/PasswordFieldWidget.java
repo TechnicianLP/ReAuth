@@ -4,6 +4,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.SharedConstants;
+import net.minecraft.util.text.TextComponent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import technicianlp.reauth.ReAuth;
 
@@ -14,7 +15,7 @@ final class PasswordFieldWidget extends TextFieldWidget {
 
     private static final Field selectionEnd = ObfuscationReflectionHelper.findField(TextFieldWidget.class, "field_146223_s");
 
-    PasswordFieldWidget(FontRenderer renderer, int posx, int posy, int x, int y, String name) {
+    PasswordFieldWidget(FontRenderer renderer, int posx, int posy, int x, int y, TextComponent name) {
         super(renderer, posx, posy, x, y, name);
         this.setMaxStringLength(512);
     }
@@ -31,16 +32,16 @@ final class PasswordFieldWidget extends TextFieldWidget {
      * Prevent Cut/Copy; actual logic handled by super
      */
     public final boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (!this.isFocused() || Screen.isCopy(keyCode) || Screen.isCut(keyCode))
+        if (!this.func_230999_j_() || Screen.func_231170_j_(keyCode) || Screen.func_231168_h_(keyCode))
             return false;
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.func_231046_a_(keyCode, scanCode, modifiers);
     }
 
     /**
      * Vanilla filters out "§" therefore a custom filter is use (see {@link #isAllowedCharacter(char)}) to allow those
      */
     @Override
-    public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
+    public boolean func_231042_a_(char p_charTyped_1_, int p_charTyped_2_) {
         if (!this.canWrite()) {
             return false;
         } else if (isAllowedCharacter(p_charTyped_1_)) {

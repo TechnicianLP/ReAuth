@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[28,)"
+loaderVersion="[32,)"
 issueTrackerURL="https://github.com/TechnicianLP/ReAuth/issues"
 
 [[mods]]
@@ -14,6 +14,6 @@ description="A Mod to renew your Session"
 [[dependencies.reauth]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.14,1.16)"
+    versionRange="[1.16.1]"
     ordering="NONE"
     side="CLIENT"
