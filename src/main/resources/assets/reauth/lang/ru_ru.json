@@ -1,0 +1,22 @@
+{
+  "reauth.open": "Открыть ReAuth",
+  "reauth.gui.auth.title": "Экран повторного входа",
+  "reauth.gui.auth.username": "Имя пользователя",
+  "reauth.gui.auth.password": "Пароль",
+  "reauth.gui.auth.checkbox": "Сохранить пароль в настройках (ВНИМАНИЕ: РИСК БЕЗОПАСНОСТИ!)",
+  "reauth.gui.auth.noCrypto": "Сохранение учетных данных недоступно для этой версии Java",
+  "reauth.gui.auth.config": "Настройки (NYI)",
+  "reauth.gui.auth.confirm.none": "Авторизоваться",
+  "reauth.gui.auth.confirm.online": "Авторизоваться",
+  "reauth.gui.auth.confirm.offline": "Играть не в сети",
+  "reauth.gui.auth.text1": "Имя пользователя/E-Mail:",
+  "reauth.gui.auth.text2": "Пароль:",
+  "reauth.gui.auth.update": "§9Доступно обновление: %s",
+  "reauth.gui.button": "ReAuth Авторизация",
+  "reauth.status.valid": "В сети: §l§a✔",
+  "reauth.status.invalid": "В сети: §l§c✘",
+  "reauth.status.unknown": "В сети: §l§7?",
+  "reauth.login.success": "§aУспешный вход!",
+  "reauth.login.fail": "§4Ошибка входа: %s",
+  "reauth.login.error": "§4Ошибка: %s"
+}
