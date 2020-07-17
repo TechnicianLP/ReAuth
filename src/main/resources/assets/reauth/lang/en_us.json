@@ -18,5 +18,7 @@
   "reauth.status.unknown": "Online: §l§7?",
   "reauth.login.success": "§aLogin successful!",
   "reauth.login.fail": "§4Login failed: %s",
-  "reauth.login.error": "§4Error: %s"
+  "reauth.login.error": "§4Error: %s",
+  "reauth.retry": "Login as %s and retry",
+  "reauth.retry.disabled": "Login and retry not available"
 }

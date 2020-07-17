@@ -1,12 +1,14 @@
 package technicianlp.reauth.gui;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.VersionChecker;
 import org.lwjgl.glfw.GLFW;
@@ -15,7 +17,7 @@ import technicianlp.reauth.ReAuth;
 
 import java.awt.Color;
 
-public final class ScreenAuth extends Screen {
+public final class AuthScreen extends Screen {
 
     private TextFieldWidget username;
     private PasswordFieldWidget pw;
@@ -30,9 +32,14 @@ public final class ScreenAuth extends Screen {
 
     private String message = "";
 
-    public ScreenAuth(Screen prev) {
+    public AuthScreen(Screen prev) {
         super(new TranslationTextComponent("reauth.gui.auth.title"));
         this.prev = prev;
+    }
+
+    public AuthScreen(Screen prev, String message) {
+        this(prev);
+        this.message = message;
     }
 
     @Override
@@ -42,29 +49,29 @@ public final class ScreenAuth extends Screen {
 
         this.baseY = this.height / 2 - 110 / 2;
 
-        this.username = new TextFieldWidget(this.font, this.width / 2 - 155, this.baseY + 15, 2 * 155, 20, I18n.format("reauth.gui.auth.username"));
+        this.username = new TextFieldWidget(this.font, this.width / 2 - 155, this.baseY + 15, 2 * 155, 20, new TranslationTextComponent("reauth.gui.auth.username"));
         this.username.setMaxStringLength(512);
         this.username.setText(ReAuth.config.getUsername());
         addButton(username);
 
-        this.pw = new PasswordFieldWidget(this.font, this.width / 2 - 155, this.baseY + 60, 2 * 155, 20, I18n.format("reauth.gui.auth.password"));
+        this.pw = new PasswordFieldWidget(this.font, this.width / 2 - 155, this.baseY + 60, 2 * 155, 20, new TranslationTextComponent("reauth.gui.auth.password"));
         this.pw.setMaxStringLength(Short.MAX_VALUE);
         this.pw.setText(ReAuth.config.getPassword());
         addButton(this.pw);
 
         focus(username.getText().isEmpty() ? username : pw);
 
-        this.save = new CheckboxButton(this.width / 2 - 155, this.baseY + 85, 2 * 155, 20, I18n.format("reauth.gui.auth.checkbox"), !pw.getText().isEmpty());
+        this.save = new CheckboxButton(this.width / 2 - 155, this.baseY + 85, 2 * 155, 20, new TranslationTextComponent("reauth.gui.auth.checkbox"), !pw.getText().isEmpty());
         if (ReAuth.config.hasCrypto()) {
             addButton(this.save);
         }
 
-        this.confirm = new Button(this.width / 2 - 155, this.baseY + 110, 153, 20, "", (b) -> doLogin());
+        this.confirm = new Button(this.width / 2 - 155, this.baseY + 110, 153, 20, StringTextComponent.EMPTY, (b) -> doLogin());
         addButton(confirm);
-        this.cancel = new Button(this.width / 2 + 2, this.baseY + 110, 155, 20, I18n.format("gui.cancel"), (b) -> this.getMinecraft().displayGuiScreen(prev));
+        this.cancel = new Button(this.width / 2 + 2, this.baseY + 110, 155, 20, new TranslationTextComponent("gui.cancel"), (b) -> this.getMinecraft().displayGuiScreen(prev));
         addButton(cancel);
 
-        this.config = new Button(this.width - 80, this.height - 25, 75, 20, I18n.format("reauth.gui.auth.config"), (b) -> {
+        this.config = new Button(this.width - 80, this.height - 25, 75, 20, new TranslationTextComponent("reauth.gui.auth.config"), (b) -> {
 //            this.getMinecraft().displayGuiScreen(new ConfigGUI(this));
             ReAuth.config.setCredentials("", "", "");
             onClose();
@@ -72,7 +79,7 @@ public final class ScreenAuth extends Screen {
 //        addButton(config);
 
         VersionChecker.CheckResult result = VersionChecker.getResult(ReAuth.modInfo);
-        if (result.status == VersionChecker.Status.OUTDATED || result.status == VersionChecker.Status.BETA_OUTDATED) {
+        if (message.isEmpty() && result.status == VersionChecker.Status.OUTDATED || result.status == VersionChecker.Status.BETA_OUTDATED) {
             // Cannot be null but is marked as such :(
             @SuppressWarnings("ConstantConditions")
             String msg = result.changes.get(result.target);
@@ -82,24 +89,24 @@ public final class ScreenAuth extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground();
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(matrices);
 
-        this.drawCenteredString(this.font, I18n.format("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
-        this.drawCenteredString(this.font, I18n.format("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
+        this.drawCenteredString(matrices, this.font, I18n.format("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
+        this.drawCenteredString(matrices, this.font, I18n.format("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
         if (!this.message.isEmpty()) {
-            this.drawCenteredString(this.font, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
+            this.drawCenteredString(matrices, this.font, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
         }
 
         if (!ReAuth.config.hasCrypto()) {
-            this.drawString(this.font, I18n.format("reauth.gui.auth.noCrypto"), this.width / 2 - 155, this.baseY + 90, Color.WHITE.getRGB());
+            this.drawString(matrices, this.font, I18n.format("reauth.gui.auth.noCrypto"), this.width / 2 - 155, this.baseY + 90, Color.WHITE.getRGB());
         }
 
         LoginType status = getLoginType();
-        this.confirm.setMessage(I18n.format(status.getTranslation()));
+        this.confirm.setMessage(new TranslationTextComponent(status.getTranslation()));
         this.confirm.active = status.isActive();
 
-        super.render(mouseX, mouseY, partialTicks);
+        super.render(matrices, mouseX, mouseY, partialTicks);
     }
 
     /**
@@ -111,7 +118,7 @@ public final class ScreenAuth extends Screen {
             ((TextFieldWidget) old).setFocused2(false);
         if (widget != null)
             widget.setFocused2(true);
-        setFocusedDefault(widget);
+        setFocused(widget);
     }
 
     @Override
@@ -159,7 +166,7 @@ public final class ScreenAuth extends Screen {
             LoginType type = getLoginType();
             switch (type) {
                 case Online:
-                    ReAuth.auth.login(this.username.getText(), this.pw.getPW(), this.save.isChecked());
+                    ReAuth.auth.login(this.username.getText(), this.pw.getPassword(), this.save.isChecked());
                     break;
                 case Offline:
                     ReAuth.auth.offline(this.username.getText());

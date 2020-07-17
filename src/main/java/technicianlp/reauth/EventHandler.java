@@ -1,6 +1,7 @@
 package technicianlp.reauth;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.ConnectingScreen;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.gui.screen.MultiplayerScreen;
@@ -8,6 +9,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -16,7 +18,7 @@ import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import technicianlp.reauth.gui.ScreenAuth;
+import technicianlp.reauth.gui.AuthScreen;
 
 import java.lang.reflect.Field;
 
@@ -31,24 +33,46 @@ public final class EventHandler {
         Screen screen = event.getGui();
         if (screen instanceof MultiplayerScreen) {
             // Add Button to MultiplayerScreen
-            event.addWidget(new Button(5, 5, 100, 20, I18n.format("reauth.gui.button"), (b) -> openAuthenticationScreen(screen)));
+            event.addWidget(new Button(5, 5, 100, 20, new TranslationTextComponent("reauth.gui.button"), b -> {
+                openAuthenticationScreen(screen);
+            }));
         } else if (screen instanceof MainMenuScreen) {
             // Support for Custom Main Menu (add button outside of viewport)
-            event.addWidget(new Button(-50, -50, 20, 20, I18n.format("reauth.gui.button"), (b) -> openAuthenticationScreen(screen)));
+            event.addWidget(new Button(-50, -50, 20, 20, new TranslationTextComponent("reauth.gui.button"), b -> {
+                openAuthenticationScreen(screen);
+            }));
         } else if (screen instanceof DisconnectedScreen) {
-            // Change DisconnectedScreen if its reason is an invalid session
-            if ("connect.failed".equals(getTranslationKey(screen.getTitle()))) {
-                if (getTranslationKey(ReAuth.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
-                    Widget menu = event.getWidgetList().get(0);
-                    event.addWidget(new Button(menu.x, menu.y + 25, 200, 20, I18n.format("reauth.open"),
-                            (b) -> openAuthenticationScreen(ReAuth.getField(previousScreen, screen))));
+            // Add Buttons to DisconnectedScreen if its reason is an invalid session
+            handleDisconnectScreen(event, screen);
+        } else if (screen instanceof ConnectingScreen) {
+            // Save Screen to retrieve server later
+            DisconnectHandler.setConnectScreen((ConnectingScreen) screen);
+        }
+    }
+
+    private static void handleDisconnectScreen(InitGuiEvent.Post event, Screen screen) {
+        if ("connect.failed".equals(getTranslationKey(screen.getTitle()))) {
+            if (getTranslationKey(ReAuth.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
+                Widget menu = event.getWidgetList().get(0);
+
+                String key = DisconnectHandler.canRetryLogin() ? "reauth.retry" : "reauth.retry.disabled";
+                ITextComponent retryText = new TranslationTextComponent(key, ReAuth.config.getProfile());
+                Button retryButton = new Button(menu.x, menu.y + 25, 200, 20, retryText, b -> {
+                    DisconnectHandler.retryLogin();
+                });
+                if (!DisconnectHandler.canRetryLogin()) {
+                    retryButton.active = false;
                 }
+                event.addWidget(retryButton);
+                event.addWidget(new Button(menu.x, menu.y + 50, 200, 20, new TranslationTextComponent("reauth.open"), b -> {
+                    Minecraft.getInstance().displayGuiScreen(new AuthScreen(ReAuth.getField(previousScreen, screen)));
+                }));
             }
         }
     }
 
     private static void openAuthenticationScreen(Screen parent) {
-        Minecraft.getInstance().displayGuiScreen(new ScreenAuth(parent));
+        Minecraft.getInstance().displayGuiScreen(new AuthScreen(parent));
     }
 
     private static String getTranslationKey(Object component) {
@@ -62,7 +86,7 @@ public final class EventHandler {
     public static void onDrawGui(DrawScreenEvent.Post e) {
         if (e.getGui() instanceof MultiplayerScreen) {
             AuthHelper.SessionStatus state = ReAuth.auth.getSessionStatus(false);
-            e.getGui().drawString(e.getGui().getMinecraft().fontRenderer, I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
+            e.getGui().drawString(e.getMatrixStack(), e.getGui().getMinecraft().fontRenderer, I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
         }
     }
 

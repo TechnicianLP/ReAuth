@@ -4,6 +4,8 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.SharedConstants;
+import net.minecraft.util.Util;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import technicianlp.reauth.ReAuth;
 
@@ -14,22 +16,17 @@ final class PasswordFieldWidget extends TextFieldWidget {
 
     private static final Field selectionEnd = ObfuscationReflectionHelper.findField(TextFieldWidget.class, "field_146223_s");
 
-    PasswordFieldWidget(FontRenderer renderer, int posx, int posy, int x, int y, String name) {
+    PasswordFieldWidget(FontRenderer renderer, int posx, int posy, int x, int y, ITextComponent name) {
         super(renderer, posx, posy, x, y, name);
         this.setMaxStringLength(512);
     }
 
     private char[] password = new char[0];
 
-    final char[] getPW() {
-        char[] pw = new char[password.length];
-        System.arraycopy(password, 0, pw, 0, password.length);
-        return pw;
-    }
-
     /**
      * Prevent Cut/Copy; actual logic handled by super
      */
+    @Override
     public final boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (!this.isFocused() || Screen.isCopy(keyCode) || Screen.isCut(keyCode))
             return false;
@@ -54,6 +51,7 @@ final class PasswordFieldWidget extends TextFieldWidget {
     /**
      * Modified version of {@link TextFieldWidget#writeText(String)} to allow for displayed text to differ and make the password be array based
      */
+    @Override
     public final void writeText(String rawInput) {
         int selectionEnd = getSelectionEnd();
         int selStart = Math.min(this.getCursorPosition(), selectionEnd);
@@ -72,35 +70,34 @@ final class PasswordFieldWidget extends TextFieldWidget {
             System.arraycopy(password, selEnd, newPW, selStart + input.length, password.length - selEnd);
 
         setPassword(newPW);
-        this.clampCursorPosition(selStart + input.length);
-        this.setSelectionPos(getCursorPosition());
     }
 
     /**
      * Modified version of {@link TextFieldWidget#deleteFromCursor(int)} to allow for displayed text to differ and make the password be array based
      */
     @Override
-    public final void deleteFromCursor(int num) {
+    public final void deleteFromCursor(int characterOffset) {
         if (password.length == 0)
             return;
         if (this.getSelectionEnd() != this.getCursorPosition()) {
             this.writeText("");
         } else {
-            boolean direction = num < 0;
-            int start = direction ? Math.max(this.getCursorPosition() + num, 0) : this.getCursorPosition();
-            int end = direction ? this.getCursorPosition() : Math.min(this.getCursorPosition() + num, password.length);
+            int cursor = Util.func_240980_a_(this.getText(), this.getCursorPosition(), characterOffset);
+            int start = Math.min(cursor, this.getCursorPosition());
+            int end = Math.max(cursor, this.getCursorPosition());
 
-            char[] newPW = new char[start + password.length - end];
+            if(start != end) {
+                char[] newPW = new char[start + password.length - end];
 
-            if (start >= 0)
-                System.arraycopy(password, 0, newPW, 0, start);
+                if (start >= 0)
+                    System.arraycopy(password, 0, newPW, 0, start);
 
-            if (end < password.length)
-                System.arraycopy(password, end, newPW, start, password.length - end);
+                if (end < password.length)
+                    System.arraycopy(password, end, newPW, start, password.length - end);
 
-            if (direction)
-                this.moveCursorBy(num);
-            setPassword(newPW);
+                setPassword(newPW);
+                this.setCursorPosition(start);
+            }
         }
     }
 
@@ -111,6 +108,12 @@ final class PasswordFieldWidget extends TextFieldWidget {
         Arrays.fill(this.password, 'f');
         this.password = password;
         updateText();
+    }
+    
+    final char[] getPassword() {
+        char[] pw = new char[password.length];
+        System.arraycopy(password, 0, pw, 0, password.length);
+        return pw;
     }
 
     /**

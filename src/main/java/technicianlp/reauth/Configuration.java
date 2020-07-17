@@ -155,6 +155,10 @@ public final class Configuration {
         return "";
     }
 
+    public String getProfile() {
+        return profileNameSpec.get();
+    }
+
     /**
      * Decrypt Password
      * Empty String is not decrypted
@@ -171,5 +175,12 @@ public final class Configuration {
      */
     public boolean hasCrypto() {
         return crypto != null;
+    }
+
+    public boolean hasCredentials() {
+        return hasCrypto() &&
+                !usernameSpec.get().isEmpty() &&
+                !passwordSpec.get().isEmpty() &&
+                !profileNameSpec.get().isEmpty();
     }
 }
