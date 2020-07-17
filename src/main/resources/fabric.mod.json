@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "reauth",
+  "version": "${version}",
+
+  "name": "ReAuth",
+  "description": "A Mod to renew your Session",
+  "authors": [
+    "TechnicianLP"
+  ],
+  "contact": {
+    "homepage": "https://github.com/TechnicianLP/ReAuth",
+    "sources": "https://github.com/TechnicianLP/ReAuth",
+    "issues": "https://github.com/TechnicianLP/ReAuth/issues"
+  },
+
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "technicianlp.reauth.ReAuth"
+    ],
+    "modmenu": [
+      "technicianlp.reauth.integration.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "reauth.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x",
+    "autoconfig1u": "*"
+  },
+  "recommends": {
+    "cloth-config2": "*",
+    "modmenu": "*"
+  },
+  "custom": { "modmenu:clientsideOnly": true }
+}

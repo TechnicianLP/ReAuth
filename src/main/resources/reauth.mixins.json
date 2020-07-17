@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "technicianlp.reauth.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [],
+  "client": [
+    "MultiplayerScreenMixin",
+    "DisconnectedScreenMixin",
+    "ConnectScreenMixin",
+    "MinecraftClientMixin",
+    "TextFieldWidgetMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
