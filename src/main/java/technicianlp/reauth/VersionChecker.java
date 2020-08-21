@@ -12,7 +12,7 @@ import java.util.Map;
 
 public final class VersionChecker implements Runnable {
 
-    private static final String MC_VERSION = "1.16";
+    private static final String MC_VERSION = "1.16.2";
     private static final String JSON_URL = "https://github.com/TechnicianLP/ReAuth/raw/master/update.json";
 
     private Status status = Status.UNKNOWN;

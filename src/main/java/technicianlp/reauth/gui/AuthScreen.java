@@ -46,7 +46,7 @@ public final class AuthScreen extends Screen {
     @Override
     public void init() {
         super.init();
-        this.client.keyboard.enableRepeatEvents(true);
+        this.client.keyboard.setRepeatEvents(true);
 
         this.baseY = this.height / 2 - 110 / 2;
 
@@ -91,10 +91,10 @@ public final class AuthScreen extends Screen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrices);
 
-        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
-        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
+        drawCenteredString(matrices, this.textRenderer, I18n.translate("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
+        drawCenteredString(matrices, this.textRenderer, I18n.translate("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
         if (!this.message.isEmpty()) {
-            this.drawCenteredString(matrices, this.textRenderer, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
+            drawCenteredString(matrices, this.textRenderer, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
         }
 
         if (!ReAuth.config.hasCrypto()) {
@@ -201,7 +201,7 @@ public final class AuthScreen extends Screen {
     public void removed() {
         super.removed();
         this.pw.setPassword(new char[0]);
-        this.client.keyboard.enableRepeatEvents(false);
+        this.client.keyboard.setRepeatEvents(false);
     }
 
     private enum LoginType {

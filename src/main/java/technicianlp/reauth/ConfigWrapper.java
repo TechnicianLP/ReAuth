@@ -85,7 +85,7 @@ public final class ConfigWrapper {
      * Fall back to "local" path if that lookup fails (somehow)
      */
     private String getPath() {
-        Path configFile = FabricLoader.getInstance().getConfigDirectory().toPath().resolve(CONFIG_NAME + ".toml");
+        Path configFile = FabricLoader.getInstance().getConfigDir().resolve(CONFIG_NAME + ".toml");
         try {
             if (Files.exists(configFile))
                 return configFile.toRealPath().toString();

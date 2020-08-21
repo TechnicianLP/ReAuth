@@ -8,3 +8,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+rootProject.name='ReAuth Fabric 1.16'

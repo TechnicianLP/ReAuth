@@ -19,8 +19,10 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modApi "me.sargunvohra.mcmods:autoconfig1u:3.2.0-unstable"
-	modImplementation "io.github.prospector:modmenu:1.14.0+build.24"
-	modApi "me.shedaniel.cloth:config-2:4.6.0"
+	modImplementation "io.github.prospector:modmenu:1.14.6+build.31"
+	modApi ("me.shedaniel.cloth:config-2:4.7.0-unstable") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
 }
