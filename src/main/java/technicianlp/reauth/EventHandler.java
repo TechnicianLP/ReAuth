@@ -1,6 +1,7 @@
 package technicianlp.reauth;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.ConnectingScreen;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.MainMenuScreen;
@@ -51,8 +52,8 @@ public final class EventHandler {
     }
 
     private static void handleDisconnectScreen(InitGuiEvent.Post event, Screen screen) {
-        if ("connect.failed".equals(getTranslationKey(screen.getTitle()))) {
-            if (getTranslationKey(ReAuth.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
+        if ("connect.failed".equals(DisconnectHandler.getTranslationKey(screen.getTitle()))) {
+            if (DisconnectHandler.getTranslationKey(ReAuth.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
                 Widget menu = event.getWidgetList().get(0);
 
                 String key = DisconnectHandler.canRetryLogin() ? "reauth.retry" : "reauth.retry.disabled";
@@ -75,18 +76,11 @@ public final class EventHandler {
         Minecraft.getInstance().displayGuiScreen(new AuthScreen(parent));
     }
 
-    private static String getTranslationKey(Object component) {
-        if (component instanceof TranslationTextComponent) {
-            return ((TranslationTextComponent) component).getKey();
-        }
-        return "";
-    }
-
     @SubscribeEvent
     public static void onDrawGui(DrawScreenEvent.Post e) {
         if (e.getGui() instanceof MultiplayerScreen) {
             AuthHelper.SessionStatus state = ReAuth.auth.getSessionStatus(false);
-            e.getGui().drawString(e.getMatrixStack(), e.getGui().getMinecraft().fontRenderer, I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
+            AbstractGui.drawString(e.getMatrixStack(), e.getGui().getMinecraft().fontRenderer, I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
         }
     }
 

@@ -1,6 +1,8 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/reauth",
   "promos": {
+    "1.16.2-latest": "3.9.1",
+    "1.16.2-recommended": "3.9.1",
     "1.16.1-latest": "3.9.0",
     "1.16.1-recommended": "3.9.0",
     "1.15.2-latest": "3.8.1",
@@ -9,7 +11,14 @@
     "1.14.4-recommended": "3.8.1"
   },
   "promos-fabric": {
+    "1.16.2-latest": "3.9.1",
     "1.16-latest": "3.9.0"
+  },
+  "1.16.2": {
+    "3.9.1": "Port to 1.16.2"
+  },
+  "1.16.2-fabric": {
+    "3.9.1": "Port to 1.16.2"
   },
   "1.16.1": {
     "3.9.0": "Port to 1.16; Add Login and Retry Button"

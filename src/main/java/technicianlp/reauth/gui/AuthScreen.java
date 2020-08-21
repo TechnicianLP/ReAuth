@@ -92,14 +92,14 @@ public final class AuthScreen extends Screen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrices);
 
-        this.drawCenteredString(matrices, this.font, I18n.format("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
-        this.drawCenteredString(matrices, this.font, I18n.format("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
+        drawCenteredString(matrices, this.font, I18n.format("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
+        drawCenteredString(matrices, this.font, I18n.format("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
         if (!this.message.isEmpty()) {
-            this.drawCenteredString(matrices, this.font, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
+            drawCenteredString(matrices, this.font, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
         }
 
         if (!ReAuth.config.hasCrypto()) {
-            this.drawString(matrices, this.font, I18n.format("reauth.gui.auth.noCrypto"), this.width / 2 - 155, this.baseY + 90, Color.WHITE.getRGB());
+            drawString(matrices, this.font, I18n.format("reauth.gui.auth.noCrypto"), this.width / 2 - 155, this.baseY + 90, Color.WHITE.getRGB());
         }
 
         LoginType status = getLoginType();

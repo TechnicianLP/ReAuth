@@ -5,7 +5,6 @@ import net.minecraftforge.fml.config.ModConfig;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
