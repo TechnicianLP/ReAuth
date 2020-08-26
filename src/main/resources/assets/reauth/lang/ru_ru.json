@@ -18,5 +18,7 @@
   "reauth.status.unknown": "В сети: §l§7?",
   "reauth.login.success": "§aУспешный вход!",
   "reauth.login.fail": "§4Ошибка входа: %s",
-  "reauth.login.error": "§4Ошибка: %s"
+  "reauth.login.error": "§4Ошибка: %s",
+  "reauth.retry": "Авторизоваться как %s и переподключиться",
+  "reauth.retry.disabled": "Авторизация и переподключение недоступны"
 }
