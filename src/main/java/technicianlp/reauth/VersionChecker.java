@@ -1,10 +1,18 @@
 package technicianlp.reauth;
 
 import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
+import net.minecraft.SharedConstants;
 import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -12,16 +20,25 @@ import java.util.Map;
 
 public final class VersionChecker implements Runnable {
 
-    private static final String MC_VERSION = "1.16.2";
+    private static final String MC_VERSION = SharedConstants.getGameVersion().getReleaseTarget();
     private static final String JSON_URL = "https://github.com/TechnicianLP/ReAuth/raw/master/update.json";
+    private static final Type mapType = new TypeToken<Map<String, String>>() {}.getType();
 
     private Status status = Status.UNKNOWN;
     private String changes = null;
 
+    private final Gson gson;
+
+    public VersionChecker() {
+        gson = new GsonBuilder()
+                .registerTypeAdapter(VersionJson.class, new VersionJsonDeserializer())
+                .create();
+    }
+
     public void runVersionCheck() {
         status = Status.UNKNOWN;
         changes = null;
-        new Thread(new VersionChecker(), "ReAuth Version Check").start();
+        new Thread(this, "ReAuth Version Check").start();
     }
 
     @Override
@@ -33,9 +50,9 @@ public final class VersionChecker implements Runnable {
             String data = IOUtils.toString(inputstream, StandardCharsets.UTF_8);
             inputstream.close();
 
-            VersionJson json = new Gson().fromJson(data, VersionJson.class);
+            VersionJson json = gson.fromJson(data, VersionJson.class);
 
-            String latest = json.versions.get(MC_VERSION + "-latest");
+            String latest = json.versions.get(MC_VERSION + "-recommended");
             String current = ReAuth.container.getMetadata().getVersion().getFriendlyString();
             int currentId = versionToInt(current);
 
@@ -81,10 +98,28 @@ public final class VersionChecker implements Runnable {
     }
 
     private static class VersionJson {
-        @SerializedName("promos-fabric")
         Map<String, String> versions = new HashMap<>();
-        @SerializedName(MC_VERSION + "-fabric")
         Map<String, String> changelog = new HashMap<>();
+
+        public VersionJson(Map<String, String> versions, Map<String, String> changelog) {
+            if (versions != null)
+                this.versions.putAll(versions);
+            if (changelog != null)
+                this.changelog.putAll(changelog);
+        }
+    }
+
+    private static class VersionJsonDeserializer implements JsonDeserializer<VersionJson> {
+        @Override
+        public VersionJson deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonObject()) {
+                JsonObject object = (JsonObject) json;
+                Map<String, String> versions = context.deserialize(object.get("promos-fabric"), mapType);
+                Map<String, String> changelog = context.deserialize(object.get(MC_VERSION + "-fabric"), mapType);
+                return new VersionJson(versions, changelog);
+            }
+            return null;
+        }
     }
 
     public enum Status {
