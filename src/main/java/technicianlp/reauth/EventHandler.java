@@ -80,7 +80,7 @@ public final class EventHandler {
     public static void onDrawGui(DrawScreenEvent.Post e) {
         if (e.getGui() instanceof MultiplayerScreen) {
             AuthHelper.SessionStatus state = ReAuth.auth.getSessionStatus(false);
-            AbstractGui.drawString(e.getMatrixStack(), e.getGui().getMinecraft().fontRenderer, I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
+            Minecraft.getInstance().fontRenderer.drawStringWithShadow(e.getMatrixStack(), I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
         }
     }
 

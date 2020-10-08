@@ -2,6 +2,7 @@ package technicianlp.reauth.gui;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -92,14 +93,14 @@ public final class AuthScreen extends Screen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrices);
 
-        drawCenteredString(matrices, this.font, I18n.format("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
-        drawCenteredString(matrices, this.font, I18n.format("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
+        drawCenteredString2(matrices, this.font, I18n.format("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
+        drawCenteredString2(matrices, this.font, I18n.format("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
         if (!this.message.isEmpty()) {
-            drawCenteredString(matrices, this.font, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
+            drawCenteredString2(matrices, this.font, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
         }
 
         if (!ReAuth.config.hasCrypto()) {
-            drawString(matrices, this.font, I18n.format("reauth.gui.auth.noCrypto"), this.width / 2 - 155, this.baseY + 90, Color.WHITE.getRGB());
+            this.font.drawStringWithShadow(matrices, I18n.format("reauth.gui.auth.noCrypto"), this.width / 2 - 155, this.baseY + 90, Color.WHITE.getRGB());
         }
 
         LoginType status = getLoginType();
@@ -225,5 +226,13 @@ public final class AuthScreen extends Screen {
         public String getTranslation() {
             return "reauth.gui.auth.confirm." + translation;
         }
+    }
+
+    /**
+     * for 1.16.x compat this needs to be copied
+     * the superclass method changes from instance to static between 1.16.1 and 1.16.2
+     */
+    private void drawCenteredString2(MatrixStack matrix, FontRenderer font, String text, int x, int y, int color) {
+        font.drawStringWithShadow(matrix, text, (float) (x - font.getStringWidth(text) / 2), (float) y, color);
     }
 }
