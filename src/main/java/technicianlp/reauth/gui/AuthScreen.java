@@ -1,6 +1,7 @@
 package technicianlp.reauth.gui;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -91,10 +92,10 @@ public final class AuthScreen extends Screen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrices);
 
-        drawCenteredString(matrices, this.textRenderer, I18n.translate("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
-        drawCenteredString(matrices, this.textRenderer, I18n.translate("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
+        drawCenteredString2(matrices, this.textRenderer, I18n.translate("reauth.gui.auth.text1"), this.width / 2, this.baseY, Color.WHITE.getRGB());
+        drawCenteredString2(matrices, this.textRenderer, I18n.translate("reauth.gui.auth.text2"), this.width / 2, this.baseY + 45, Color.WHITE.getRGB());
         if (!this.message.isEmpty()) {
-            drawCenteredString(matrices, this.textRenderer, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
+            drawCenteredString2(matrices, this.textRenderer, this.message, this.width / 2, this.baseY - 15, 0xFFFFFF);
         }
 
         if (!ReAuth.config.hasCrypto()) {
@@ -224,5 +225,13 @@ public final class AuthScreen extends Screen {
         public String getTranslation() {
             return "reauth.gui.auth.confirm." + translation;
         }
+    }
+
+    /**
+     * for 1.16.x compat this needs to be copied
+     * the superclass method changes from instance to static between 1.16.1 and 1.16.2
+     */
+    private void drawCenteredString2(MatrixStack matrices, TextRenderer textRenderer, String text, int centerX, int y, int color) {
+        textRenderer.drawWithShadow(matrices, text, (float)(centerX - textRenderer.getWidth(text) / 2), (float)y, color);
     }
 }
