@@ -80,7 +80,7 @@ public final class AuthScreen extends Screen {
 //        addButton(config);
 
         VersionChecker.CheckResult result = VersionChecker.getResult(ReAuth.modInfo);
-        if (message.isEmpty() && result.status == VersionChecker.Status.OUTDATED || result.status == VersionChecker.Status.BETA_OUTDATED) {
+        if (message.isEmpty() && result.status == VersionChecker.Status.OUTDATED) {
             // Cannot be null but is marked as such :(
             @SuppressWarnings("ConstantConditions")
             String msg = result.changes.get(result.target);
