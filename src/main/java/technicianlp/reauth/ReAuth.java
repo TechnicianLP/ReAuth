@@ -14,8 +14,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Field;
-
 @Mod("reauth")
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class ReAuth {
@@ -58,12 +56,4 @@ public final class ReAuth {
         config.setConfig(event.getConfig());
     }
 
-    @SuppressWarnings("unchecked")
-    public static <E> E getField(Field field, Object object) {
-        try {
-            return (E) field.get(object);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Failed Reflective Access", e);
-        }
-    }
 }

@@ -75,7 +75,7 @@ public final class AuthScreen extends Screen {
         this.config = new Button(this.width - 80, this.height - 25, 75, 20, new TranslationTextComponent("reauth.gui.auth.config"), (b) -> {
 //            this.getMinecraft().displayGuiScreen(new ConfigGUI(this));
             ReAuth.config.setCredentials("", "", "");
-            onClose();
+            closeScreen();
         });
 //        addButton(config);
 
@@ -114,18 +114,18 @@ public final class AuthScreen extends Screen {
      * Sets the focus to the given TextFieldWidget
      */
     private void focus(TextFieldWidget widget) {
-        IGuiEventListener old = getFocused();
+        IGuiEventListener old = getListener();
         if (old instanceof TextFieldWidget)
             ((TextFieldWidget) old).setFocused2(false);
         if (widget != null)
             widget.setFocused2(true);
-        setFocused(widget);
+        setListener(widget);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int p_keyPressed_2_, int p_keyPressed_3_) {
         if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
-            IGuiEventListener focus = getFocused();
+            IGuiEventListener focus = getListener();
             if (focus == username) {
                 focus(pw);
                 return true;
@@ -185,23 +185,23 @@ public final class AuthScreen extends Screen {
             ReAuth.log.error("Error:", e);
         }
         if (success)
-            onClose();
+            closeScreen();
     }
 
     /**
-     * Method called to request this Screen to close itself (unfortunate MCP name)
+     * Method called to request this Screen to close itself
      */
     @Override
-    public void onClose() {
+    public void closeScreen() {
         this.getMinecraft().displayGuiScreen(prev);
     }
 
     /**
-     * Called once this Screen is closed (unfortunate MCP name)
+     * Called once this Screen is closed
      */
     @Override
-    public void removed() {
-        super.removed();
+    public void onClose() {
+        super.onClose();
         this.pw.setPassword(new char[0]);
         getMinecraft().keyboardListener.enableRepeatEvents(false);
     }

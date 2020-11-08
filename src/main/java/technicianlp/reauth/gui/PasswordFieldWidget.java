@@ -1,20 +1,25 @@
 package technicianlp.reauth.gui;
 
+import com.google.common.base.Preconditions;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.SharedConstants;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import technicianlp.reauth.ReAuth;
+import technicianlp.reauth.ReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
 final class PasswordFieldWidget extends TextFieldWidget {
 
-    private static final Field selectionEnd = ObfuscationReflectionHelper.findField(TextFieldWidget.class, "field_146223_s");
+    private static final Field selectionEnd;
+
+    static {
+        selectionEnd = ReflectionHelper.findMcpField(TextFieldWidget.class, "field_146223_s");
+        Preconditions.checkNotNull(selectionEnd, "Reflection failed: field_146223_s");
+    }
 
     PasswordFieldWidget(FontRenderer renderer, int posx, int posy, int x, int y, ITextComponent name) {
         super(renderer, posx, posy, x, y, name);
@@ -163,6 +168,6 @@ final class PasswordFieldWidget extends TextFieldWidget {
      * Getter due to the field being private in super
      */
     public int getSelectionEnd() {
-        return ReAuth.getField(selectionEnd, this);
+        return ReflectionHelper.getField(selectionEnd, this);
     }
 }

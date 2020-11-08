@@ -20,7 +20,7 @@ archivesBaseName = "${ModName}-${MCVersion}-Forge"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200707-1.16.1'
+    mappings channel: 'snapshot', version: '20201028-1.16.3'
 
     runs {
         client {
@@ -48,7 +48,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.2-33.0.19'
+    minecraft 'net.minecraftforge:forge:1.16.4-35.0.2'
 }
 
 jar {

@@ -1,7 +1,7 @@
 package technicianlp.reauth;
 
+import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.ConnectingScreen;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.MainMenuScreen;
@@ -18,7 +18,6 @@ import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import technicianlp.reauth.gui.AuthScreen;
 
 import java.lang.reflect.Field;
@@ -26,8 +25,15 @@ import java.lang.reflect.Field;
 @Mod.EventBusSubscriber(modid = "reauth", value = Dist.CLIENT)
 public final class EventHandler {
 
-    private static final Field disconnectMessage = ObfuscationReflectionHelper.findField(DisconnectedScreen.class, "field_146304_f");
-    private static final Field previousScreen = ObfuscationReflectionHelper.findField(DisconnectedScreen.class, "field_146307_h");
+    private static final Field disconnectMessage;
+    private static final Field previousScreen;
+
+    static {
+        disconnectMessage = ReflectionHelper.findMcpField(DisconnectedScreen.class, "field_146304_f");
+        Preconditions.checkNotNull(disconnectMessage, "Reflection failed: field_146304_f");
+        previousScreen = ReflectionHelper.findMcpField(DisconnectedScreen.class, "field_146307_h");
+        Preconditions.checkNotNull(previousScreen, "Reflection failed: field_146307_h");
+    }
 
     @SubscribeEvent
     public static void onInitGui(InitGuiEvent.Post event) {
@@ -53,7 +59,7 @@ public final class EventHandler {
 
     private static void handleDisconnectScreen(InitGuiEvent.Post event, Screen screen) {
         if ("connect.failed".equals(DisconnectHandler.getTranslationKey(screen.getTitle()))) {
-            if (DisconnectHandler.getTranslationKey(ReAuth.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
+            if (DisconnectHandler.getTranslationKey(ReflectionHelper.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
                 Widget menu = event.getWidgetList().get(0);
 
                 String key = DisconnectHandler.canRetryLogin() ? "reauth.retry" : "reauth.retry.disabled";
@@ -66,7 +72,7 @@ public final class EventHandler {
                 }
                 event.addWidget(retryButton);
                 event.addWidget(new Button(menu.x, menu.y + 50, 200, 20, new TranslationTextComponent("reauth.open"), b -> {
-                    Minecraft.getInstance().displayGuiScreen(new AuthScreen(ReAuth.getField(previousScreen, screen)));
+                    Minecraft.getInstance().displayGuiScreen(new AuthScreen(ReflectionHelper.getField(previousScreen, screen)));
                 }));
             }
         }

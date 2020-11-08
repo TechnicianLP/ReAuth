@@ -1,5 +1,6 @@
 package technicianlp.reauth;
 
+import com.google.common.base.Preconditions;
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
@@ -7,14 +8,14 @@ import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 import com.mojang.util.UUIDTypeAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 public final class AuthHelper {
@@ -25,35 +26,50 @@ public final class AuthHelper {
     private static final long cacheTime = 5 * 1000 * 60L;
 
     /**
-     * Reflective YggdrasilUserAuthentication#accessToken
+     * Reflective {@link YggdrasilUserAuthentication#accessToken}
      */
     private static final Field accessToken;
     /**
-     * Reflective Minecraft#session
+     * Reflective {@link Minecraft#session}
      */
-    private static Field sessionField;
+    private static final Field sessionField;
     /**
-     * Reflective YggdrasilUserAuthentication#checkTokenValidity
+     * Reflective {@link YggdrasilUserAuthentication#checkTokenValidity}
      */
     private static final Method checkTokenValidity;
     /**
-     * Reflective YggdrasilUserAuthentication#logInWithPassword
+     * Reflective {@link YggdrasilUserAuthentication#logInWithPassword}
      */
     private static final Method logInWithPassword;
+    /**
+     * Reflective {@link YggdrasilUserAuthentication#YggdrasilUserAuthentication}
+     */
+    private static final Constructor<YggdrasilUserAuthentication> authConstructor;
+    private static final BiFunction<YggdrasilAuthenticationService, String, Object[]> authParameterFactory;
 
     static {
-        sessionField = ObfuscationReflectionHelper.findField(Minecraft.class, "field_71449_j");
-        try {
-            Class<?> clz = YggdrasilUserAuthentication.class;
-            accessToken = clz.getDeclaredField("accessToken");
-            accessToken.setAccessible(true);
-            checkTokenValidity = clz.getDeclaredMethod("checkTokenValidity");
-            checkTokenValidity.setAccessible(true);
-            logInWithPassword = clz.getDeclaredMethod("logInWithPassword");
-            logInWithPassword.setAccessible(true);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("Failed Reflective access", e);
+        sessionField = ReflectionHelper.findMcpField(Minecraft.class, "field_71449_j");
+        Preconditions.checkNotNull(sessionField, "Reflection failed: field_71449_j");
+
+        Class<YggdrasilUserAuthentication> clz = YggdrasilUserAuthentication.class;
+        accessToken = ReflectionHelper.findField(clz, "accessToken");
+        Preconditions.checkNotNull(accessToken, "Reflection failed: accessToken");
+        checkTokenValidity = ReflectionHelper.findMethod(clz, "checkTokenValidity");
+        Preconditions.checkNotNull(checkTokenValidity, "Reflection failed: checkTokenValidity");
+        logInWithPassword = ReflectionHelper.findMethod(clz, "logInWithPassword");
+        Preconditions.checkNotNull(logInWithPassword, "Reflection failed: logInWithPassword");
+
+        // Constructor changed between 1.16.3 and 1.16.4: clientToken needs to be passed into the YUA
+        Constructor<YggdrasilUserAuthentication> constructor;
+        constructor = ReflectionHelper.findConstructor(clz, YggdrasilAuthenticationService.class, String.class, Agent.class);
+        if (constructor != null) {
+            authParameterFactory = (authService, clientToken) -> new Object[]{authService, clientToken, Agent.MINECRAFT};
+        } else {
+            constructor = ReflectionHelper.findConstructor(clz, YggdrasilAuthenticationService.class, Agent.class);
+            authParameterFactory = (authService, clientToken) -> new Object[]{authService, Agent.MINECRAFT};
         }
+        Preconditions.checkNotNull(constructor, "Reflection failed: <init>");
+        authConstructor = constructor;
     }
 
     /**
@@ -78,8 +94,10 @@ public final class AuthHelper {
     public AuthHelper() {
         Proxy proxy = Minecraft.getInstance().getProxy();
         String clientId = UUID.randomUUID().toString();
-        checkAuth = new YggdrasilUserAuthentication(new YggdrasilAuthenticationService(proxy, null), Agent.MINECRAFT);
-        loginAuth = new YggdrasilUserAuthentication(new YggdrasilAuthenticationService(proxy, clientId), Agent.MINECRAFT);
+        Object[] checkAuthParams = authParameterFactory.apply(new YggdrasilAuthenticationService(proxy, (String) null), null);
+        checkAuth = ReflectionHelper.callConstructor(authConstructor, checkAuthParams);
+        Object[] loginAuthParams = authParameterFactory.apply(new YggdrasilAuthenticationService(proxy, clientId), clientId);
+        loginAuth = ReflectionHelper.callConstructor(authConstructor, loginAuthParams);
     }
 
     /**
@@ -105,8 +123,8 @@ public final class AuthHelper {
      * Uses the Validate Endpoint to check the current Tokens validity and updates the cache accordingly
      */
     private void updateSessionStatus() {
-        setToken(getSession().getToken());
-        boolean valid = callCheckTokenValidity();
+        ReflectionHelper.setField(accessToken, checkAuth, getSession().getToken());
+        boolean valid = ReflectionHelper.callMethod(checkTokenValidity, checkAuth);
         status = valid ? SessionStatus.VALID : SessionStatus.INVALID;
         lastCheck = System.currentTimeMillis();
     }
@@ -123,7 +141,14 @@ public final class AuthHelper {
         loginAuth.setUsername(user);
         loginAuth.setPassword(password);
         try {
-            callLogInWithPassword();
+            try {
+                ReflectionHelper.callMethod(logInWithPassword, loginAuth);
+            } catch (ReflectionHelper.UncheckedInvocationTargetException exception) {
+                Throwable parent = exception.getCause();
+                if (parent instanceof AuthenticationException)
+                    throw (AuthenticationException) parent;
+                ReAuth.log.error("LogInWithPassword has thrown unexpected exception:", parent);
+            }
 
             String username = loginAuth.getSelectedProfile().getName();
             String uuid = UUIDTypeAdapter.fromUUID(loginAuth.getSelectedProfile().getId());
@@ -159,41 +184,8 @@ public final class AuthHelper {
     }
 
     private void setSession(Session s) {
-        try {
-            sessionField.set(Minecraft.getInstance(), s);
-        } catch (ReflectiveOperationException throwable) {
-            throw new RuntimeException("Failed Reflective Access", throwable);
-        }
+        ReflectionHelper.setField(sessionField, Minecraft.getInstance(), s);
         status = SessionStatus.UNKNOWN;
-    }
-
-    private void setToken(String token) {
-        try {
-            accessToken.set(checkAuth, token);
-        } catch (ReflectiveOperationException throwable) {
-            throw new RuntimeException("Failed Reflective Access", throwable);
-        }
-    }
-
-    private boolean callCheckTokenValidity() {
-        try {
-            return (Boolean) checkTokenValidity.invoke(checkAuth);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("Failed Reflective Access", e);
-        }
-    }
-
-    private void callLogInWithPassword() throws AuthenticationException {
-        try {
-            logInWithPassword.invoke(loginAuth);
-        } catch (InvocationTargetException exception) {
-            Throwable parent = exception.getCause();
-            if (parent instanceof AuthenticationException)
-                throw (AuthenticationException) parent;
-            ReAuth.log.error("LogInWithPassword has thrown unexpected exception:", parent);
-        } catch (ReflectiveOperationException throwable) {
-            throw new RuntimeException("Failed Reflective Access", throwable);
-        }
     }
 
     public boolean isValidName(String username) {
