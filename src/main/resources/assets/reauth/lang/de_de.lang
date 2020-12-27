@@ -1,0 +1,22 @@
+{
+  "reauth.open": "Öffne ReAuth",
+  "reauth.gui.auth.title": "ReAuthentifizierungsbildschirm",
+  "reauth.gui.auth.username": "Nutzername",
+  "reauth.gui.auth.password": "Passwort",
+  "reauth.gui.auth.checkbox": "Passwort in die Config speichern (WARNUNG: SICHERHEITSRISIKO!)",
+  "reauth.gui.auth.noCrypto": "Das Speichern von Anmeldeinformationen ist für diese Java-Version nicht verfügbar",
+  "reauth.gui.auth.config": "Config (NYI)",
+  "reauth.gui.auth.confirm.none": "Anmelden",
+  "reauth.gui.auth.confirm.online": "Anmelden",
+  "reauth.gui.auth.confirm.offline": "Spiele offline",
+  "reauth.gui.auth.text1": "Nutzername/E-Mail:",
+  "reauth.gui.auth.text2": "Passwort:",
+  "reauth.gui.auth.update": "§9Update verfügbar: %s",
+  "reauth.gui.button": "ReAuth Anmeldung",
+  "reauth.status.valid": "Online: §l§a✔",
+  "reauth.status.invalid": "Online: §l§c✘",
+  "reauth.status.unknown": "Online: §l§7?",
+  "reauth.login.success": "§aAnmeldung erfolgreich!",
+  "reauth.login.fail": "§4Anmeldung fehlgeschlagen: %s",
+  "reauth.login.error": "§4Fehler: %s"
+}
