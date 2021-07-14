@@ -4,6 +4,7 @@ import com.mojang.authlib.exceptions.AuthenticationException;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.TranslatableText;
 import technicianlp.reauth.ReAuth;
@@ -35,10 +36,10 @@ public class DisconnectUtil {
             ReAuth.auth.login(ReAuth.config.getUsername(), ReAuth.config.getPassword(), true);
             if (screen != null) {
                 SocketAddress add = screen.reauthGetConnection().getAddress();
-                if (add instanceof InetSocketAddress) {
-                    InetSocketAddress address = (InetSocketAddress) add;
+                if (add instanceof InetSocketAddress address) {
                     MinecraftClient client = MinecraftClient.getInstance();
-                    client.openScreen(new ConnectScreen(screen.reauthGetParent(), client, address.getHostString(), address.getPort()));
+                    ServerAddress serverAddress = new ServerAddress(address.getHostString(), address.getPort());
+                    ConnectScreen.connect(screen.reauthGetParent(), client, serverAddress, null);
                 }
             }
         } catch (AuthenticationException exception) {

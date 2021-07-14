@@ -27,7 +27,7 @@ public class MultiplayerScreenMixin extends Screen {
         if(Screen.hasShiftDown()) {
             ReAuth.auth.getSessionStatus(true);
         }
-        addButton(new ButtonWidget(5, 5, 100, 20, new TranslatableText("reauth.gui.button"),
+        addDrawableChild(new ButtonWidget(5, 5, 100, 20, new TranslatableText("reauth.gui.button"),
                 b -> MinecraftClient.getInstance().openScreen(new AuthScreen(this))));
     }
 
