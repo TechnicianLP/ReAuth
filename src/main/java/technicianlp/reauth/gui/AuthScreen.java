@@ -54,30 +54,30 @@ public final class AuthScreen extends Screen {
         this.username = new TextFieldWidget(this.textRenderer, this.width / 2 - 155, this.baseY + 15, 2 * 155, 20, new TranslatableText("reauth.gui.auth.username"));
         this.username.setMaxLength(512);
         this.username.setText(ReAuth.config.getUsername());
-        addButton(username);
+        addDrawableChild(username);
 
         this.pw = new PasswordFieldWidget(this.textRenderer, this.width / 2 - 155, this.baseY + 60, 2 * 155, 20, new TranslatableText("reauth.gui.auth.password"));
         this.pw.setMaxLength(Short.MAX_VALUE);
         this.pw.setText(ReAuth.config.getPassword());
-        addButton(this.pw);
+        addDrawableChild(this.pw);
 
         setInitialFocus(username.getText().isEmpty() ? username : pw);
 
         this.save = new CheckboxWidget(this.width / 2 - 155, this.baseY + 85, 2 * 155, 20, new TranslatableText("reauth.gui.auth.checkbox"), !pw.getText().isEmpty());
         if (ReAuth.config.hasCrypto()) {
-            addButton(this.save);
+            addDrawableChild(this.save);
         }
 
         this.confirm = new ButtonWidget(this.width / 2 - 155, this.baseY + 110, 153, 20, LiteralText.EMPTY, b -> doLogin());
-        addButton(confirm);
+        addDrawableChild(confirm);
         this.cancel = new ButtonWidget(this.width / 2 + 2, this.baseY + 110, 155, 20, new TranslatableText("gui.cancel"), b -> this.client.openScreen(prev));
-        addButton(cancel);
+        addDrawableChild(cancel);
 
         this.config = new ButtonWidget(this.width - 80, this.height - 25, 75, 20, new TranslatableText("reauth.gui.auth.config"), b -> {
             this.client.openScreen(ClothConfigIntegration.getConfigScreen(this));
         });
         if (ClothConfigIntegration.isAvailable()) {
-            addButton(config);
+            addDrawableChild(config);
         }
 
         if (message.isEmpty() && ReAuth.versionCheck.getStatus() == VersionChecker.Status.OUTDATED) {
@@ -115,9 +115,9 @@ public final class AuthScreen extends Screen {
     private void focus(TextFieldWidget widget) {
         Element old = getFocused();
         if (old instanceof TextFieldWidget)
-            ((TextFieldWidget) old).setSelected(false);
+            ((TextFieldWidget) old).setTextFieldFocused(false);
         if (widget != null)
-            widget.setSelected(true);
+            widget.setTextFieldFocused(true);
         focusOn(widget);
     }
 
@@ -232,6 +232,6 @@ public final class AuthScreen extends Screen {
      * the superclass method changes from instance to static between 1.16.1 and 1.16.2
      */
     private void drawCenteredString2(MatrixStack matrices, TextRenderer textRenderer, String text, int centerX, int y, int color) {
-        textRenderer.drawWithShadow(matrices, text, (float)(centerX - textRenderer.getWidth(text) / 2), (float)y, color);
+        textRenderer.drawWithShadow(matrices, text, (float) (centerX - textRenderer.getWidth(text) / 2), (float) y, color);
     }
 }
