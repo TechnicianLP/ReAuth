@@ -1,16 +1,18 @@
 package technicianlp.reauth.mixinUtil;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
 import com.mojang.authlib.exceptions.AuthenticationException;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.TranslatableText;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.gui.AuthScreen;
-
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 public class DisconnectUtil {
     private static ConnectScreenDuck screen;
@@ -38,7 +40,7 @@ public class DisconnectUtil {
                 if (add instanceof InetSocketAddress) {
                     InetSocketAddress address = (InetSocketAddress) add;
                     MinecraftClient client = MinecraftClient.getInstance();
-                    client.openScreen(new ConnectScreen(screen.reauthGetParent(), client, address.getHostString(), address.getPort()));
+                    ConnectScreen.connect(screen.reauthGetParent(), client, new ServerAddress(address.getHostString(), address.getPort()), null);
                 }
             }
         } catch (AuthenticationException exception) {
