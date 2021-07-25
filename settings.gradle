@@ -9,4 +9,4 @@ pluginManagement {
     }
 }
 
-rootProject.name='ReAuth Fabric 1.16'
+rootProject.name='ReAuth Fabric 1.17'
