@@ -1,20 +1,27 @@
-modLoader="javafml"
-loaderVersion="[28,)"
-license="All rights reserved"
-issueTrackerURL="https://github.com/TechnicianLP/ReAuth/issues"
+modLoader = "javafml"
+loaderVersion = "[28,)"
+license = "All rights reserved"
+issueTrackerURL = "https://github.com/TechnicianLP/ReAuth/issues"
 
 [[mods]]
-modId="reauth"
-version="${file.jarVersion}"
-displayName="ReAuth"
-updateJSONURL="https://raw.githubusercontent.com/TechnicianLP/ReAuth/master/update.json"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/reauth"
-authors="TechnicianLP"
-description="A Mod to renew your Session"
+modId = "reauth"
+version = "${file.jarVersion}"
+displayName = "ReAuth"
+updateJSONURL = "https://raw.githubusercontent.com/TechnicianLP/ReAuth/master/update.json"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/reauth"
+authors = "TechnicianLP"
+description = "A Mod to renew your Session"
 
 [[dependencies.reauth]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.16,1.17)"
-    ordering="NONE"
-    side="CLIENT"
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.16,1.17)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.reauth]]
+modId="forge"
+mandatory=true
+versionRange="[36.2.9,)"
+ordering="NONE"
+side="CLIENT"
