@@ -1,6 +1,6 @@
 package technicianlp.reauth.util;
 
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -9,7 +9,6 @@ import java.lang.reflect.Modifier;
 
 public final class ReflectionHelper {
 
-    private static final Field fieldModifiers = findField(Field.class, "modifiers");
 
     public static Method findMethod(Class<?> clz, String name, Class<?>... parameterTypes) {
         try {
@@ -71,14 +70,6 @@ public final class ReflectionHelper {
             return ObfuscationReflectionHelper.findField(clz, name);
         } catch (ObfuscationReflectionHelper.UnableToFindFieldException ignored) {
             throw new UncheckedReflectiveOperationException("Unable to find MCP Field: " + name);
-        }
-    }
-
-    public static void unlockFinalField(Field field) {
-        try {
-            fieldModifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        } catch (ReflectiveOperationException exception) {
-            throw new UncheckedReflectiveOperationException("Unable to unlock final field", exception);
         }
     }
 

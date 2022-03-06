@@ -49,7 +49,7 @@ public final class AuthenticationCodeServer {
         };
     }
 
-    public final synchronized void stop() {
+    public synchronized void stop() {
         if (this.running) {
             this.executor.execute(this.stopServer);
             this.running = false;

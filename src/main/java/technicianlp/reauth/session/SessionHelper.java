@@ -1,29 +1,30 @@
 package technicianlp.reauth.session;
 
 import com.mojang.authlib.exceptions.AuthenticationException;
-import com.mojang.authlib.minecraft.OfflineSocialInteractions;
-import com.mojang.authlib.minecraft.SocialInteractionsService;
+import com.mojang.authlib.minecraft.UserApiService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.social.FilterManager;
-import net.minecraft.client.util.Splashes;
-import net.minecraft.util.Session;
+import net.minecraft.client.User;
+import net.minecraft.client.gui.screens.social.PlayerSocialManager;
+import net.minecraft.client.main.GameConfig;
+import net.minecraft.client.resources.SplashManager;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.util.ReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 public final class SessionHelper {
 
-    private static final Field sessionField = ReflectionHelper.findMcpField(Minecraft.class, "field_71449_j");
-    private static final Field interactionServiceField = ReflectionHelper.findMcpField(Minecraft.class, "field_244734_au");
-    private static final Field filterManagerField = ReflectionHelper.findMcpField(Minecraft.class, "field_244597_aC");
-    private static final Field splashesSessionField = ReflectionHelper.findMcpField(Splashes.class, "field_215281_d");
+    private static final Field userField = ReflectionHelper.findMcpField(Minecraft.class, "f_90998_");
+    private static final Field userApiServiceField = ReflectionHelper.findMcpField(Minecraft.class, "f_193584_");
+    private static final Field socialManagerField = ReflectionHelper.findMcpField(Minecraft.class, "f_91006_");
+    private static final Field splashesSessionField = ReflectionHelper.findMcpField(SplashManager.class, "f_118863_");
 
     private static final Pattern usernamePattern = Pattern.compile("[A-Za-z0-9_]{2,16}");
 
@@ -46,48 +47,52 @@ public final class SessionHelper {
      * Set the Session and update dependant fields
      * <p>
      * <li>Clear ProfileProperties and repopulate them
-     * <li>Recreate {@link SocialInteractionsService}, using logic from {@link Minecraft#func_244735_a}
-     * <li>Recreate {@link FilterManager} with the new SocialInteractionsService
-     * <li>Update {@link Splashes#gameSession}
+     * <li>Recreate {@link UserApiService}, using logic from {@link Minecraft#createUserApiService(YggdrasilAuthenticationService, GameConfig)}
+     * <li>Recreate {@link PlayerSocialManager} with the new SocialInteractionsService
+     * <li>Update {@link SplashManager#user}
      */
     private static void setSession(SessionData data, boolean online) {
-        Minecraft minecraft = Minecraft.getInstance();
+        try {
+            Minecraft minecraft = Minecraft.getInstance();
 
-        Session session = new Session(data.username, data.uuid, data.accessToken, data.type);
+            User session = new User(data.username(), data.uuid(), data.accessToken(), Optional.empty(), Optional.empty(), User.Type.byName(data.type()));
 
-        ReflectionHelper.setField(sessionField, minecraft, session);
-        SessionChecker.invalidate();
+            ReflectionHelper.setField(userField, minecraft, session);
+            SessionChecker.invalidate();
 
-        // Update things depending on the Session.
-        // TODO keep updated across versions
+            // Update things depending on the Session.
+            // TODO keep updated across versions
 
-        // Clear ProfileProperties and repopulate them
-        minecraft.getProfileProperties().clear();
-        minecraft.getProfileProperties();
-        // UserProperties are unused
+            // Clear ProfileProperties and repopulate them
+            minecraft.getProfileProperties().clear();
+            minecraft.getProfileProperties();
+            // UserProperties are unused
 
-        // Recreate SocialInteractionsService
-        SocialInteractionsService interactionsService = null;
-        if (online) {
-            YggdrasilMinecraftSessionService sessionService = (YggdrasilMinecraftSessionService) minecraft.getSessionService();
-            YggdrasilAuthenticationService authService = sessionService.getAuthenticationService();
-            try {
-                interactionsService = authService.createSocialInteractionsService(session.getToken());
-            } catch (AuthenticationException authenticationexception) {
-                ReAuth.log.error("Failed to create SocialInteractionsService", authenticationexception);
+            // Recreate UserApiService
+            UserApiService userApiService = null;
+            if (online) {
+                YggdrasilMinecraftSessionService sessionService = (YggdrasilMinecraftSessionService) minecraft.getMinecraftSessionService();
+                YggdrasilAuthenticationService authService = sessionService.getAuthenticationService();
+                try {
+                    userApiService = authService.createUserApiService(session.getAccessToken());
+                } catch (AuthenticationException authenticationexception) {
+                    ReAuth.log.error("Failed to create UserApiService", authenticationexception);
+                }
             }
-        }
-        if (interactionsService == null) {
-            interactionsService = new OfflineSocialInteractions();
-        }
-        ReflectionHelper.setField(interactionServiceField, minecraft, interactionsService);
+            if (userApiService == null) {
+                userApiService = UserApiService.OFFLINE;
+            }
+            ReflectionHelper.setField(userApiServiceField, minecraft, userApiService);
 
-        // Recreate FilterManager
-        FilterManager filterManager = new FilterManager(minecraft, interactionsService);
-        ReflectionHelper.setField(filterManagerField, minecraft, filterManager);
+            // Recreate FilterManager
+            PlayerSocialManager socialManager = new PlayerSocialManager(minecraft, userApiService);
+            ReflectionHelper.setField(socialManagerField, minecraft, socialManager);
 
-        // Update Splashes session
-        ReflectionHelper.setField(splashesSessionField, minecraft.getSplashes(), session);
+            // Update Splashes session
+            ReflectionHelper.setField(splashesSessionField, minecraft.getSplashManager(), session);
+        } catch (Exception e) {
+            ReAuth.log.error("Failed to update Session", e);
+        }
     }
 
     /**

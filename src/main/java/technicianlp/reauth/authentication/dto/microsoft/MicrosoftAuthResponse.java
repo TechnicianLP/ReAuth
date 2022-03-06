@@ -36,20 +36,20 @@ public final class MicrosoftAuthResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
+    public boolean isValid() {
         return this.error == null && this.expires_in != null && this.accessToken != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public @Nullable String getError() {
         return this.error;
     }
 
-    public final String getAccessToken() {
+    public String getAccessToken() {
         return this.accessToken;
     }
 
-    public final String getRefreshToken() {
+    public String getRefreshToken() {
         return this.refreshToken;
     }
 }

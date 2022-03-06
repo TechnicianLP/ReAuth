@@ -29,20 +29,20 @@ public final class AuthenticateResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
+    public boolean isValid() {
         return this.error == null && this.accessToken != null && this.profile != null && this.profile.name != null && this.profile.uuid != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public @Nullable String getError() {
         return this.error;
     }
 
-    public final SessionData getSession() {
+    public SessionData getSession() {
         if (this.profile == null) {
             return null;
         }
-        return new SessionData(this.profile.name, this.profile.uuid, this.accessToken);
+        return new SessionData(this.profile.name, this.profile.uuid, this.accessToken, "mojang");
     }
 
     public static final class Profile {

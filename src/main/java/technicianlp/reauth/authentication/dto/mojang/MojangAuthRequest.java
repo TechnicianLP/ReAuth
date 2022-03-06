@@ -18,7 +18,7 @@ public final class MojangAuthRequest implements RequestObject.JSON<MojangAuthRes
     }
 
     @Override
-    public final Class<MojangAuthResponse> getResponseClass() {
+    public Class<MojangAuthResponse> getResponseClass() {
         return MojangAuthResponse.class;
     }
 }

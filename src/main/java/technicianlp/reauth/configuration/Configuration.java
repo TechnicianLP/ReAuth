@@ -25,21 +25,21 @@ public final class Configuration {
         this.spec = builder.build();
     }
 
-    public final ForgeConfigSpec getSpec() {
+    public ForgeConfigSpec getSpec() {
         return this.spec;
     }
 
-    public final void updateConfig(ModConfig config) {
+    public void updateConfig(ModConfig config) {
         this.config = config;
         Crypto.updateConfigPath(this.getPath(config));
         this.profileList.updateConfig(config);
     }
 
-    public final void save() {
+    public void save() {
         this.config.save();
     }
 
-    public final ProfileList getProfileList() {
+    public ProfileList getProfileList() {
         return this.profileList;
     }
 

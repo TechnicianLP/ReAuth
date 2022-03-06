@@ -1,15 +1,16 @@
 package technicianlp.reauth.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TranslationTextComponent;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.TranslatableComponent;
 
 abstract class AbstractScreen extends Screen {
 
@@ -25,42 +26,44 @@ abstract class AbstractScreen extends Screen {
     protected int screenHeight = 175;
 
     AbstractScreen(String title) {
-        super(new TranslationTextComponent("reauth.gui.auth.title"));
+        super(new TranslatableComponent("reauth.gui.auth.title"));
         this.title = title;
     }
 
     @Override
     public void init() {
         super.init();
-        this.getMinecraft().keyboardListener.enableRepeatEvents(true);
+        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(true);
 
         this.centerX = this.width / 2;
         this.baseX = this.centerX - this.screenWidth / 2;
         this.centerY = this.height / 2;
         this.baseY = this.centerY - this.screenHeight / 2;
 
-        Button cancel = new Button(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, new TranslationTextComponent("reauth.gui.close"), (b) -> this.closeScreen());
-        this.addButton(cancel);
+        Button cancel = new Button(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, new TranslatableComponent("reauth.gui.close"), (b) -> this.onClose());
+        this.addRenderableWidget(cancel);
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
-        this.fillGradient(matrices, 0, 0, this.width, this.height, 0xc0101010, 0xd0101010);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        this.fillGradient(poseStack, 0, 0, this.width, this.height, 0xc0101010, 0xd0101010);
 
         // modified renderDirtBackground(0);
-        this.getMinecraft().getTextureManager().bindTexture(BACKGROUND_LOCATION);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        bufferbuilder.pos(this.baseX, this.baseY + this.screenHeight, 0.0D).tex(0.0F, this.screenHeight / 32.0F).color(80, 80, 80, 255).endVertex();
-        bufferbuilder.pos(this.baseX + this.screenWidth, this.baseY + this.screenHeight, 0.0D).tex(this.screenWidth / 32.0F, this.screenHeight / 32.0F).color(80, 80, 80, 255).endVertex();
-        bufferbuilder.pos(this.baseX + this.screenWidth, this.baseY, 0.0D).tex(this.screenWidth / 32.0F, 0F).color(80, 80, 80, 255).endVertex();
-        bufferbuilder.pos(this.baseX, this.baseY, 0.0D).tex(0.0F, 0F).color(80, 80, 80, 255).endVertex();
-        tessellator.draw();
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferbuilder = tesselator.getBuilder();
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShaderTexture(0, BACKGROUND_LOCATION);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        bufferbuilder.vertex(this.baseX, this.baseY + this.screenHeight, 0.0D).uv(0.0F, this.screenHeight / 32.0F).color(80, 80, 80, 255).endVertex();
+        bufferbuilder.vertex(this.baseX + this.screenWidth, this.baseY + this.screenHeight, 0.0D).uv(this.screenWidth / 32.0F, this.screenHeight / 32.0F).color(80, 80, 80, 255).endVertex();
+        bufferbuilder.vertex(this.baseX + this.screenWidth, this.baseY, 0.0D).uv(this.screenWidth / 32.0F, 0F).color(80, 80, 80, 255).endVertex();
+        bufferbuilder.vertex(this.baseX, this.baseY, 0.0D).uv(0.0F, 0F).color(80, 80, 80, 255).endVertex();
+        tesselator.end();
 
-        super.render(matrices, mouseX, mouseY, partialTicks);
+        super.render(poseStack, mouseX, mouseY, partialTicks);
 
-        this.font.drawStringWithShadow(matrices, I18n.format(this.title), this.centerX - (BUTTON_WIDTH / 2f), this.baseY + 8, 0xFFFFFFFF);
+        this.font.drawShadow(poseStack, I18n.get(this.title), this.centerX - (BUTTON_WIDTH / 2f), this.baseY + 8, 0xFFFFFFFF);
     }
 
     protected final void transitionScreen(Screen newScreen) {
@@ -70,7 +73,7 @@ abstract class AbstractScreen extends Screen {
 
     protected void requestClose(boolean completely) {
         if (completely) {
-            this.getMinecraft().popGuiLayer();
+            super.onClose();
         } else {
             this.transitionScreen(new MainScreen());
         }
@@ -80,7 +83,7 @@ abstract class AbstractScreen extends Screen {
      * Method called to request this Screen to close itself
      */
     @Override
-    public final void closeScreen() {
+    public final void onClose() {
         this.requestClose(false);
     }
 
@@ -88,8 +91,8 @@ abstract class AbstractScreen extends Screen {
      * Called once this Screen is closed
      */
     @Override
-    public void onClose() {
-        super.onClose();
-        this.getMinecraft().keyboardListener.enableRepeatEvents(false);
+    public void removed() {
+        super.removed();
+        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
     }
 }

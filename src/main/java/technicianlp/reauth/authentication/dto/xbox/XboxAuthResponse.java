@@ -45,16 +45,16 @@ public final class XboxAuthResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
+    public boolean isValid() {
         return this.error == null && this.validUntil != null && this.token != null && this.userhash != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public @Nullable String getError() {
         return this.error;
     }
 
-    public final String getToken() {
+    public String getToken() {
         return this.token;
     }
 
@@ -64,7 +64,7 @@ public final class XboxAuthResponse implements ResponseObject {
     public static final class UserhashDeserializer implements JsonDeserializer<String> {
 
         @Override
-        public final String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             try {
                 JsonArray xui = json.getAsJsonObject().getAsJsonArray("xui");
                 for (JsonElement claim : xui) {

@@ -1,7 +1,7 @@
 package technicianlp.reauth.session;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Session;
+import net.minecraft.client.User;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.YggdrasilAPI;
 import technicianlp.reauth.authentication.http.UnreachableServiceException;
@@ -33,9 +33,9 @@ public final class SessionChecker {
             status = SessionStatus.REFRESHING;
             lastCheck = System.currentTimeMillis();
 
-            CompletableFuture<Session> session = CompletableFuture.completedFuture(Minecraft.getInstance().getSession());
-            CompletableFuture<String> token = session.thenApply(Session::getToken);
-            CompletableFuture<String> uuid = session.thenApply(Session::getPlayerID);
+            CompletableFuture<User> session = CompletableFuture.completedFuture(Minecraft.getInstance().getUser());
+            CompletableFuture<String> token = session.thenApply(User::getAccessToken);
+            CompletableFuture<String> uuid = session.thenApply(User::getUuid);
             token.thenCombineAsync(uuid, SessionChecker::getSessionStatus, ReAuth.executor)
                     .thenAccept(status -> SessionChecker.status = status);
         }

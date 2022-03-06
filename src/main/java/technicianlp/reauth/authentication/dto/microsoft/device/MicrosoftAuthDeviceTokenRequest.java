@@ -30,12 +30,12 @@ public final class MicrosoftAuthDeviceTokenRequest implements RequestObject.Form
     }
 
     @Override
-    public final Class<MicrosoftAuthResponse> getResponseClass() {
+    public Class<MicrosoftAuthResponse> getResponseClass() {
         return MicrosoftAuthResponse.class;
     }
 
     @Override
-    public final Map<String, String> getFields() {
+    public Map<String, String> getFields() {
         return this.fields;
     }
 }

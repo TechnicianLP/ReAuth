@@ -13,7 +13,7 @@ public final class Response<R extends ResponseObject> {
         this.response = response;
     }
 
-    public final boolean isValid() {
+    public boolean isValid() {
         if (this.response != null) {
             return this.response.isValid();
         } else {
@@ -21,7 +21,7 @@ public final class Response<R extends ResponseObject> {
         }
     }
 
-    public final R get() throws InvalidResponseException {
+    public R get() throws InvalidResponseException {
         if (this.isValid()) {
             return this.response;
         } else if (this.response != null) {
@@ -31,7 +31,7 @@ public final class Response<R extends ResponseObject> {
         }
     }
 
-    public final R getUnchecked() {
+    public R getUnchecked() {
         return this.response;
     }
 }

@@ -97,17 +97,17 @@ public final class MicrosoftDeviceFlow extends FlowBase implements DeviceCodeFlo
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
+    public CompletableFuture<SessionData> getSession() {
         return this.session;
     }
 
     @Override
-    public final boolean hasProfile() {
+    public boolean hasProfile() {
         return this.profile != null;
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfile() {
         if (this.profile != null) {
             return this.profile;
         } else {
@@ -116,12 +116,12 @@ public final class MicrosoftDeviceFlow extends FlowBase implements DeviceCodeFlo
     }
 
     @Override
-    public final CompletableFuture<String> getLoginUrl() {
+    public CompletableFuture<String> getLoginUrl() {
         return this.url;
     }
 
     @Override
-    public final CompletableFuture<String> getCode() {
+    public CompletableFuture<String> getCode() {
         return this.code;
     }
 }

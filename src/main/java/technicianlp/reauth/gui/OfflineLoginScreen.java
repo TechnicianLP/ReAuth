@@ -1,17 +1,17 @@
 package technicianlp.reauth.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TranslationTextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.lwjgl.glfw.GLFW;
 import technicianlp.reauth.session.SessionHelper;
 
 public final class OfflineLoginScreen extends AbstractScreen {
 
-    private TextFieldWidget username;
+    private EditBox username;
     private Button confirm;
 
     public OfflineLoginScreen() {
@@ -19,37 +19,37 @@ public final class OfflineLoginScreen extends AbstractScreen {
     }
 
     @Override
-    public final void init() {
+    public void init() {
         super.init();
-        this.getMinecraft().keyboardListener.enableRepeatEvents(true);
 
-        this.username = new TextFieldWidget(this.font, this.centerX - BUTTON_WIDTH / 2, this.centerY - 5, BUTTON_WIDTH, 20, new TranslationTextComponent("reauth.gui.auth.username"));
-        this.username.setMaxStringLength(16);
-        this.addButton(this.username);
-        this.username.setFocused2(true);
-        this.setListener(this.username);
+        this.username = new EditBox(this.font, this.centerX - BUTTON_WIDTH / 2, this.centerY - 5, BUTTON_WIDTH, 20, new TranslatableComponent("reauth.gui.auth.username"));
+        this.username.setMaxLength(16);
+        this.addRenderableWidget(this.username);
+        this.username.setFocus(true);
+        this.setFocused(this.username);
+        this.addRenderableWidget(this.username);
 
-        this.confirm = new Button(this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, new TranslationTextComponent("reauth.gui.button.offline"), (b) -> this.performUsernameChange());
-        this.addButton(this.confirm);
+        this.confirm = new Button(this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, new TranslatableComponent("reauth.gui.button.offline"), (b) -> this.performUsernameChange());
+        this.addRenderableWidget(this.confirm);
     }
 
     @Override
-    public final void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrices, mouseX, mouseY, partialTicks);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(poseStack, mouseX, mouseY, partialTicks);
 
-        this.font.drawStringWithShadow(matrices, I18n.format("reauth.gui.auth.username"), this.centerX - (BUTTON_WIDTH / 2f), this.centerY - 15, 0xFFFFFFFF);
+        this.font.drawShadow(poseStack, I18n.get("reauth.gui.auth.username"), this.centerX - (BUTTON_WIDTH / 2f), this.centerY - 15, 0xFFFFFFFF);
     }
 
     @Override
-    public final void tick() {
+    public void tick() {
         super.tick();
-        this.confirm.active = SessionHelper.isValidOfflineUsername(this.username.getText());
+        this.confirm.active = SessionHelper.isValidOfflineUsername(this.username.getValue());
     }
 
     @Override
-    public final boolean keyPressed(int keyCode, int p_keyPressed_2_, int p_keyPressed_3_) {
+    public boolean keyPressed(int keyCode, int p_keyPressed_2_, int p_keyPressed_3_) {
         if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
-            IGuiEventListener focus = this.getListener();
+            GuiEventListener focus = this.getFocused();
             if (focus == this.username) {
                 this.performUsernameChange();
                 return true;
@@ -63,7 +63,7 @@ public final class OfflineLoginScreen extends AbstractScreen {
      * Closes the Screen if successful
      */
     private void performUsernameChange() {
-        SessionHelper.setOfflineUsername(this.username.getText());
+        SessionHelper.setOfflineUsername(this.username.getValue());
         this.requestClose(true);
     }
 }

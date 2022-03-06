@@ -2,7 +2,6 @@ package technicianlp.reauth.authentication.flows.impl;
 
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.authentication.flows.FlowCallback;
-import technicianlp.reauth.authentication.flows.impl.util.Futures;
 import technicianlp.reauth.configuration.Profile;
 
 import java.util.concurrent.CompletableFuture;
@@ -13,22 +12,22 @@ public final class UnknownProfileFlow extends FlowBase {
 
     public UnknownProfileFlow(FlowCallback callback) {
         super(callback);
-        this.future = Futures.failed(new IllegalArgumentException("Unknown Profile Type"));
+        this.future = CompletableFuture.failedFuture(new IllegalArgumentException("Unknown Profile Type"));
         this.future.whenComplete(this::onFlowComplete);
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
+    public CompletableFuture<SessionData> getSession() {
         return this.future;
     }
 
     @Override
-    public final boolean hasProfile() {
+    public boolean hasProfile() {
         return false;
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfile() {
         throw new IllegalStateException("Profile creation not supported");
     }
 }

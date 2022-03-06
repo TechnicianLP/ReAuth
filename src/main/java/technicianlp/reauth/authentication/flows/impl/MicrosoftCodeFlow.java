@@ -64,7 +64,7 @@ public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCo
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
+    public CompletableFuture<SessionData> getSession() {
         return this.session;
     }
 
@@ -74,7 +74,7 @@ public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCo
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfile() {
         if (this.profile != null) {
             return this.profile;
         } else {
@@ -83,12 +83,12 @@ public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCo
     }
 
     @Override
-    public final String getLoginUrl() {
+    public String getLoginUrl() {
         return this.loginUrl;
     }
 
     @Override
-    public final void cancel() {
+    public void cancel() {
         super.cancel();
         this.executor.execute(() -> this.codeServer.stop());
     }

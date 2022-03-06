@@ -16,7 +16,7 @@ final class ResourcesHandler extends Handler {
     }
 
     @Override
-    public final void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod().toUpperCase(Locale.ROOT);
 
         Response response;

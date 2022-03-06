@@ -1,27 +1,27 @@
 package technicianlp.reauth.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.widget.button.CheckboxButton;
-import net.minecraft.util.text.ITextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.network.chat.Component;
 
-public final class SaveButton extends CheckboxButton {
+public final class SaveButton extends Checkbox {
 
     private final ITooltip tooltip;
 
-    public SaveButton(int x, int y, ITextComponent title, ITooltip tooltip) {
+    public SaveButton(int x, int y, Component title, ITooltip tooltip) {
         super(x, y, 20, 20, title, false);
         this.tooltip = tooltip;
     }
 
     @Override
-    public final void renderWidget(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.renderWidget(matrixStack, mouseX, mouseY, partialTicks);
-        if (this.isHovered()) {
-            this.tooltip.onTooltip(this, matrixStack, mouseX, mouseY);
+    public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        super.renderButton(poseStack, mouseX, mouseY, partialTicks);
+        if (this.isHoveredOrFocused()) {
+            this.tooltip.onTooltip(this, poseStack, mouseX, mouseY);
         }
     }
 
     public interface ITooltip {
-        void onTooltip(CheckboxButton button, MatrixStack matrixStack, int mouseX, int mouseY);
+        void onTooltip(SaveButton button, PoseStack poseStack, int mouseX, int mouseY);
     }
 }

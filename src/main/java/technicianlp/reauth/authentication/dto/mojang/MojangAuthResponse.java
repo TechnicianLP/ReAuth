@@ -30,16 +30,16 @@ public final class MojangAuthResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
+    public boolean isValid() {
         return this.error == null && this.token != null && this.expiry != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public @Nullable String getError() {
         return this.error;
     }
 
-    public final String getToken() {
+    public String getToken() {
         return this.token;
     }
 }

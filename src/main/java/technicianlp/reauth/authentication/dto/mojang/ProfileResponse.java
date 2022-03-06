@@ -30,12 +30,12 @@ public final class ProfileResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
+    public boolean isValid() {
         return this.error == null && this.uuid != null && this.name != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public @Nullable String getError() {
         return this.error;
     }
 }

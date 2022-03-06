@@ -41,7 +41,7 @@ final class XboxAuthenticationFlow extends FlowBase {
     }
 
     private SessionData makeSession(MojangAuthResponse auth, ProfileResponse profile) {
-        return new SessionData(profile.name, profile.uuid, auth.token);
+        return new SessionData(profile.name, profile.uuid, auth.token, "msa");
     }
 
     /**
@@ -60,21 +60,21 @@ final class XboxAuthenticationFlow extends FlowBase {
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
+    public CompletableFuture<SessionData> getSession() {
         return this.session;
     }
 
-    final CompletableFuture<Boolean> hasTokenExpiredError() {
+    CompletableFuture<Boolean> hasTokenExpiredError() {
         return this.expiredToken;
     }
 
     @Override
-    public final boolean hasProfile() {
+    public boolean hasProfile() {
         return false;
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfile() {
         throw new IllegalStateException("Profile creation not supported");
     }
 }

@@ -26,7 +26,7 @@ public final class ProfileList {
                 .define("profiles", this::createDefaultProfileList, this::validateProfileList);
     }
 
-    final void updateConfig(ModConfig config) {
+    void updateConfig(ModConfig config) {
         this.configSupplier = config.getConfigData()::createSubConfig;
 
         List<CommentedConfig> list = new ArrayList<>(this.profilesProperty.get());
@@ -34,7 +34,7 @@ public final class ProfileList {
         this.saveProfiles(list);
     }
 
-    public final void storeProfile(Profile profile) {
+    public void storeProfile(Profile profile) {
         List<CommentedConfig> list = new ArrayList<>(this.profilesProperty.get());
         if (list.isEmpty()) {
             list.add(profile.getConfig());
@@ -44,7 +44,7 @@ public final class ProfileList {
         this.saveProfiles(list);
     }
 
-    public final Profile getProfile() {
+    public Profile getProfile() {
         List<CommentedConfig> list = this.profilesProperty.get();
         if (list.isEmpty()) {
             return null;
@@ -58,7 +58,7 @@ public final class ProfileList {
         }
     }
 
-    final Profile createProfile(Map<String, String> data) {
+    Profile createProfile(Map<String, String> data) {
         Map<String, String> orderedData = new TreeMap<>(new ProfileKeyComparator());
         orderedData.putAll(data);
 

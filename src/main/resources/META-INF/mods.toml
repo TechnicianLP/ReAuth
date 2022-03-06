@@ -15,13 +15,13 @@ description = "A Mod to renew your Session"
 [[dependencies.reauth]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.16,1.17)"
+versionRange = "[1.18,1.19)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.reauth]]
-modId="forge"
-mandatory=true
-versionRange="[36.2.9,)"
-ordering="NONE"
-side="CLIENT"
+modId = "forge"
+mandatory = true
+versionRange = "[36.2.9,)"
+ordering = "NONE"
+side = "CLIENT"

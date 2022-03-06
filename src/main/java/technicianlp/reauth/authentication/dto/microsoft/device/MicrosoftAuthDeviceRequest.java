@@ -28,12 +28,12 @@ public final class MicrosoftAuthDeviceRequest implements RequestObject.Form<Micr
     }
 
     @Override
-    public final Class<MicrosoftAuthDeviceResponse> getResponseClass() {
+    public Class<MicrosoftAuthDeviceResponse> getResponseClass() {
         return MicrosoftAuthDeviceResponse.class;
     }
 
     @Override
-    public final Map<String, String> getFields() {
+    public Map<String, String> getFields() {
         return this.fields;
     }
 }

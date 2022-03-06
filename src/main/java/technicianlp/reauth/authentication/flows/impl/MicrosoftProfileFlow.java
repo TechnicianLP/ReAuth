@@ -14,6 +14,7 @@ import technicianlp.reauth.configuration.ProfileBuilder;
 import technicianlp.reauth.crypto.Crypto;
 import technicianlp.reauth.crypto.ProfileEncryption;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.BiConsumer;
@@ -50,7 +51,7 @@ public final class MicrosoftProfileFlow extends FlowBase {
         this.registerDependantStages(this.encryption, xblTokenDec);
         this.registerDependantFlow(this.xboxFlow1);
 
-        CompletableFuture<String> refreshTokenEnc = this.refreshRequired.thenCompose(Futures.conditional(profile.get(Profile.REFRESH_TOKEN), Futures.cancelled()));
+        CompletableFuture<String> refreshTokenEnc = this.refreshRequired.thenCompose(Futures.conditional(profile.get(Profile.REFRESH_TOKEN), CompletableFuture.failedFuture(new CancellationException())));
         CompletableFuture<String> refreshTokenDec = this.encryption.thenCombineAsync(refreshTokenEnc, ProfileEncryption::decryptFieldTwo, this.executor);
         CompletableFuture<MicrosoftAuthResponse> auth = refreshTokenDec.thenApplyAsync(this.wrapStep(FlowStage.MS_REDEEM_REFRESH_TOKEN, MsAuthAPI::redeemRefreshToken), this.executor);
         CompletableFuture<XboxAuthResponse> xasu = auth.thenApply(MicrosoftAuthResponse::getAccessToken)
@@ -94,17 +95,17 @@ public final class MicrosoftProfileFlow extends FlowBase {
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
+    public CompletableFuture<SessionData> getSession() {
         return this.session;
     }
 
     @Override
-    public final boolean hasProfile() {
+    public boolean hasProfile() {
         return true;
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfile() {
         return this.profileFuture;
     }
 

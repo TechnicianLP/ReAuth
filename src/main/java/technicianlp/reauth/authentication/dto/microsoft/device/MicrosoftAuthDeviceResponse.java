@@ -40,20 +40,20 @@ public final class MicrosoftAuthDeviceResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
+    public boolean isValid() {
         return this.error == null && this.deviceCode != null && this.userCode != null && this.verificationUri != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public @Nullable String getError() {
         return this.error;
     }
 
-    public final String getUserCode() {
+    public String getUserCode() {
         return this.userCode;
     }
 
-    public final String getVerificationUri() {
+    public String getVerificationUri() {
         return this.verificationUri;
     }
 }

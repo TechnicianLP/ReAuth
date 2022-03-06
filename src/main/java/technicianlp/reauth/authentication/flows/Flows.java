@@ -10,14 +10,11 @@ import technicianlp.reauth.configuration.Profile;
 public final class Flows {
 
     public static Flow loginWithProfile(Profile profile, FlowCallback callback) {
-        switch (profile.getValue(Profile.PROFILE_TYPE)) {
-            case Profile.PROFILE_TYPE_MICROSOFT:
-                return new MicrosoftProfileFlow(profile, callback);
-            case Profile.PROFILE_TYPE_MOJANG:
-                return new MojangAuthenticationFlow(profile, callback);
-            default:
-                return new UnknownProfileFlow(callback);
-        }
+        return switch (profile.getValue(Profile.PROFILE_TYPE)) {
+            case Profile.PROFILE_TYPE_MICROSOFT -> new MicrosoftProfileFlow(profile, callback);
+            case Profile.PROFILE_TYPE_MOJANG -> new MojangAuthenticationFlow(profile, callback);
+            default -> new UnknownProfileFlow(callback);
+        };
     }
 
     public static AuthorizationCodeFlow loginWithAuthCode(boolean persist, FlowCallback callback) {

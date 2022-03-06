@@ -24,7 +24,7 @@ public final class XboxXstsAuthRequest implements RequestObject.JSON<XboxAuthRes
     }
 
     @Override
-    public final Class<XboxAuthResponse> getResponseClass() {
+    public Class<XboxAuthResponse> getResponseClass() {
         return XboxAuthResponse.class;
     }
 
@@ -34,7 +34,7 @@ public final class XboxXstsAuthRequest implements RequestObject.JSON<XboxAuthRes
     public static final class Serializer implements JsonSerializer<XboxXstsAuthRequest> {
 
         @Override
-        public final JsonElement serialize(XboxXstsAuthRequest src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(XboxXstsAuthRequest src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject properties = new JsonObject();
             properties.addProperty("SandboxId", "RETAIL");
             properties.add("UserTokens", context.serialize(new String[]{src.token}));

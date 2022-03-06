@@ -1,11 +1,11 @@
 package technicianlp.reauth.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.TranslatableComponent;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.flows.AuthorizationCodeFlow;
 import technicianlp.reauth.authentication.flows.DeviceCodeFlow;
@@ -37,7 +37,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         super("reauth.gui.title.flow");
     }
 
-    public final void setFlow(Flow flow) {
+    public void setFlow(Flow flow) {
         this.flow = flow;
         flow.getSession().thenAccept(SessionHelper::setSession);
         if (flow.hasProfile()) {
@@ -46,7 +46,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
     }
 
     @Override
-    public final void init() {
+    public void init() {
         super.init();
 
         int buttonWidth = 196;
@@ -56,7 +56,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         if (this.stage == FlowStage.MS_AWAIT_AUTH_CODE && this.flow instanceof AuthorizationCodeFlow) {
             try {
                 URL url = new URL(((AuthorizationCodeFlow) this.flow).getLoginUrl());
-                this.addButton(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, new TranslationTextComponent("reauth.msauth.button.browser"), (b) -> Util.getOSType().openURL(url)));
+                this.addRenderableWidget(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, new TranslatableComponent("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
             } catch (MalformedURLException e) {
                 ReAuth.log.error("Browser button failed", e);
             }
@@ -67,7 +67,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
                     String urlString = flow.getLoginUrl().join();
                     String code = flow.getCode().join();
                     URL url = new URL(urlString);
-                    this.addButton(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, new TranslationTextComponent("reauth.msauth.button.browser"), (b) -> Util.getOSType().openURL(url)));
+                    this.addRenderableWidget(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, new TranslatableComponent("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
                     this.formatArgs = new String[]{urlString, code};
                 }
             } catch (MalformedURLException e) {
@@ -77,10 +77,10 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
     }
 
     @Override
-    public final void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrices, mouseX, mouseY, partialTicks);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(poseStack, mouseX, mouseY, partialTicks);
 
-        String text = I18n.format(this.stage.getRawName(), (Object[]) this.formatArgs);
+        String text = I18n.get(this.stage.getRawName(), (Object[]) this.formatArgs);
         String[] lines = text.split("\\R");
         int height = lines.length * 9;
         for (String s : lines) {
@@ -93,13 +93,13 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         for (String line : lines) {
             if (line.startsWith("$")) {
                 line = line.substring(1);
-                matrices.push();
-                matrices.scale(2, 2, 1);
-                this.font.drawStringWithShadow(matrices, line, (float) (this.centerX - this.font.getStringWidth(line)) / 2, (float) y / 2, 0xFFFFFFFF);
+                poseStack.pushPose();
+                poseStack.scale(2, 2, 1);
+                this.font.drawShadow(poseStack, line, (float) (this.centerX - this.font.width(line)) / 2, (float) y / 2, 0xFFFFFFFF);
                 y += 18;
-                matrices.pop();
+                poseStack.popPose();
             } else {
-                this.font.drawStringWithShadow(matrices, line, (float) (this.centerX - this.font.getStringWidth(line) / 2), (float) y, 0xFFFFFFFF);
+                this.font.drawShadow(poseStack, line, (float) (this.centerX - this.font.width(line) / 2), (float) y, 0xFFFFFFFF);
                 y += 9;
             }
         }
@@ -114,25 +114,25 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         }
     }
 
-    public final void disableAutoClose() {
+    public void disableAutoClose() {
         this.autoClose = false;
     }
 
     @Override
-    public final void onClose() {
-        super.onClose();
+    public void removed() {
+        super.removed();
         this.flow.cancel();
     }
 
     @Override
-    public final void transitionStage(FlowStage newStage) {
+    public void transitionStage(FlowStage newStage) {
         this.stage = newStage;
         ReAuth.log.info(this.stage.getLogLine());
         this.init(Minecraft.getInstance(), this.width, this.height);
 
         if (newStage == FlowStage.MS_AWAIT_AUTH_CODE && this.flow instanceof AuthorizationCodeFlow) {
             try {
-                Util.getOSType().openURL(new URL(((AuthorizationCodeFlow) this.flow).getLoginUrl()));
+                Util.getPlatform().openUrl(new URL(((AuthorizationCodeFlow) this.flow).getLoginUrl()));
             } catch (MalformedURLException e) {
                 ReAuth.log.error("Failed to open page", e);
             }
@@ -142,7 +142,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
     }
 
     @Override
-    public final Executor getExecutor() {
+    public Executor getExecutor() {
         return ReAuth.executor;
     }
 }

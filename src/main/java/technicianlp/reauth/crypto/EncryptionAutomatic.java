@@ -47,12 +47,12 @@ final class EncryptionAutomatic implements ProfileEncryption {
     }
 
     @Override
-    public final String decryptFieldOne(String encrypted) throws CryptoException {
+    public String decryptFieldOne(String encrypted) throws CryptoException {
         return this.decrypt(encrypted, IV1_OFFSET);
     }
 
     @Override
-    public final String decryptFieldTwo(String encrypted) throws CryptoException {
+    public String decryptFieldTwo(String encrypted) throws CryptoException {
         return this.decrypt(encrypted, IV2_OFFSET);
     }
 
@@ -67,12 +67,12 @@ final class EncryptionAutomatic implements ProfileEncryption {
     }
 
     @Override
-    public final String encryptFieldOne(String value) throws CryptoException {
+    public String encryptFieldOne(String value) throws CryptoException {
         return this.encrypt(value, IV1_OFFSET);
     }
 
     @Override
-    public final String encryptFieldTwo(String value) throws CryptoException {
+    public String encryptFieldTwo(String value) throws CryptoException {
         return this.encrypt(value, IV2_OFFSET);
     }
 
@@ -99,13 +99,13 @@ final class EncryptionAutomatic implements ProfileEncryption {
     }
 
     @Override
-    public final void saveToProfile(Map<String, String> profile) {
+    public void saveToProfile(Map<String, String> profile) {
         profile.put(Profile.KEY, Profile.KEY_AUTO);
         profile.put(Profile.SALT, Base64.getEncoder().encodeToString(this.salt));
     }
 
     @Override
-    public final ProfileEncryption randomizedCopy() {
+    public ProfileEncryption randomizedCopy() {
         return new EncryptionAutomatic(this.path);
     }
 }

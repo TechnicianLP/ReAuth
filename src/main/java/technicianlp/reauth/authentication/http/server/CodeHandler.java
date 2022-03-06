@@ -23,7 +23,7 @@ final class CodeHandler extends Handler {
     }
 
     @Override
-    public final void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod().toUpperCase(Locale.ROOT);
         Response response;
         if ("POST".equals(method)) {
@@ -65,24 +65,20 @@ final class CodeHandler extends Handler {
         Map<String, String> formFields = new HashMap<>();
         String[] fields = formUrlEncoded.split("&");
 
-        try {
-            for (String field : fields) {
-                if (field.isEmpty()) {
-                    continue;
-                }
-                String key = field;
-                String value = "";
-
-                int delimiter = field.indexOf('=');
-                if (delimiter != -1) {
-                    key = field.substring(0, delimiter);
-                    value = field.substring(delimiter + 1);
-                }
-
-                formFields.putIfAbsent(URLDecoder.decode(key, "UTF-8"), URLDecoder.decode(value, "UTF-8"));
+        for (String field : fields) {
+            if (field.isEmpty()) {
+                continue;
             }
-        } catch (UnsupportedEncodingException exception) {
-            throw new RuntimeException("UTF-8 unsupported", exception);
+            String key = field;
+            String value = "";
+
+            int delimiter = field.indexOf('=');
+            if (delimiter != -1) {
+                key = field.substring(0, delimiter);
+                value = field.substring(delimiter + 1);
+            }
+
+            formFields.putIfAbsent(URLDecoder.decode(key, StandardCharsets.UTF_8), URLDecoder.decode(value, StandardCharsets.UTF_8));
         }
         return formFields;
     }

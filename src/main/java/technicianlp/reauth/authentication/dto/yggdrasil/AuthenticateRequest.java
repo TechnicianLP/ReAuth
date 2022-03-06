@@ -28,7 +28,7 @@ public final class AuthenticateRequest implements RequestObject.JSON<Authenticat
     }
 
     @Override
-    public final Class<AuthenticateResponse> getResponseClass() {
+    public Class<AuthenticateResponse> getResponseClass() {
         return AuthenticateResponse.class;
     }
 
@@ -38,7 +38,7 @@ public final class AuthenticateRequest implements RequestObject.JSON<Authenticat
     public static final class Serializer implements JsonSerializer<AuthenticateRequest> {
 
         @Override
-        public final JsonElement serialize(AuthenticateRequest src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(AuthenticateRequest src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject agent = new JsonObject();
             agent.addProperty("name", "Minecraft");
             agent.addProperty("version", 1);

@@ -1,6 +1,6 @@
 package technicianlp.reauth.authentication.http.server;
 
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.language.I18n;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileNotFoundException;
@@ -19,19 +19,19 @@ final class PageWriter {
         this.loginUrl = loginUrl;
     }
 
-    final ByteBuffer createSuccessResponsePage() throws IOException {
+    ByteBuffer createSuccessResponsePage() throws IOException {
         String successMessage = this.formatAndEscape("reauth.msauth.code.success");
         String closeMessage = this.formatAndEscape("reauth.msauth.code.success.close");
         return this.createPage(successMessage, closeMessage);
     }
 
-    final ByteBuffer createErrorResponsePage(String errorCode) throws IOException {
+    ByteBuffer createErrorResponsePage(String errorCode) throws IOException {
         String errorMessage = this.formatAndEscape(this.getErrorMessage(errorCode));
         String retryMessage = this.createLink(this.formatAndEscape("reauth.msauth.code.retry"), this.loginUrl);
         return this.createPage(errorMessage, retryMessage);
     }
 
-    final ByteBuffer createHttpErrorResponsePage(HttpStatus error) throws IOException {
+    ByteBuffer createHttpErrorResponsePage(HttpStatus error) throws IOException {
         String errorMessage = this.formatAndEscape("reauth.msauth.code.error.http" + error.code);
         String retryMessage = this.createLink(this.formatAndEscape("reauth.msauth.code.retry"), this.loginUrl);
         return this.createPage(errorMessage, retryMessage);
@@ -56,21 +56,16 @@ final class PageWriter {
     }
 
     private String getErrorMessage(String authError) {
-        String type = "unknown";
-        switch (authError) {
-            case "access_denied":
-                type = "cancelled";
-                break;
-            case "server_error":
-            case "temporarily_unavailable":
-                type = "server";
-                break;
-        }
+        String type = switch (authError) {
+            case "access_denied" -> "cancelled";
+            case "server_error", "temporarily_unavailable" -> "server";
+            default -> "unknown";
+        };
         return "reauth.msauth.code.fail." + type;
     }
 
     private String formatAndEscape(String key, Object... arguments) {
-        String text = I18n.format(key, arguments);
+        String text = I18n.get(key, arguments);
         text = text.replaceAll("&", "&amp;");
         text = text.replaceAll("<", "&lt;");
         text = text.replaceAll(">", "&gt;");
