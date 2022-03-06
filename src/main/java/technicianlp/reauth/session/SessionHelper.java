@@ -51,43 +51,47 @@ public final class SessionHelper {
      * <li>Update {@link Splashes#gameSession}
      */
     private static void setSession(SessionData data, boolean online) {
-        Minecraft minecraft = Minecraft.getInstance();
+        try {
+            Minecraft minecraft = Minecraft.getInstance();
 
-        Session session = new Session(data.username, data.uuid, data.accessToken, data.type);
+            Session session = new Session(data.username, data.uuid, data.accessToken, data.type);
 
-        ReflectionHelper.setField(sessionField, minecraft, session);
-        SessionChecker.invalidate();
+            ReflectionHelper.setField(sessionField, minecraft, session);
+            SessionChecker.invalidate();
 
-        // Update things depending on the Session.
-        // TODO keep updated across versions
+            // Update things depending on the Session.
+            // TODO keep updated across versions
 
-        // Clear ProfileProperties and repopulate them
-        minecraft.getProfileProperties().clear();
-        minecraft.getProfileProperties();
-        // UserProperties are unused
+            // Clear ProfileProperties and repopulate them
+            minecraft.getProfileProperties().clear();
+            minecraft.getProfileProperties();
+            // UserProperties are unused
 
-        // Recreate SocialInteractionsService
-        SocialInteractionsService interactionsService = null;
-        if (online) {
-            YggdrasilMinecraftSessionService sessionService = (YggdrasilMinecraftSessionService) minecraft.getSessionService();
-            YggdrasilAuthenticationService authService = sessionService.getAuthenticationService();
-            try {
-                interactionsService = authService.createSocialInteractionsService(session.getToken());
-            } catch (AuthenticationException authenticationexception) {
-                ReAuth.log.error("Failed to create SocialInteractionsService", authenticationexception);
+            // Recreate SocialInteractionsService
+            SocialInteractionsService interactionsService = null;
+            if (online) {
+                YggdrasilMinecraftSessionService sessionService = (YggdrasilMinecraftSessionService) minecraft.getSessionService();
+                YggdrasilAuthenticationService authService = sessionService.getAuthenticationService();
+                try {
+                    interactionsService = authService.createSocialInteractionsService(session.getToken());
+                } catch (AuthenticationException authenticationexception) {
+                    ReAuth.log.error("Failed to create SocialInteractionsService", authenticationexception);
+                }
             }
-        }
-        if (interactionsService == null) {
-            interactionsService = new OfflineSocialInteractions();
-        }
-        ReflectionHelper.setField(interactionServiceField, minecraft, interactionsService);
+            if (interactionsService == null) {
+                interactionsService = new OfflineSocialInteractions();
+            }
+            ReflectionHelper.setField(interactionServiceField, minecraft, interactionsService);
 
-        // Recreate FilterManager
-        FilterManager filterManager = new FilterManager(minecraft, interactionsService);
-        ReflectionHelper.setField(filterManagerField, minecraft, filterManager);
+            // Recreate FilterManager
+            FilterManager filterManager = new FilterManager(minecraft, interactionsService);
+            ReflectionHelper.setField(filterManagerField, minecraft, filterManager);
 
-        // Update Splashes session
-        ReflectionHelper.setField(splashesSessionField, minecraft.getSplashes(), session);
+            // Update Splashes session
+            ReflectionHelper.setField(splashesSessionField, minecraft.getSplashes(), session);
+        } catch (Exception e) {
+            ReAuth.log.error("Failed to update Session", e);
+        }
     }
 
     /**

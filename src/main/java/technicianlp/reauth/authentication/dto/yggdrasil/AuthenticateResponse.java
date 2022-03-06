@@ -42,7 +42,7 @@ public final class AuthenticateResponse implements ResponseObject {
         if (this.profile == null) {
             return null;
         }
-        return new SessionData(this.profile.name, this.profile.uuid, this.accessToken);
+        return new SessionData(this.profile.name, this.profile.uuid, this.accessToken, "mojang");
     }
 
     public static final class Profile {

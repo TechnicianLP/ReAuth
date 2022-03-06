@@ -41,7 +41,7 @@ final class XboxAuthenticationFlow extends FlowBase {
     }
 
     private SessionData makeSession(MojangAuthResponse auth, ProfileResponse profile) {
-        return new SessionData(profile.name, profile.uuid, auth.token);
+        return new SessionData(profile.name, profile.uuid, auth.token, "msa");
     }
 
     /**

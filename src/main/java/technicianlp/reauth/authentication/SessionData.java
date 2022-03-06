@@ -7,10 +7,6 @@ public final class SessionData {
     public final String accessToken;
     public final String type;
 
-    public SessionData(String username, String uuid, String accessToken) {
-        this(username, uuid, accessToken, "mojang");
-    }
-
     public SessionData(String username, String uuid, String accessToken, String type) {
         this.username = username;
         this.uuid = uuid;

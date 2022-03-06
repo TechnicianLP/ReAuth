@@ -20,8 +20,8 @@ ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.reauth]]
-modId="forge"
-mandatory=true
-versionRange="[36.2.9,)"
-ordering="NONE"
-side="CLIENT"
+modId = "forge"
+mandatory = true
+versionRange = "[36.2.9,)"
+ordering = "NONE"
+side = "CLIENT"
