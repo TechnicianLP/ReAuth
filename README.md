@@ -1,22 +1,49 @@
 # ReAuth
-A Mod to Re-Login to Mojang while Minecraft is still running
+
+A Mod to Login again while Minecraft is running. 
+No lengthy restarts for an expired session required.
+
+## Overview
 
 Capabilities:
- - Fixes the Problem of having to restart your Client when your Session is invalid
- - Shows whether your Session is valid
- - Change Accounts while Minecraft is running
- - Change Username for playing offline (has to be enabled in config)
 
+- Fixes the Problem of having to restart your Client when your Session is invalid
+- Shows whether your Session is valid
+- Change Accounts while Minecraft is running
+- Change Username for playing offline
 
-The Mod is clientside only - it will not work in servers mods folder
-
-Just hit the "Re-Login" Button in the Multiplayermenu and enter your Logindata, after that you will be able to login on your Servers
-
+The Mod is clientside only - it will not work in servers mods folder  
 An invisible Login-Button is available in the MainMenu to be wrapped by CustomMainMenu (Button-ID 17325)(1.7.10+)
 
-I know that entering your Logindata simply into a Mod might sound risky, but thats why i have the Source here
+While a Mod handling login credentials may sound risky, the sourcecode is visible here for independent verification.
 
--http://minecraft.curseforge.com/projects/reauth                                                                         
--http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/wip-mods/2555554
+## Branches
 
-License: All Rights Reserved
+Since ReAuth supports a lot of Minecraft versions across two Modloaders their respective branches are listed here.  
+Versions below 4.0 will be updated to support Microsoft authentication as soon as possible.
+
+| MC Version     | Modloader | Link to branch                                                         | ReAuth version |
+|----------------|-----------|------------------------------------------------------------------------|----------------|
+| 1.18.2         | Forge     | [1.18](https://github.com/TechnicianLP/ReAuth/tree/1.18)               | 4.0.0          |
+| 1.18.2         | Fabric    | ---                                                                    | ---            |
+| 1.16.5         | Forge     | [1.16](https://github.com/TechnicianLP/ReAuth/tree/1.16)               | 4.0.1          |
+| 1.16.x         | Fabric    | [1.16-Fabric](https://github.com/TechnicianLP/ReAuth/tree/1.16-Fabric) | 3.9.3          |
+| 1.14 / 1.15    | Forge     | [1.14](https://github.com/TechnicianLP/ReAuth/tree/1.14)               | 3.8.1          |
+| 1.12.x         | Forge     | [1.12](https://github.com/TechnicianLP/ReAuth/tree/1.12)               | 3.6.0          |
+| 1.11.2         | Forge     | [1.11](https://github.com/TechnicianLP/ReAuth/tree/1.11)               | 3.5.2          |
+| 1.9.4 / 1.10.2 | Forge     | [1.10](https://github.com/TechnicianLP/ReAuth/tree/1.10)               | 3.5.2          |
+| 1.8.9          | Forge     | [1.8](https://github.com/TechnicianLP/ReAuth/tree/1.8)                 | 3.5.0          |
+| 1.7.10         | Forge     | [1.7](https://github.com/TechnicianLP/ReAuth/tree/1.7)                 | 3.5.0          |
+| 1.7.2          | Forge     | [1.7.2](https://github.com/TechnicianLP/ReAuth/tree/1.7.2)             | 3.5.0          |
+| 1.6.4          | Forge     | [1.6.4](https://github.com/TechnicianLP/ReAuth/tree/1.6.4)             | 3.5.0          |
+| 1.5.2          | Forge     | [1.5.2](https://github.com/TechnicianLP/ReAuth/tree/1.5.2)             | 3.5.0          |
+| 1.4.7          | Forge     | [1.4.7](https://github.com/TechnicianLP/ReAuth/tree/1.4.7)             | 3.5.0          |
+
+## Links
+
+- http://minecraft.curseforge.com/projects/reauth
+- http://minecraft.curseforge.com/projects/reauth-fabric
+
+## License
+
+All Rights Reserved.
