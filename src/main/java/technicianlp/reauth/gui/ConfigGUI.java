@@ -1,4 +1,4 @@
-//package technicianlp.reauth.gui;
+package technicianlp.reauth.gui;//package technicianlp.reauth.gui;
 //
 //import com.google.common.collect.ImmutableList;
 //import net.minecraft.client.gui.GuiScreen;
