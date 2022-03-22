@@ -28,7 +28,7 @@ Versions below 4.0 will be updated to support Microsoft authentication as soon a
 | 1.18.2         | Fabric    | ---                                                                    | ---            |
 | 1.16.5         | Forge     | [1.16](https://github.com/TechnicianLP/ReAuth/tree/1.16)               | 4.0.1          |
 | 1.16.x         | Fabric    | [1.16-Fabric](https://github.com/TechnicianLP/ReAuth/tree/1.16-Fabric) | 3.9.3          |
-| 1.14 / 1.15    | Forge     | [1.14](https://github.com/TechnicianLP/ReAuth/tree/1.14)               | 3.8.1          |
+| 1.14 / 1.15    | Forge     | [1.14](https://github.com/TechnicianLP/ReAuth/tree/1.14)               | 4.0.0          |
 | 1.12.x         | Forge     | [1.12](https://github.com/TechnicianLP/ReAuth/tree/1.12)               | 3.6.0          |
 | 1.11.2         | Forge     | [1.11](https://github.com/TechnicianLP/ReAuth/tree/1.11)               | 3.5.2          |
 | 1.9.4 / 1.10.2 | Forge     | [1.10](https://github.com/TechnicianLP/ReAuth/tree/1.10)               | 3.5.2          |
