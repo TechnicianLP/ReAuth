@@ -1,85 +1,78 @@
 package technicianlp.reauth;
 
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import technicianlp.reauth.configuration.Config;
+import technicianlp.reauth.configuration.ProfileList;
+import technicianlp.reauth.crypto.Crypto;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
-@Mod(modid = "reauth", name = "ReAuth", version = "3.6.0", guiFactory = "technicianlp.reauth.GuiFactory", canBeDeactivated = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.12]", certificateFingerprint = "daba0ec4df71b6da841768c49fb873def208a1e3")
+@Mod(modid = "reauth", name = "ReAuth", canBeDeactivated = true, clientSideOnly = true,
+        guiFactory = "technicianlp.reauth.gui.GuiFactory",
+        updateJSON = "https://raw.githubusercontent.com/TechnicianLP/ReAuth/master/update.json",
+        certificateFingerprint = "daba0ec4df71b6da841768c49fb873def208a1e3")
+@Mod.EventBusSubscriber(value = Side.CLIENT)
 public final class ReAuth {
 
-    static final Logger log = LogManager.getLogger("ReAuth");
-    static Configuration config;
-
-    static boolean OfflineModeEnabled;
+    public static final Logger log = LogManager.getLogger("ReAuth");
+    public static final ExecutorService executor;
 
     @Mod.Instance("reauth")
     static ReAuth main;
 
-    @Mod.Metadata
-    static ModMetadata meta;
+    public static final Config config;
+    public static final ProfileList profiles;
+
+    static {
+        executor = Executors.newCachedThreadPool(new ReAuthThreadFactory());
+        Path configFile = new File(Minecraft.getMinecraft().mcDataDir, ".ReAuth.cfg").toPath();
+        config = new Config(configFile);
+        profiles = config.getProfileList();
+        Crypto.init();
+    }
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent evt) {
-        MinecraftForge.EVENT_BUS.register(this);
-
-        //Moved ReAuth config out of /config
-        File config = new File(Minecraft.getMinecraft().mcDataDir, ".ReAuth.cfg");
-        //new one missing; old one there -> move the file
-        if (evt.getSuggestedConfigurationFile().exists() && !config.exists())
-            evt.getSuggestedConfigurationFile().renameTo(config);
-        //initialize config
-        ReAuth.config = new Configuration(config);
-        ReAuth.loadConfig();
-
-        Secure.init();
+    public void preInit(FMLPreInitializationEvent event) {
+        ReAuth.config.loadConfig();
     }
 
     @SubscribeEvent
-    public void onConfigChanged(OnConfigChangedEvent evt) {
-        if (evt.getModID().equals("reauth")) {
-            ReAuth.loadConfig();
+    public static void configChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (event.getModID().equals("reauth")) {
+            config.loadConfig();
         }
-    }
-
-    /**
-     * (re-)loads config
-     */
-    private static void loadConfig() {
-        Property username = config.get(Configuration.CATEGORY_GENERAL, "username", "", "Your Username");
-        Secure.username = username.getString();
-
-        Property password = config.get(Configuration.CATEGORY_GENERAL, "password", "", "Your Password in plaintext if chosen to save to disk");
-        Secure.password = password.getString().toCharArray();
-
-        Property offline = config.get(Configuration.CATEGORY_GENERAL, "offlineModeEnabled", false, "Enables play-offline button");
-        Main.OfflineModeEnabled = offline.getBoolean();
-
-        Property validator = config.get(Configuration.CATEGORY_GENERAL, "validatorEnabled", true, "Disables the Session Validator");
-        GuiHandler.enabled = validator.getBoolean();
-
-        Property bold = config.get(Configuration.CATEGORY_GENERAL, "validatorBold", true, "If the Session-Validator look weird disable this");
-        GuiHandler.bold = bold.getBoolean();
-
-        ReAuth.config.save();
     }
 
     @Mod.EventHandler
     public void securityError(FMLFingerprintViolationEvent event) {
-//        log.fatal("+-----------------------------------------------------------------------------------+");
-//        log.fatal("|The Version of ReAuth is not signed! It was modified! Ignoring because of Dev-Mode!|");
-//        log.fatal("+-----------------------------------------------------------------------------------+");
-        throw new SecurityException("The Version of ReAuth is not signed! It is a modified version!");
+        throw new SecurityException("ReAuth is not signed! It was likely modified!");
     }
 
+    private static final class ReAuthThreadFactory implements ThreadFactory {
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final ThreadGroup group = new ThreadGroup("ReAuth");
+
+        @Override
+        public Thread newThread(Runnable runnable) {
+            Thread t = new Thread(this.group, runnable, "ReAuth-" + this.threadNumber.getAndIncrement());
+            if (t.isDaemon())
+                t.setDaemon(false);
+            if (t.getPriority() != Thread.NORM_PRIORITY)
+                t.setPriority(Thread.NORM_PRIORITY);
+            return t;
+        }
+    }
 }

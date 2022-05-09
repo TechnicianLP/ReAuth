@@ -1,4 +1,4 @@
-package technicianlp.reauth;
+package technicianlp.reauth.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
