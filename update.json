@@ -9,7 +9,8 @@
     "1.16.2-recommended": "3.9.3",
     "1.16.1-recommended": "3.9.3",
     "1.15.2-recommended": "4.0.0",
-    "1.14.4-recommended": "4.0.0"
+    "1.14.4-recommended": "4.0.0",
+    "1.12.2-recommended": "4.0.0"
   },
   "promos-fabric": {
     "1.16.4-recommended": "3.9.3",
@@ -75,5 +76,8 @@
     "3.8.1": "Fixed Credentials saving for Mojangs Java Version",
     "3.8.0": "Encrypted Credentials saving",
     "3.7.0": "Port to 1.14"
+  },
+  "1.12.2": {
+    "4.0.0": "Microsoft Authentication"
   }
 }
