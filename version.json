@@ -6,7 +6,7 @@
     "allowed-message": "Version too old"
   },
   "1.11": {
-    "latest": "3.5.0",
+    "latest": "4.0.0",
     "latest-message": "Changed VersionChecker",
     "allowed": "[3.2,)",
     "allowed-message": "Version too old"
