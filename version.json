@@ -1,19 +1,19 @@
 {
   "1.12": {
     "latest": "4.0.0",
-    "latest-message": "Microsoft Authentication",
+    "latest-message": "Microsoft Auth",
     "allowed": "[3.2,)",
     "allowed-message": "Version too old"
   },
   "1.11": {
     "latest": "4.0.0",
-    "latest-message": "Changed VersionChecker",
+    "latest-message": "Microsoft Auth",
     "allowed": "[3.2,)",
     "allowed-message": "Version too old"
   },
   "1.9": {
-    "latest": "3.5.0",
-    "latest-message": "Changed VersionChecker",
+    "latest": "4.0.0",
+    "latest-message": "Microsoft Auth",
     "allowed": "[3.2,)",
     "allowed-message": "Version too old"
   },
