@@ -9,7 +9,8 @@
     "1.12.2-recommended": "4.0.0",
     "1.11.2-recommended": "4.0.0",
     "1.10.2-recommended": "4.0.0",
-    "1.9.4-recommended": "4.0.0"
+    "1.9.4-recommended": "4.0.0",
+    "1.8.9-recommended": "4.0.0"
   },
   "promos-fabric": {
     "1.16.4-recommended": "3.9.3",
@@ -86,6 +87,9 @@
     "4.0.0": "Microsoft Authentication"
   },
   "1.9.4": {
+    "4.0.0": "Microsoft Authentication"
+  },
+  "1.8.9": {
     "4.0.0": "Microsoft Authentication"
   }
 }
