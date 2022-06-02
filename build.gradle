@@ -1,37 +1,49 @@
 buildscript {
     repositories {
+        maven { url = "https://maven.minecraftforge.net/" }
         mavenCentral()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath "net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT"
     }
 }
 
-apply plugin: 'forge'
+apply plugin: "forge"
 
-version = "3.5.0"
-group = "reauth.Main" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "ReAuth"
+version = "${Major}.${Patch}"
+group = "${Author}"
+archivesBaseName = "${ModName}-${MCVersion}-Forge"
 
-sourceCompatibility = targetCompatibility = '1.6' // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.6'
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = "1.8"
 
 minecraft {
-    version = "1.7.10-10.13.4.1448-1.7.10"
-    runDir = "eclipse"
+    version = "1.7.10-10.13.4.1614-1.7.10"
+    runDir = "run"
+
+    mappings = "snapshot_20140925"
 }
 
 dependencies {
+    compileOnly "org.jetbrains:annotations:23.0.0"
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : "${ModID}",
+                "Specification-Vendor"    : "${Author}",
+                "Specification-Version"   : "${version}",
+                "Implementation-Title"    : "${ModName}",
+                "Implementation-Version"  : "${version}",
+                "Implementation-Vendor"   : "${Author}",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+ext {
+    autoSignProfile = "reauth"
+    autoSignTarget = tasks.jar.archivePath
 }
 
 processResources {
@@ -41,67 +53,14 @@ processResources {
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+        include "mcmod.info"
 
         // replace version and mcversion
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+        expand "version": project.version, "mcversion": project.minecraft.version
     }
 
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-}
-
-import groovy.swing.SwingBuilder
-
-import java.awt.*
-
-task signJar(type: Exec, dependsOn: reobf) {
-    onlyIf {
-        project.hasProperty('keyStore')
-    }
-    ext {
-        storePass = null
-        keyPass = null
-    }
-    executable = "jarsigner"
-    args(["-signedJar", jar.archivePath, jar.archivePath, project.keyStoreAlias, "-tsa", project.tsa, "-keystore", project.keyStore])
-    doFirst {
-        if (storePass != null && storePass?.trim())
-            args(["-storepass", storePass])
-        if (keyPass != null && keyPass?.trim())
-            args(["-keypass", keyPass])
-    }
-}
-
-build.dependsOn signJar
-
-gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(':signJar')) {
-        if (System.console() == null) {
-            new SwingBuilder().edt {
-                dialog(modal: true, title: 'KeyStore Passwords', alwaysOnTop: true, resizable: false, locationRelativeTo: null, show: true, size: [300, 150]) {
-                    panel(layout: new BorderLayout(5, 5)) {
-                        def store
-                        def key
-                        vbox(constraints: BorderLayout.CENTER) {
-                            label(text: "Keystore:",)
-                            store = passwordField()
-                            label(text: "Key:")
-                            key = passwordField()
-                        }
-                        button(defaultButton: true, text: 'OK', constraints: BorderLayout.SOUTH, actionPerformed: {
-                            signJar.storePass = new String(store.password)
-                            signJar.keyPass = new String(key.password)
-                            dispose()
-                        })
-                    }
-                }
-            }
-        } else {
-            signJar.storePass = new String(System.console().readPassword("\nKeyStore Password: "))
-            signJar.keyPass = new String(System.console().readPassword("\nKey Password: "))
-        }
+        exclude "mcmod.info"
     }
 }

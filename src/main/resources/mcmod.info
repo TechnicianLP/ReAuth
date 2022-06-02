@@ -3,12 +3,10 @@
   "modid": "reauth",
   "name": "ReAuth",
   "description": "A Mod to renew your Session",
-  "version": "3.5.0",
+  "version": "${version}",
   "mcversion": "[1.7.10]",
   "url": "http://minecraft.curseforge.com/projects/reauth",
-  "updateUrl": "",
   "authorList": ["TechnicianLP"],
-  "credits": "Mojang and the Forge and FML guys, for making this possible",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
