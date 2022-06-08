@@ -7,6 +7,7 @@ import technicianlp.reauth.authentication.YggdrasilAPI;
 import technicianlp.reauth.authentication.http.UnreachableServiceException;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 public final class SessionChecker {
 
@@ -25,7 +26,7 @@ public final class SessionChecker {
      * Get the cached Validity Status of the accessToken
      * Re-Validation is done if the cache expires
      */
-    public static SessionStatus getSessionStatus() {
+    public static SessionStatus getSessionStatus(ExecutorService executor) {
         if (lastCheck + cacheTime < System.currentTimeMillis())
             status = SessionStatus.UNKNOWN;
 
@@ -36,7 +37,7 @@ public final class SessionChecker {
             CompletableFuture<Session> session = CompletableFuture.completedFuture(Minecraft.getMinecraft().getSession());
             CompletableFuture<String> token = session.thenApply(Session::getToken);
             CompletableFuture<String> uuid = session.thenApply(Session::getPlayerID);
-            token.thenCombineAsync(uuid, SessionChecker::getSessionStatus, ReAuth.executor)
+            token.thenCombineAsync(uuid, SessionChecker::getSessionStatus, executor)
                     .thenAccept(status -> SessionChecker.status = status);
         }
         return status;

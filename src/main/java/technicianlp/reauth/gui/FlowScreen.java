@@ -15,10 +15,8 @@ import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.FlowStage;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.session.SessionHelper;
-import technicianlp.reauth.util.ReflectionUtils;
 
 import java.awt.Desktop;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.CancellationException;

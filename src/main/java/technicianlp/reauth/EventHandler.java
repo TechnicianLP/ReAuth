@@ -22,8 +22,8 @@ import java.lang.reflect.Field;
 
 public final class EventHandler {
 
-    private static final Field disconnectReason = ReflectionUtils.findMcpField(GuiDisconnected.class, "field_146306_a", "reason");
-    private static final Field disconnectMessage = ReflectionUtils.findMcpField(GuiDisconnected.class, "field_146304_f", "message");
+    private static final Field disconnectReason = ReflectionUtils.findObfuscatedField(GuiDisconnected.class, "field_146306_a", "reason");
+    private static final Field disconnectMessage = ReflectionUtils.findObfuscatedField(GuiDisconnected.class, "field_146304_f", "message");
 
     @SubscribeEvent
     public final void onInitGui(InitGuiEvent.Post event) {
@@ -67,7 +67,7 @@ public final class EventHandler {
     @SubscribeEvent
     public final void onDrawGui(DrawScreenEvent.Post e) {
         if (e.gui instanceof GuiMultiplayer) {
-            SessionStatus state = SessionChecker.getSessionStatus();
+            SessionStatus state = SessionChecker.getSessionStatus(ReAuth.executor);
             Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
         }
     }

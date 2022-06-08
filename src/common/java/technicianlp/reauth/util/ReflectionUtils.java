@@ -6,8 +6,6 @@ import java.lang.reflect.Modifier;
 
 public final class ReflectionUtils {
 
-    private static final Field fieldModifiers = findField(Field.class, "modifiers");
-
     private static Method findMethodInternal(Class<?> clz, String name, Class<?>... parameterTypes) throws NoSuchMethodException {
         Method method = clz.getDeclaredMethod(name, parameterTypes);
         method.setAccessible(true);
@@ -22,7 +20,7 @@ public final class ReflectionUtils {
         }
     }
 
-    public static Method findMcpMethod(Class<?> clz, String obfName, String name, Class<?>... parameterTypes) {
+    public static Method findObfuscatedMethod(Class<?> clz, String obfName, String name, Class<?>... parameterTypes) {
         try {
             return findMethodInternal(clz, obfName, parameterTypes);
         } catch (NoSuchMethodException suppressed) {
@@ -30,7 +28,7 @@ public final class ReflectionUtils {
                 return findMethodInternal(clz, name, parameterTypes);
             } catch (NoSuchMethodException exception) {
                 exception.addSuppressed(suppressed);
-                throw new UncheckedReflectiveOperationException("Unable to find MCP Method: " + name, exception);
+                throw new UncheckedReflectiveOperationException("Unable to find Obfuscated Method: " + name, exception);
             }
         }
     }
@@ -58,7 +56,7 @@ public final class ReflectionUtils {
         }
     }
 
-    public static Field findMcpField(Class<?> clz, String obfName, String name) {
+    public static Field findObfuscatedField(Class<?> clz, String obfName, String name) {
         try {
             return findFieldInternal(clz, obfName);
         } catch (NoSuchFieldException suppressed) {
@@ -66,13 +64,14 @@ public final class ReflectionUtils {
                 return findFieldInternal(clz, name);
             } catch (NoSuchFieldException exception) {
                 exception.addSuppressed(suppressed);
-                throw new UncheckedReflectiveOperationException("Unable to find MCP Field: " + name, exception);
+                throw new UncheckedReflectiveOperationException("Unable to find Obfuscated Field: " + name, exception);
             }
         }
     }
 
     public static void unlockFinalField(Field field) {
         try {
+            Field fieldModifiers = findField(Field.class, "modifiers");
             fieldModifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         } catch (ReflectiveOperationException exception) {
             throw new UncheckedReflectiveOperationException("Unable to unlock final field", exception);

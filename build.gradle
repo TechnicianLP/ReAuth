@@ -23,6 +23,19 @@ minecraft {
     mappings = "snapshot_20140925"
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir "src/main/java"
+            srcDir "src/common/java"
+        }
+        resources{
+            srcDir "src/main/resources"
+            srcDir "src/common/resources"
+        }
+    }
+}
+
 dependencies {
     compileOnly "org.jetbrains:annotations:23.0.0"
 }

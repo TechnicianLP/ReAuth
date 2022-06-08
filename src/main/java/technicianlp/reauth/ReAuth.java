@@ -12,15 +12,18 @@ import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import technicianlp.reauth.configuration.Config;
+import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileList;
-import technicianlp.reauth.crypto.Crypto;
+import technicianlp.reauth.mojangfix.MojangJavaFix;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 @Mod(modid = "reauth", name = "ReAuth", version = "4.0.0", canBeDeactivated = true,
         acceptedMinecraftVersions = "[1.7.10]",
@@ -35,16 +38,18 @@ public final class ReAuth {
 
     public static final Config config;
     public static final ProfileList profiles;
+    public static final Function<Map<String, String>, Profile> profileCreator;
 
     static {
+        MojangJavaFix.fixMojangJava();
+
         executor = Executors.newCachedThreadPool(new ReAuthThreadFactory());
         versionCheck = new VersionChecker();
 
         Path configFile = new File(Minecraft.getMinecraft().mcDataDir, ".ReAuth.cfg").toPath();
         config = new Config(configFile);
         profiles = config.getProfileList();
-
-        Crypto.init();
+        profileCreator = profiles::createProfile;
     }
 
     @Mod.EventHandler

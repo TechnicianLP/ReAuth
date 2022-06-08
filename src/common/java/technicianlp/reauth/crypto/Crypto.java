@@ -37,10 +37,6 @@ public final class Crypto {
         return new PkceChallenge();
     }
 
-    public static void init() {
-        JceWorkaround.ensureUnlimitedCryptography();
-    }
-
     public static void updateConfigPath(String configPath) {
         Crypto.configPath = configPath;
     }
