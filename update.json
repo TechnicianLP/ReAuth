@@ -20,7 +20,7 @@
     "1.9.4-recommended": "4.0.0",
     "1.8.9-latest": "4.0.0",
     "1.8.9-recommended": "4.0.0",
-    "1.7.10-recommended": "4.0.0"
+    "1.7.10-recommended": "4.0.2"
   },
   "promos-fabric": {
     "1.16.4-recommended": "3.9.3",
@@ -103,6 +103,7 @@
     "4.0.0": "Microsoft Authentication"
   },
   "1.7.10": {
-    "4.0.0": "Microsoft Authentication"
+    "4.0.0": "Microsoft Authentication",
+    "4.0.2": "Fix Login on Mojang Launcher"
   }
 }
