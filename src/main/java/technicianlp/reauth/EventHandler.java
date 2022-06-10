@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.Session;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -21,14 +22,14 @@ import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.gui.MainScreen;
 import technicianlp.reauth.session.SessionChecker;
 import technicianlp.reauth.session.SessionStatus;
-import technicianlp.reauth.util.ReflectionHelper;
+import technicianlp.reauth.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 
 @Mod.EventBusSubscriber(modid = "reauth", value = Dist.CLIENT)
 public final class EventHandler {
 
-    private static final Field disconnectMessage = ReflectionHelper.findMcpField(DisconnectedScreen.class, "field_146304_f");
+    private static final Field disconnectMessage = ReflectionUtils.findObfuscatedField(DisconnectedScreen.class, "field_146304_f", "message");
 
     @SubscribeEvent
     public static void onInitGui(InitGuiEvent.Post event) {
@@ -50,7 +51,7 @@ public final class EventHandler {
 
     private static void handleDisconnectScreen(InitGuiEvent.Post event, Screen screen) {
         if ("connect.failed".equals(ReconnectHelper.getTranslationKey(screen.getTitle()))) {
-            if (ReconnectHelper.getTranslationKey(ReflectionHelper.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
+            if (ReconnectHelper.getTranslationKey(ReflectionUtils.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
                 Widget menu = event.getWidgetList().get(0);
 
                 Profile profile = ReAuth.profiles.getProfile();
@@ -76,7 +77,8 @@ public final class EventHandler {
     @SubscribeEvent
     public static void onDrawGui(DrawScreenEvent.Post e) {
         if (e.getGui() instanceof MultiplayerScreen) {
-            SessionStatus state = SessionChecker.getSessionStatus();
+            Session user = Minecraft.getInstance().getSession();
+            SessionStatus state = SessionChecker.getSessionStatus(user.getToken(), user.getPlayerID());
             Minecraft.getInstance().fontRenderer.drawStringWithShadow(e.getMatrixStack(), I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
         }
     }

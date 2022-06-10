@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -35,9 +34,16 @@ minecraft {
     }
 }
 
+sourceSets {
+    main {
+        java.srcDirs += "src/common/java"
+        resources.srcDirs += "src/common/resources"
+    }
+}
+
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.23'
-    compile 'org.jetbrains:annotations:16.0.2'
+    compile 'org.jetbrains:annotations:23.0.0'
 }
 
 jar {
@@ -57,4 +63,8 @@ jar {
 ext {
     autoSignProfile = "reauth"
     autoSignTarget = tasks.jar.archivePath
+}
+
+repositories {
+    mavenCentral()
 }

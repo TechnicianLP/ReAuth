@@ -11,7 +11,7 @@ import net.minecraft.client.util.Splashes;
 import net.minecraft.util.Session;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.SessionData;
-import technicianlp.reauth.util.ReflectionHelper;
+import technicianlp.reauth.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
@@ -20,10 +20,10 @@ import java.util.regex.Pattern;
 
 public final class SessionHelper {
 
-    private static final Field sessionField = ReflectionHelper.findMcpField(Minecraft.class, "field_71449_j");
-    private static final Field interactionServiceField = ReflectionHelper.findMcpField(Minecraft.class, "field_244734_au");
-    private static final Field filterManagerField = ReflectionHelper.findMcpField(Minecraft.class, "field_244597_aC");
-    private static final Field splashesSessionField = ReflectionHelper.findMcpField(Splashes.class, "field_215281_d");
+    private static final Field sessionField = ReflectionUtils.findObfuscatedField(Minecraft.class, "field_71449_j", "session");
+    private static final Field interactionServiceField = ReflectionUtils.findObfuscatedField(Minecraft.class, "field_244734_au", "field_244734_au");
+    private static final Field filterManagerField = ReflectionUtils.findObfuscatedField(Minecraft.class, "field_244597_aC", "field_244597_aC");
+    private static final Field splashesSessionField = ReflectionUtils.findObfuscatedField(Splashes.class, "field_215281_d", "gameSession");
 
     private static final Pattern usernamePattern = Pattern.compile("[A-Za-z0-9_]{2,16}");
 
@@ -56,7 +56,7 @@ public final class SessionHelper {
 
             Session session = new Session(data.username, data.uuid, data.accessToken, data.type);
 
-            ReflectionHelper.setField(sessionField, minecraft, session);
+            ReflectionUtils.setField(sessionField, minecraft, session);
             SessionChecker.invalidate();
 
             // Update things depending on the Session.
@@ -81,14 +81,14 @@ public final class SessionHelper {
             if (interactionsService == null) {
                 interactionsService = new OfflineSocialInteractions();
             }
-            ReflectionHelper.setField(interactionServiceField, minecraft, interactionsService);
+            ReflectionUtils.setField(interactionServiceField, minecraft, interactionsService);
 
             // Recreate FilterManager
             FilterManager filterManager = new FilterManager(minecraft, interactionsService);
-            ReflectionHelper.setField(filterManagerField, minecraft, filterManager);
+            ReflectionUtils.setField(filterManagerField, minecraft, filterManager);
 
             // Update Splashes session
-            ReflectionHelper.setField(splashesSessionField, minecraft.getSplashes(), session);
+            ReflectionUtils.setField(splashesSessionField, minecraft.getSplashes(), session);
         } catch (Exception e) {
             ReAuth.log.error("Failed to update Session", e);
         }
