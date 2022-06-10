@@ -28,7 +28,7 @@ public final class OfflineLoginScreen extends AbstractScreen {
         this.username.setFocused2(true);
         this.setFocused(this.username);
 
-        this.confirm = new Button(this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, I18n.format("reauth.gui.button.offline"), (b) -> this.performUsernameChange());
+        this.confirm = new Button(this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, I18n.format("reauth.gui.button.username"), (b) -> this.performUsernameChange());
         this.addButton(this.confirm);
     }
 
@@ -62,7 +62,9 @@ public final class OfflineLoginScreen extends AbstractScreen {
      * Closes the Screen if successful
      */
     private void performUsernameChange() {
-        SessionHelper.setOfflineUsername(this.username.getText());
-        this.requestClose(true);
+        if (SessionHelper.isValidOfflineUsername(this.username.getText())) {
+            SessionHelper.setOfflineUsername(this.username.getText());
+            this.requestClose(true);
+        }
     }
 }

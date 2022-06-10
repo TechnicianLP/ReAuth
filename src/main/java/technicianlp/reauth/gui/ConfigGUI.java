@@ -1,4 +1,4 @@
-package technicianlp.reauth.gui;//package technicianlp.reauth.gui;
+package technicianlp.reauth.gui;
 //
 //import com.google.common.collect.ImmutableList;
 //import net.minecraft.client.gui.GuiScreen;
@@ -14,5 +14,4 @@ package technicianlp.reauth.gui;//package technicianlp.reauth.gui;
 //    ConfigGUI(GuiScreen parent) {
 //        super(parent, ImmutableList.of(ce), "reauth", "reauth", false, false, "Config for ReAuth", "");
 //    }
-//
 //}

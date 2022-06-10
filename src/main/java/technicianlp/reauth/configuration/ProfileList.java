@@ -14,12 +14,12 @@ import java.util.function.Supplier;
 
 public final class ProfileList {
 
-    private final Configuration configuration;
+    private final Config configuration;
     private final ForgeConfigSpec.ConfigValue<List<CommentedConfig>> profilesProperty;
 
     private Supplier<CommentedConfig> configSupplier = TomlFormat::newConfig;
 
-    ProfileList(Configuration configuration, ForgeConfigSpec.Builder builder) {
+    ProfileList(Config configuration, ForgeConfigSpec.Builder builder) {
         this.configuration = configuration;
         this.profilesProperty = builder
                 .comment("Saved Profiles. Check Documentation for Info & Syntax")

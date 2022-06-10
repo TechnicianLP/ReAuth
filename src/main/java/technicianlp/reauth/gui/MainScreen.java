@@ -31,11 +31,7 @@ public final class MainScreen extends AbstractScreen {
         Profile profile = ReAuth.profiles.getProfile();
         if (profile != null) {
             String text = I18n.format("reauth.gui.profile", profile.getValue(Profile.NAME, "Steve"));
-            this.addButton(new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text, (b) -> {
-                FlowScreen screen = new FlowScreen(this.background);
-                screen.setFlow(Flows.loginWithProfile(profile, screen));
-                this.getMinecraft().displayGuiScreen(screen);
-            }));
+            this.addButton(new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text, (b) -> FlowScreen.open(Flows::loginWithProfile, profile, this.background)));
         } else {
             Button profileButton = new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, I18n.format("reauth.gui.noProfile"), (b) -> {
             });
@@ -43,17 +39,9 @@ public final class MainScreen extends AbstractScreen {
             this.addButton(profileButton);
         }
 
-        this.addButton(new Button(this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20, I18n.format("This Device"), (b) -> {
-            FlowScreen screen = new FlowScreen(this.background);
-            screen.setFlow(Flows.loginWithAuthCode(saveButton.isChecked(), screen));
-            this.getMinecraft().displayGuiScreen(screen);
-        }));
-        this.addButton(new Button(this.centerX + 1, y + 45, buttonWidthH - 1, 20, I18n.format("Any Device"), (b) -> {
-            FlowScreen screen = new FlowScreen(this.background);
-            screen.setFlow(Flows.loginWithDeviceCode(saveButton.isChecked(), screen));
-            this.getMinecraft().displayGuiScreen(screen);
-        }));
-        this.addButton(new Button(this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20, I18n.format("Choose Username"), (b) -> this.getMinecraft().displayGuiScreen(new OfflineLoginScreen(this.background))));
+        this.addButton(new Button(this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20, I18n.format("reauth.gui.button.authcode"), (b) -> FlowScreen.open(Flows::loginWithAuthCode, saveButton.isChecked(), this.background)));
+        this.addButton(new Button(this.centerX + 1, y + 45, buttonWidthH - 1, 20, I18n.format("reauth.gui.button.devicecode"), (b) -> FlowScreen.open(Flows::loginWithDeviceCode, saveButton.isChecked(), this.background)));
+        this.addButton(new Button(this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20, I18n.format("reauth.gui.button.offline"), (b) -> this.getMinecraft().displayGuiScreen(new OfflineLoginScreen(this.background))));
 
 
         VersionChecker.CheckResult result = VersionChecker.getResult(ReAuth.modInfo);

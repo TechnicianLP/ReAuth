@@ -24,7 +24,6 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             mods {
                 reauth {
@@ -32,6 +31,13 @@ minecraft {
                 }
             }
         }
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "src/common/java"
+        resources.srcDirs += "src/common/resources"
     }
 }
 

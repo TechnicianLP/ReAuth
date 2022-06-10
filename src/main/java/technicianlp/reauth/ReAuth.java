@@ -1,5 +1,6 @@
 package technicianlp.reauth;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ExtensionPoint;
@@ -13,32 +14,38 @@ import net.minecraftforge.forgespi.language.IModInfo;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import technicianlp.reauth.configuration.Configuration;
+import technicianlp.reauth.configuration.Config;
 import technicianlp.reauth.configuration.ProfileList;
-import technicianlp.reauth.crypto.Crypto;
+import technicianlp.reauth.mojangfix.MojangJavaFix;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 
 @Mod("reauth")
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class ReAuth {
 
     public static final Logger log = LogManager.getLogger("ReAuth");
-    public static final Configuration config;
-    public static final ProfileList profiles;
+    public static final ExecutorService executor;
+
     public static IModInfo modInfo;
 
-    public static final ExecutorService executor;
+    public static final Config config;
+    public static final ProfileList profiles;
+
+    public static final BiFunction<String, Object[], String> i18n = I18n::format;
 
     static {
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            config = new Configuration();
-            profiles = config.getProfileList();
+            MojangJavaFix.fixMojangJava();
+
             executor = Executors.newCachedThreadPool(new ReAuthThreadFactory());
-            Crypto.init();
+
+            config = new Config();
+            profiles = config.getProfileList();
         } else {
             config = null;
             profiles = null;
