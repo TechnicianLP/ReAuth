@@ -38,7 +38,7 @@ abstract class AbstractScreen extends GuiScreen {
         this.centerY = this.height / 2;
         this.baseY = this.centerY - this.screenHeight / 2;
 
-        GuiButton cancel = new GuiButton(1,this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, I18n.format("reauth.gui.close"));
+        GuiButton cancel = new GuiButton(1, this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, I18n.format("reauth.gui.close"));
         this.buttonList.add(cancel);
     }
 
@@ -84,7 +84,7 @@ abstract class AbstractScreen extends GuiScreen {
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
         super.actionPerformed(button);
-        if(button.id == 1) {
+        if (button.id == 1) {
             this.requestClose(false);
         }
     }
