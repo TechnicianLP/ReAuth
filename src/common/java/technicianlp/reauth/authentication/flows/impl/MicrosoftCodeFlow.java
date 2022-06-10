@@ -45,7 +45,7 @@ public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCo
 
         if (persist) {
             CompletableFuture<Tokens> tokens = ms.thenCombine(xasu, Tokens::new);
-            CompletableFuture<ProfileEncryption> encryption = Crypto.newEncryption(this.executor);
+            CompletableFuture<ProfileEncryption> encryption = CompletableFuture.supplyAsync(Crypto::newEncryption, this.executor);
             CompletableFuture<ProfileBuilder> builder = this.session.thenCombine(encryption, ProfileBuilder::new);
             this.profile = builder.thenCombine(tokens, ProfileBuilder::buildMicrosoft);
             this.profile.whenComplete(this::onProfileComplete);

@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.Session;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
@@ -67,7 +68,8 @@ public final class EventHandler {
     @SubscribeEvent
     public final void onDrawGui(DrawScreenEvent.Post e) {
         if (e.gui instanceof GuiMultiplayer) {
-            SessionStatus state = SessionChecker.getSessionStatus(ReAuth.executor);
+            Session user = Minecraft.getMinecraft().getSession();
+            SessionStatus state = SessionChecker.getSessionStatus(user.getToken(), user.getPlayerID());
             Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
         }
     }

@@ -7,8 +7,6 @@ import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
 import technicianlp.reauth.session.SessionHelper;
 
-import java.io.IOException;
-
 public final class OfflineLoginScreen extends AbstractScreen {
 
     private GuiTextField username;
@@ -47,7 +45,7 @@ public final class OfflineLoginScreen extends AbstractScreen {
     }
 
     @Override
-    public final void keyTyped(char typedChar, int keyCode)  {
+    public final void keyTyped(char typedChar, int keyCode) {
         super.keyTyped(typedChar, keyCode);
         this.username.textboxKeyTyped(typedChar, keyCode);
         if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
@@ -56,7 +54,7 @@ public final class OfflineLoginScreen extends AbstractScreen {
     }
 
     @Override
-    protected void actionPerformed(GuiButton button)  {
+    protected void actionPerformed(GuiButton button) {
         super.actionPerformed(button);
         if (button.id == 3) {
             this.performUsernameChange();

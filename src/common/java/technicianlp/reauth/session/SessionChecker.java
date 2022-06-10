@@ -1,13 +1,10 @@
 package technicianlp.reauth.session;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.Session;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.YggdrasilAPI;
 import technicianlp.reauth.authentication.http.UnreachableServiceException;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
 public final class SessionChecker {
 
@@ -26,7 +23,7 @@ public final class SessionChecker {
      * Get the cached Validity Status of the accessToken
      * Re-Validation is done if the cache expires
      */
-    public static SessionStatus getSessionStatus(ExecutorService executor) {
+    public static SessionStatus getSessionStatus(String token, String uuid) {
         if (lastCheck + cacheTime < System.currentTimeMillis())
             status = SessionStatus.UNKNOWN;
 
@@ -34,10 +31,9 @@ public final class SessionChecker {
             status = SessionStatus.REFRESHING;
             lastCheck = System.currentTimeMillis();
 
-            CompletableFuture<Session> session = CompletableFuture.completedFuture(Minecraft.getMinecraft().getSession());
-            CompletableFuture<String> token = session.thenApply(Session::getToken);
-            CompletableFuture<String> uuid = session.thenApply(Session::getPlayerID);
-            token.thenCombineAsync(uuid, SessionChecker::getSessionStatus, executor)
+            CompletableFuture<String> tokenFuture = CompletableFuture.completedFuture(token);
+            CompletableFuture<String> uuidFuture = CompletableFuture.completedFuture(uuid);
+            tokenFuture.thenCombineAsync(uuidFuture, SessionChecker::getSessionStatus0, ReAuth.executor)
                     .thenAccept(status -> SessionChecker.status = status);
         }
         return status;
@@ -47,10 +43,7 @@ public final class SessionChecker {
         status = SessionStatus.UNKNOWN;
     }
 
-    /**
-     * Uses the Validate Endpoint to check the Tokens validity
-     */
-    private static SessionStatus getSessionStatus(String accessToken, String uuid) {
+    private static SessionStatus getSessionStatus0(String accessToken, String uuid) {
         try {
             return YggdrasilAPI.validate(accessToken, uuid) ? SessionStatus.VALID : SessionStatus.INVALID;
         } catch (UnreachableServiceException e) {

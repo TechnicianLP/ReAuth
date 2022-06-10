@@ -8,24 +8,23 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import technicianlp.reauth.configuration.Config;
-import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileList;
 import technicianlp.reauth.mojangfix.MojangJavaFix;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
-@Mod(modid = "reauth", name = "ReAuth", version = "4.0.0", canBeDeactivated = true,
+@Mod(modid = "reauth", name = "ReAuth", version = "4.0.3", canBeDeactivated = true,
         acceptedMinecraftVersions = "[1.7.10]",
         guiFactory = "technicianlp.reauth.gui.GuiFactory",
         certificateFingerprint = "daba0ec4df71b6da841768c49fb873def208a1e3")
@@ -38,7 +37,8 @@ public final class ReAuth {
 
     public static final Config config;
     public static final ProfileList profiles;
-    public static final Function<Map<String, String>, Profile> profileCreator;
+
+    public static final BiFunction<String, Object[], String> i18n = I18n::format;
 
     static {
         MojangJavaFix.fixMojangJava();
@@ -49,7 +49,6 @@ public final class ReAuth {
         Path configFile = new File(Minecraft.getMinecraft().mcDataDir, ".ReAuth.cfg").toPath();
         config = new Config(configFile);
         profiles = config.getProfileList();
-        profileCreator = profiles::createProfile;
     }
 
     @Mod.EventHandler

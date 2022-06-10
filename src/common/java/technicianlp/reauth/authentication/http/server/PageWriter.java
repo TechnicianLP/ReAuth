@@ -1,7 +1,7 @@
 package technicianlp.reauth.authentication.http.server;
 
-import net.minecraft.client.resources.I18n;
 import org.apache.commons.io.IOUtils;
+import technicianlp.reauth.ReAuth;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -70,7 +70,7 @@ final class PageWriter {
     }
 
     private String formatAndEscape(String key, Object... arguments) {
-        String text = I18n.format(key, arguments);
+        String text = ReAuth.i18n.apply(key, arguments);
         text = text.replaceAll("&", "&amp;");
         text = text.replaceAll("<", "&lt;");
         text = text.replaceAll(">", "&gt;");

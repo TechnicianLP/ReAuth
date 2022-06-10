@@ -37,8 +37,7 @@ public final class ProfileList {
         this.config.save();
     }
 
-    public final void storeProfile(Profile profile0) {
-        ProfileImpl profile = (ProfileImpl) profile0;
+    public final void storeProfile(Profile profile) {
         if (profile.isLoaded())
             return;
 
@@ -67,7 +66,7 @@ public final class ProfileList {
 
         String profileType = values.getOrDefault(Profile.PROFILE_TYPE, Profile.PROFILE_TYPE_NONE);
         if (!Profile.PROFILE_TYPE_NONE.equals(profileType)) {
-            return new ProfileImpl(values, true);
+            return new Profile(values, true);
         } else {
             return null;
         }
@@ -78,7 +77,7 @@ public final class ProfileList {
     }
 
     public final Profile createProfile(Map<String, String> data) {
-        return new ProfileImpl(data, false);
+        return new Profile(data, false);
     }
 
     private void correctProfile(ConfigCategory profile) {

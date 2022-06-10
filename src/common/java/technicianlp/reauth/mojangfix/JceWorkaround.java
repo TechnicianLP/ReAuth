@@ -19,7 +19,7 @@ final class JceWorkaround {
         try {
             if (Cipher.getMaxAllowedKeyLength("AES") != Integer.MAX_VALUE) {
                 ReAuth.log.warn("Cryptography is restricted in this Java installation");
-                if(!MojangJavaFix.java8){
+                if (!MojangJavaFix.java8) {
                     ReAuth.log.warn("Cryptography is likely deliberately restricted!");
                 }
                 removeCryptographyRestrictions();

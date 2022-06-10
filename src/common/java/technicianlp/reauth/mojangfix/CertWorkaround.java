@@ -1,9 +1,9 @@
 package technicianlp.reauth.mojangfix;
 
-import sun.security.ssl.SSLContextImpl;
 import technicianlp.reauth.ReAuth;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLContextSpi;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public final class CertWorkaround {
 
@@ -104,12 +103,12 @@ public final class CertWorkaround {
     }
 
     private static List<X509Certificate> getTrustedCerts(TrustManagerFactory trustManagerFactory) {
-        return Arrays.stream(trustManagerFactory.getTrustManagers())
-                .filter(X509TrustManager.class::isInstance)
-                .map(X509TrustManager.class::cast)
-                .map(X509TrustManager::getAcceptedIssuers)
-                .flatMap(Arrays::stream)
-                .collect(Collectors.toList());
+        X509ExtendedTrustManager trustManager = findX509ExtendedTrustManager(trustManagerFactory);
+        if (trustManager != null) {
+            return new ArrayList<>(Arrays.asList(trustManager.getAcceptedIssuers()));
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     private static TrustManagerFactory createTrustFactory(Map<String, X509Certificate> certificates) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
@@ -133,7 +132,8 @@ public final class CertWorkaround {
     }
 
     /**
-     * required in order to combine multiple TrustManagers as {@link SSLContextImpl} only considers the first {@link X509TrustManager}
+     * required in order to combine multiple TrustManagers.
+     * The default Implementation of {@link SSLContextSpi} only considers the first {@link X509TrustManager}
      */
     private static final class CombinedX509ExtendedTrustManager extends X509ExtendedTrustManager {
 
@@ -185,11 +185,11 @@ public final class CertWorkaround {
         }
 
         /**
-         * checks if any of the supplied trustManagers accepts the supplied operation.
+         * checks if any of the trustManagers accepts the supplied operation.
          *
          * @throws CertificateException if all trustManagers refuse the operation
          */
-        private <U> void check(CertificateCheckConsumer checkFunction) throws CertificateException {
+        private void check(CertificateCheckConsumer checkFunction) throws CertificateException {
             Deque<CertificateException> exceptions = new LinkedList<>();
             for (X509ExtendedTrustManager trustManager : this.trustManagers) {
                 try {
@@ -206,7 +206,7 @@ public final class CertWorkaround {
     }
 
     @FunctionalInterface
-    private static interface CertificateCheckConsumer {
+    private interface CertificateCheckConsumer {
         void check(X509ExtendedTrustManager trustManager) throws CertificateException;
     }
 }

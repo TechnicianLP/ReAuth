@@ -40,8 +40,8 @@ public final class MicrosoftProfileFlow extends FlowBase {
 
         this.session = new CompletableFuture<>();
         this.session.whenComplete(this::onSessionComplete);
-        this.step(FlowStage.CRYPTO_INIT);
-        this.encryption = Crypto.getProfileEncryption(profile, callback);
+        CompletableFuture<Profile> profileFuture = CompletableFuture.completedFuture(profile);
+        this.encryption = profileFuture.thenApplyAsync(this.wrapStep(FlowStage.CRYPTO_INIT, Crypto::getProfileEncryption), this.executor);
         this.refreshRequired = new CompletableFuture<>();
 
         CompletableFuture<String> xblTokenDec = this.encryption.thenCombineAsync(profile.get(Profile.XBL_TOKEN), ProfileEncryption::decryptFieldOne, this.executor);
@@ -84,7 +84,7 @@ public final class MicrosoftProfileFlow extends FlowBase {
             if (this.refreshRequired.isDone()) {
                 this.session.completeExceptionally(throwable);
             }
-            if (this.xboxFlow1.hasTokenExpiredError().getNow(false)) {
+            if (this.xboxFlow1.hasExpiredTokenError()) {
                 this.refreshRequired.complete(true);
             } else {
                 this.session.completeExceptionally(throwable);
