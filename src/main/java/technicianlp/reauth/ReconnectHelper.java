@@ -9,17 +9,16 @@ import technicianlp.reauth.authentication.flows.Flow;
 import technicianlp.reauth.authentication.flows.Flows;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.gui.FlowScreen;
-import technicianlp.reauth.util.ReflectionHelper;
+import technicianlp.reauth.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.CompletableFuture;
 
 public final class ReconnectHelper {
 
-    private static final Field managerField = ReflectionHelper.findMcpField(ConnectScreen.class, "f_95684_");
-    private static final Field previousField = ReflectionHelper.findMcpField(ConnectScreen.class, "f_95686_");
+    private static final Field managerField = ReflectionUtils.findObfuscatedField(ConnectScreen.class, "f_95684_", "connection");
+    private static final Field previousField = ReflectionUtils.findObfuscatedField(ConnectScreen.class, "f_95686_", "parent");
     private static ConnectScreen screen;
 
     public static String getTranslationKey(Object component) {
@@ -38,21 +37,17 @@ public final class ReconnectHelper {
     }
 
     public static void retryLogin(Profile profile) {
-        FlowScreen flowScreen = new FlowScreen();
-        Flow flow = Flows.loginWithProfile(profile, flowScreen);
-        flowScreen.setFlow(flow);
-        flowScreen.disableAutoClose();
-        CompletableFuture.allOf(flow.getSession(), flow.getProfile()).thenRunAsync(ReconnectHelper::connect, Minecraft.getInstance());
-        Minecraft.getInstance().pushGuiLayer(flowScreen);
+        Flow flow = FlowScreen.open(Flows::loginWithProfile, profile, true);
+        flow.thenRunAsync(ReconnectHelper::connect, Minecraft.getInstance());
     }
 
     private static void connect() {
         if (screen != null) {
-            SocketAddress add = ReflectionHelper.<Connection>getField(managerField, screen).getRemoteAddress();
+            SocketAddress add = ReflectionUtils.<Connection>getField(managerField, screen).getRemoteAddress();
             if (add instanceof InetSocketAddress address) {
                 Minecraft minecraft = Minecraft.getInstance();
                 ServerAddress server = new ServerAddress(address.getHostString(), address.getPort());
-                ConnectScreen.startConnecting(ReflectionHelper.getField(previousField, screen), minecraft, server, minecraft.getCurrentServer());
+                ConnectScreen.startConnecting(ReflectionUtils.getField(previousField, screen), minecraft, server, minecraft.getCurrentServer());
             }
         }
     }

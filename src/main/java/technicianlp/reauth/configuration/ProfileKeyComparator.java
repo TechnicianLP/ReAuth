@@ -9,7 +9,7 @@ import java.util.Comparator;
 final class ProfileKeyComparator implements Comparator<String> {
 
     @Override
-    public int compare(String o1, String o2) {
+    public final int compare(String o1, String o2) {
         return Integer.compare(this.getIndex(o1), this.getIndex(o2));
     }
 

@@ -14,19 +14,19 @@ import java.util.function.Supplier;
 
 public final class ProfileList {
 
-    private final Configuration configuration;
+    private final Config configuration;
     private final ForgeConfigSpec.ConfigValue<List<CommentedConfig>> profilesProperty;
 
     private Supplier<CommentedConfig> configSupplier = TomlFormat::newConfig;
 
-    ProfileList(Configuration configuration, ForgeConfigSpec.Builder builder) {
+    ProfileList(Config configuration, ForgeConfigSpec.Builder builder) {
         this.configuration = configuration;
         this.profilesProperty = builder
                 .comment("Saved Profiles. Check Documentation for Info & Syntax")
                 .define("profiles", this::createDefaultProfileList, this::validateProfileList);
     }
 
-    void updateConfig(ModConfig config) {
+    final void updateConfig(ModConfig config) {
         this.configSupplier = config.getConfigData()::createSubConfig;
 
         List<CommentedConfig> list = new ArrayList<>(this.profilesProperty.get());
@@ -34,7 +34,7 @@ public final class ProfileList {
         this.saveProfiles(list);
     }
 
-    public void storeProfile(Profile profile) {
+    public final void storeProfile(Profile profile) {
         List<CommentedConfig> list = new ArrayList<>(this.profilesProperty.get());
         if (list.isEmpty()) {
             list.add(profile.getConfig());
@@ -44,7 +44,7 @@ public final class ProfileList {
         this.saveProfiles(list);
     }
 
-    public Profile getProfile() {
+    public final Profile getProfile() {
         List<CommentedConfig> list = this.profilesProperty.get();
         if (list.isEmpty()) {
             return null;
@@ -58,7 +58,7 @@ public final class ProfileList {
         }
     }
 
-    Profile createProfile(Map<String, String> data) {
+    final Profile createProfile(Map<String, String> data) {
         Map<String, String> orderedData = new TreeMap<>(new ProfileKeyComparator());
         orderedData.putAll(data);
 
