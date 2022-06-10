@@ -27,7 +27,7 @@ import java.util.function.BiFunction;
 
 public final class FlowScreen extends AbstractScreen implements FlowCallback {
 
-    private static final Method openURL = ReflectionUtils.findMcpMethod(GuiScreen.class, "func_175282_a", "openWebLink", URI.class);
+    private static final Method openURL = ReflectionUtils.findObfuscatedMethod(GuiScreen.class, "func_175282_a", "openWebLink", URI.class);
 
     public static <F extends Flow, P> F open(BiFunction<P, FlowCallback, F> flowConstructor, P param, GuiScreen background) {
         FlowScreen screen = new FlowScreen(background);

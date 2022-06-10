@@ -11,5 +11,4 @@ final class ConfigGUI extends GuiConfig {
     ConfigGUI(GuiScreen parent) {
         super(parent, ImmutableList.of(new ConfigElement(ReAuth.config.getProfileList().getProfilesCategory())), "reauth", "reauth", false, false, "Config for ReAuth", "");
     }
-
 }

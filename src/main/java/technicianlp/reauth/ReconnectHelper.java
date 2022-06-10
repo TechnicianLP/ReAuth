@@ -17,8 +17,8 @@ import java.net.SocketAddress;
 
 public final class ReconnectHelper {
 
-    private static final Field managerField = ReflectionUtils.findMcpField(GuiConnecting.class, "field_146371_g", "networkManager");
-    private static final Field previousField = ReflectionUtils.findMcpField(GuiConnecting.class, "field_146374_i", "previousGuiScreen");
+    private static final Field managerField = ReflectionUtils.findObfuscatedField(GuiConnecting.class, "field_146371_g", "networkManager");
+    private static final Field previousField = ReflectionUtils.findObfuscatedField(GuiConnecting.class, "field_146374_i", "previousGuiScreen");
     private static GuiConnecting screen;
 
     public static String getTranslationKey(ITextComponent component) {

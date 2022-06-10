@@ -1,6 +1,7 @@
 package technicianlp.reauth;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
@@ -11,7 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import technicianlp.reauth.configuration.Config;
 import technicianlp.reauth.configuration.ProfileList;
-import technicianlp.reauth.crypto.Crypto;
+import technicianlp.reauth.mojangfix.MojangJavaFix;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 
 @Mod(modid = "reauth", name = "ReAuth", canBeDeactivated = true, clientSideOnly = true,
         guiFactory = "technicianlp.reauth.gui.GuiFactory",
@@ -33,12 +35,16 @@ public final class ReAuth {
     public static final Config config;
     public static final ProfileList profiles;
 
+    public static final BiFunction<String, Object[], String> i18n = I18n::format;
+
     static {
+        MojangJavaFix.fixMojangJava();
+
         executor = Executors.newCachedThreadPool(new ReAuthThreadFactory());
+
         Path configFile = new File(Minecraft.getMinecraft().mcDataDir, ".ReAuth.cfg").toPath();
         config = new Config(configFile);
         profiles = config.getProfileList();
-        Crypto.init();
     }
 
     @Mod.EventHandler
@@ -55,7 +61,13 @@ public final class ReAuth {
 
     @Mod.EventHandler
     public void securityError(FMLFingerprintViolationEvent event) {
-        throw new SecurityException("ReAuth is not signed! It was likely modified!");
+        if (event.isDirectory()) {
+            ReAuth.log.warn("+--------------------------------------------------------------+");
+            ReAuth.log.warn("| ReAuth is not packaged. ReAuth has likely been tampered with |");
+            ReAuth.log.warn("+--------------------------------------------------------------+");
+        } else {
+            throw new SecurityException("ReAuth is not signed! It was likely modified!");
+        }
     }
 
     private static final class ReAuthThreadFactory implements ThreadFactory {

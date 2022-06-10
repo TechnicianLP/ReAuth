@@ -4,23 +4,30 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT"
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: "net.minecraftforge.gradle.forge"
 //Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
 
 version = "${Major}.${Patch}"
 group = "${Author}"
 archivesBaseName = "${ModName}-${MCVersion}-Forge"
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
 
 minecraft {
     version = "1.11.2-13.20.1.2588"
     runDir = "run"
     
     mappings = "snapshot_20170612"
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "src/common/java"
+        resources.srcDirs += "src/common/resources"
+    }
 }
 
 dependencies {
@@ -54,14 +61,14 @@ processResources
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+        include "mcmod.info"
                 
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand "version":project.version, "mcversion":project.minecraft.version
     }
         
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+        exclude "mcmod.info"
     }
 }
