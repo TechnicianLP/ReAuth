@@ -6,6 +6,7 @@ import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.crypto.Crypto;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class Config {
@@ -50,15 +51,17 @@ public final class Config {
 
     /**
      * Get the Absolute path of the Config with symlinks resolved.
-     * Fall back to "local" path if that lookup fails (somehow)
+     * Fall back to "local" path if that lookup fails (somehow) or config files is missing
      */
     private String getPath(Path config) {
-        try {
-            return config.toRealPath().toString();
-        } catch (IOException e) {
-            ReAuth.log.error("Could not resolve real path", e);
-            return config.toString();
+        if (Files.exists(config)) {
+            try {
+                return config.toRealPath().toString();
+            } catch (IOException e) {
+                ReAuth.log.error("Could not resolve real path", e);
+            }
         }
+        return config.toString();
     }
 
     final Configuration getConfig() {

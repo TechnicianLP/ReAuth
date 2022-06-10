@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.SessionData;
-import technicianlp.reauth.util.ReflectionHelper;
+import technicianlp.reauth.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public final class SessionHelper {
 
-    private static final Field sessionField = ReflectionHelper.findMcpField(Minecraft.class, "field_71449_j");
+    private static final Field sessionField = ReflectionUtils.findObfuscatedField(Minecraft.class, "field_71449_j", "session");
 
     private static final Pattern usernamePattern = Pattern.compile("[A-Za-z0-9_]{2,16}");
 
@@ -36,7 +36,7 @@ public final class SessionHelper {
 
             Session session = new Session(data.username, data.uuid, data.accessToken, data.type);
 
-            ReflectionHelper.setField(sessionField, minecraft, session);
+            ReflectionUtils.setField(sessionField, minecraft, session);
             SessionChecker.invalidate();
 
             // Update things depending on the Session.

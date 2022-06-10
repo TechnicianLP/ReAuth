@@ -8,13 +8,10 @@ import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import technicianlp.reauth.ReAuth;
-import technicianlp.reauth.authentication.flows.Flow;
-import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.Flows;
 import technicianlp.reauth.configuration.Profile;
 
 import java.io.IOException;
-import java.util.function.BiFunction;
 
 public final class MainScreen extends AbstractScreen {
 
@@ -49,9 +46,9 @@ public final class MainScreen extends AbstractScreen {
             this.addButton(profileButton);
         }
 
-        this.addButton(new GuiButton(3, this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20, I18n.format("This Device")));
-        this.addButton(new GuiButton(4, this.centerX + 1, y + 45, buttonWidthH - 1, 20, I18n.format("Any Device")));
-        this.addButton(new GuiButton(5, this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20, I18n.format("Choose Username")));
+        this.addButton(new GuiButton(3, this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20, I18n.format("reauth.gui.button.authcode")));
+        this.addButton(new GuiButton(4, this.centerX + 1, y + 45, buttonWidthH - 1, 20, I18n.format("reauth.gui.button.devicecode")));
+        this.addButton(new GuiButton(5, this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20, I18n.format("reauth.gui.button.offline")));
 
         ModContainer container = Loader.instance().getIndexedModList().get("reauth");
         ForgeVersion.CheckResult result = ForgeVersion.getResult(container);
@@ -91,24 +88,18 @@ public final class MainScreen extends AbstractScreen {
             case 2:
                 Profile profile = ReAuth.profiles.getProfile();
                 if (profile != null) {
-                    this.openFlow(Flows::loginWithProfile, profile);
+                    FlowScreen.open(Flows::loginWithProfile, profile, this.background);
                 }
                 break;
             case 3:
-                this.openFlow(Flows::loginWithAuthCode, this.saveButton.isChecked());
+                FlowScreen.open(Flows::loginWithAuthCode, this.saveButton.isChecked(), this.background);
                 break;
             case 4:
-                this.openFlow(Flows::loginWithDeviceCode, this.saveButton.isChecked());
+                FlowScreen.open(Flows::loginWithDeviceCode, this.saveButton.isChecked(), this.background);
                 break;
             case 5:
                 this.mc.displayGuiScreen(new OfflineLoginScreen(this.background));
                 break;
         }
-    }
-
-    private <P> void openFlow(BiFunction<P, FlowCallback, Flow> flow, P param) {
-        FlowScreen screen = new FlowScreen(this.background);
-        screen.setFlow(flow.apply(param, screen));
-        this.mc.displayGuiScreen(screen);
     }
 }

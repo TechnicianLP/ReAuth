@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.Session;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
@@ -18,15 +19,15 @@ import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.gui.MainScreen;
 import technicianlp.reauth.session.SessionChecker;
 import technicianlp.reauth.session.SessionStatus;
-import technicianlp.reauth.util.ReflectionHelper;
+import technicianlp.reauth.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 
 @Mod.EventBusSubscriber(modid = "reauth", value = Side.CLIENT)
 public final class EventHandler {
 
-    private static final Field disconnectReason = ReflectionHelper.findMcpField(GuiDisconnected.class, "field_146306_a");
-    private static final Field disconnectMessage = ReflectionHelper.findMcpField(GuiDisconnected.class, "field_146304_f");
+    private static final Field disconnectReason = ReflectionUtils.findObfuscatedField(GuiDisconnected.class, "field_146306_a", "reason");
+    private static final Field disconnectMessage = ReflectionUtils.findObfuscatedField(GuiDisconnected.class, "field_146304_f", "message");
 
     @SubscribeEvent
     public static void onInitGui(InitGuiEvent.Post event) {
@@ -47,8 +48,8 @@ public final class EventHandler {
     }
 
     private static void handleDisconnectScreen(InitGuiEvent.Post event, GuiScreen screen) {
-        if (I18n.format("connect.failed").equals(ReflectionHelper.getField(disconnectReason, screen))) {
-            if (ReconnectHelper.getTranslationKey(ReflectionHelper.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
+        if (I18n.format("connect.failed").equals(ReflectionUtils.getField(disconnectReason, screen))) {
+            if (ReconnectHelper.getTranslationKey(ReflectionUtils.getField(disconnectMessage, screen)).startsWith("disconnect.loginFailed")) {
                 GuiButton menu = event.getButtonList().get(0);
 
                 Profile profile = ReAuth.profiles.getProfile();
@@ -70,7 +71,8 @@ public final class EventHandler {
     @SubscribeEvent
     public static void onDrawGui(DrawScreenEvent.Post e) {
         if (e.getGui() instanceof GuiMultiplayer) {
-            SessionStatus state = SessionChecker.getSessionStatus();
+            Session user = Minecraft.getMinecraft().getSession();
+            SessionStatus state = SessionChecker.getSessionStatus(user.getToken(), user.getPlayerID());
             Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(I18n.format(state.getTranslationKey()), 110, 10, 0xFFFFFFFF);
         }
     }

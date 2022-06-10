@@ -27,7 +27,7 @@ public final class OfflineLoginScreen extends AbstractScreen {
         this.username.setFocused(true);
 
 
-        this.confirm = new GuiButton(3, this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, I18n.format("reauth.gui.button.offline"));
+        this.confirm = new GuiButton(3, this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, I18n.format("reauth.gui.button.username"));
         this.addButton(this.confirm);
     }
 

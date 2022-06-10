@@ -13,7 +13,7 @@ apply plugin: 'eclipse'
 
 version = "${Major}.${Patch}"
 group = "${Author}"
-archivesBaseName = "${ModName}-${MCVersion}"
+archivesBaseName = "${ModName}-${MCVersion}-Forge"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -26,6 +26,13 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
         }
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "src/common/java"
+        resources.srcDirs += "src/common/resources"
     }
 }
 

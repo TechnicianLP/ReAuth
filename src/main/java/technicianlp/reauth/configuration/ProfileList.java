@@ -76,7 +76,7 @@ public final class ProfileList {
         return this.profilesCategory;
     }
 
-    final Profile createProfile(Map<String, String> data) {
+    public final Profile createProfile(Map<String, String> data) {
         return new Profile(data, false);
     }
 

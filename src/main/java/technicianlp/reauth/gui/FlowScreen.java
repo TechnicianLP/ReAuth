@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import org.lwjgl.opengl.GL11;
 import technicianlp.reauth.ReAuth;
+import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.authentication.flows.AuthorizationCodeFlow;
 import technicianlp.reauth.authentication.flows.DeviceCodeFlow;
 import technicianlp.reauth.authentication.flows.Flow;
@@ -13,18 +14,28 @@ import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.FlowStage;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.session.SessionHelper;
-import technicianlp.reauth.util.ReflectionHelper;
+import technicianlp.reauth.util.ReflectionUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.BiFunction;
 
 public final class FlowScreen extends AbstractScreen implements FlowCallback {
 
-    private static final Method openURL = ReflectionHelper.findMcpMethod(GuiScreen.class, "func_175282_a", void.class, URI.class);
+    private static final Method openURL = ReflectionUtils.findObfuscatedMethod(GuiScreen.class, "func_175282_a", "openWebLink", URI.class);
+
+    public static <F extends Flow, P> F open(BiFunction<P, FlowCallback, F> flowConstructor, P param, GuiScreen background) {
+        FlowScreen screen = new FlowScreen(background);
+        F flow = flowConstructor.apply(param, screen);
+        screen.flow = flow;
+        Minecraft.getMinecraft().displayGuiScreen(screen);
+        return flow;
+    }
 
     private Flow flow;
     private FlowStage stage = FlowStage.INITIAL;
@@ -32,14 +43,6 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
 
     public FlowScreen(GuiScreen background) {
         super("reauth.gui.title.flow", background);
-    }
-
-    public final void setFlow(Flow flow) {
-        this.flow = flow;
-        flow.getSession().thenAccept(SessionHelper::setSession);
-        if (flow.hasProfile()) {
-            flow.getProfile().whenComplete(this::profileComplete);
-        }
     }
 
     @Override
@@ -90,20 +93,62 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         }
     }
 
-    private void profileComplete(Profile profile, Throwable throwable) {
-        if (throwable == null) {
-            ReAuth.profiles.storeProfile(profile);
-            ReAuth.log.info("Profile saved successfully");
-        } else {
-            ReAuth.log.error("Profile failed to save", throwable);
-        }
-    }
-
     @Override
     public final void onGuiClosed() {
         super.onGuiClosed();
         if (this.stage != FlowStage.FINISHED) {
             this.flow.cancel();
+        }
+    }
+
+    @Override
+    protected void actionPerformed(GuiButton button) throws IOException {
+        super.actionPerformed(button);
+
+        String uriString = null;
+        if (button.id == 2 && this.flow instanceof AuthorizationCodeFlow) {
+            uriString = ((AuthorizationCodeFlow) this.flow).getLoginUrl();
+        } else if (button.id == 3 && this.flow instanceof DeviceCodeFlow) {
+            CompletableFuture<String> loginUrl = ((DeviceCodeFlow) this.flow).getLoginUrl();
+            if (loginUrl.isDone()) {
+                uriString = loginUrl.join();
+            }
+        }
+        if (uriString != null) {
+            try {
+                URI uri = new URI(uriString);
+                ReflectionUtils.callMethod(openURL, this, uri);
+            } catch (URISyntaxException e) {
+                ReAuth.log.error("Browser button failed", e);
+            }
+        }
+    }
+
+    @Override
+    public void onSessionComplete(SessionData session, Throwable throwable) {
+        if (throwable == null) {
+            SessionHelper.setSession(session);
+            ReAuth.log.info("Login complete");
+        } else {
+            if (throwable instanceof CancellationException || throwable.getCause() instanceof CancellationException) {
+                ReAuth.log.info("Login cancelled");
+            } else {
+                ReAuth.log.error("Login failed", throwable);
+            }
+        }
+    }
+
+    @Override
+    public void onProfileComplete(Profile profile, Throwable throwable) {
+        if (throwable == null) {
+            ReAuth.profiles.storeProfile(profile);
+            ReAuth.log.info("Profile saved successfully");
+        } else {
+            if (throwable instanceof CancellationException || throwable.getCause() instanceof CancellationException) {
+                ReAuth.log.info("Profile saving cancelled");
+            } else {
+                ReAuth.log.error("Profile failed to save", throwable);
+            }
         }
     }
 
@@ -116,7 +161,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         if (newStage == FlowStage.MS_AWAIT_AUTH_CODE && this.flow instanceof AuthorizationCodeFlow) {
             try {
                 URI uri = new URI(((AuthorizationCodeFlow) this.flow).getLoginUrl());
-                ReflectionHelper.callMethod(openURL, this, uri);
+                ReflectionUtils.callMethod(openURL, this, uri);
             } catch (URISyntaxException e) {
                 ReAuth.log.error("Failed to open page", e);
             }
@@ -128,27 +173,5 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
     @Override
     public final Executor getExecutor() {
         return ReAuth.executor;
-    }
-
-    @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
-        super.actionPerformed(button);
-        if (button.id == 2 && this.flow instanceof AuthorizationCodeFlow) {
-            try {
-                URI uri = new URI(((AuthorizationCodeFlow) this.flow).getLoginUrl());
-                ReflectionHelper.callMethod(openURL, this, uri);
-            } catch (URISyntaxException e) {
-                ReAuth.log.error("Browser button failed", e);
-            }
-        } else if (button.id == 3 && this.flow instanceof DeviceCodeFlow) {
-            try {
-                CompletableFuture<String> loginUrl = ((DeviceCodeFlow) this.flow).getLoginUrl();
-                if (loginUrl.isDone()) {
-                    ReflectionHelper.callMethod(openURL, this, new URI(loginUrl.join()));
-                }
-            } catch (URISyntaxException e) {
-                ReAuth.log.error("Browser button failed", e);
-            }
-        }
     }
 }
