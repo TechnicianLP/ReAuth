@@ -5,7 +5,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import technicianlp.reauth.session.SessionHelper;
 
@@ -22,14 +22,14 @@ public final class OfflineLoginScreen extends AbstractScreen {
     public void init() {
         super.init();
 
-        this.username = new EditBox(this.font, this.centerX - BUTTON_WIDTH / 2, this.centerY - 5, BUTTON_WIDTH, 20, new TranslatableComponent("reauth.gui.auth.username"));
+        this.username = new EditBox(this.font, this.centerX - BUTTON_WIDTH / 2, this.centerY - 5, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.auth.username"));
         this.username.setMaxLength(16);
         this.addRenderableWidget(this.username);
         this.username.setFocus(true);
         this.setFocused(this.username);
         this.addRenderableWidget(this.username);
 
-        this.confirm = new Button(this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, new TranslatableComponent("reauth.gui.button.offline"), (b) -> this.performUsernameChange());
+        this.confirm = new Button(this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.button.username"), (b) -> this.performUsernameChange());
         this.addRenderableWidget(this.confirm);
     }
 
@@ -63,7 +63,9 @@ public final class OfflineLoginScreen extends AbstractScreen {
      * Closes the Screen if successful
      */
     private void performUsernameChange() {
-        SessionHelper.setOfflineUsername(this.username.getValue());
-        this.requestClose(true);
+        if (SessionHelper.isValidOfflineUsername(this.username.getValue())) {
+            SessionHelper.setOfflineUsername(this.username.getValue());
+            this.requestClose(true);
+        }
     }
 }

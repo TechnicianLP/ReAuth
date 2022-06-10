@@ -10,7 +10,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 abstract class AbstractScreen extends Screen {
 
@@ -26,7 +26,7 @@ abstract class AbstractScreen extends Screen {
     protected int screenHeight = 175;
 
     AbstractScreen(String title) {
-        super(new TranslatableComponent("reauth.gui.auth.title"));
+        super(Component.translatable("reauth.gui.auth.title"));
         this.title = title;
     }
 
@@ -40,7 +40,7 @@ abstract class AbstractScreen extends Screen {
         this.centerY = this.height / 2;
         this.baseY = this.centerY - this.screenHeight / 2;
 
-        Button cancel = new Button(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, new TranslatableComponent("reauth.gui.close"), (b) -> this.onClose());
+        Button cancel = new Button(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, Component.translatable("reauth.gui.close"), (b) -> this.onClose());
         this.addRenderableWidget(cancel);
     }
 

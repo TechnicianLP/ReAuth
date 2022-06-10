@@ -11,7 +11,7 @@ import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.resources.SplashManager;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.SessionData;
-import technicianlp.reauth.util.ReflectionHelper;
+import technicianlp.reauth.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
@@ -21,10 +21,10 @@ import java.util.regex.Pattern;
 
 public final class SessionHelper {
 
-    private static final Field userField = ReflectionHelper.findMcpField(Minecraft.class, "f_90998_");
-    private static final Field userApiServiceField = ReflectionHelper.findMcpField(Minecraft.class, "f_193584_");
-    private static final Field socialManagerField = ReflectionHelper.findMcpField(Minecraft.class, "f_91006_");
-    private static final Field splashesSessionField = ReflectionHelper.findMcpField(SplashManager.class, "f_118863_");
+    private static final Field userField = ReflectionUtils.findObfuscatedField(Minecraft.class, "f_90998_", "user");
+    private static final Field userApiServiceField = ReflectionUtils.findObfuscatedField(Minecraft.class, "f_193584_", "userApiService");
+    private static final Field socialManagerField = ReflectionUtils.findObfuscatedField(Minecraft.class, "f_91006_", "playerSocialManager");
+    private static final Field splashesSessionField = ReflectionUtils.findObfuscatedField(SplashManager.class, "f_118863_", "user");
 
     private static final Pattern usernamePattern = Pattern.compile("[A-Za-z0-9_]{2,16}");
 
@@ -55,9 +55,9 @@ public final class SessionHelper {
         try {
             Minecraft minecraft = Minecraft.getInstance();
 
-            User session = new User(data.username(), data.uuid(), data.accessToken(), Optional.empty(), Optional.empty(), User.Type.byName(data.type()));
+            User session = new User(data.username, data.uuid, data.accessToken, Optional.empty(), Optional.empty(), User.Type.byName(data.type));
 
-            ReflectionHelper.setField(userField, minecraft, session);
+            ReflectionUtils.setField(userField, minecraft, session);
             SessionChecker.invalidate();
 
             // Update things depending on the Session.
@@ -82,14 +82,14 @@ public final class SessionHelper {
             if (userApiService == null) {
                 userApiService = UserApiService.OFFLINE;
             }
-            ReflectionHelper.setField(userApiServiceField, minecraft, userApiService);
+            ReflectionUtils.setField(userApiServiceField, minecraft, userApiService);
 
             // Recreate FilterManager
             PlayerSocialManager socialManager = new PlayerSocialManager(minecraft, userApiService);
-            ReflectionHelper.setField(socialManagerField, minecraft, socialManager);
+            ReflectionUtils.setField(socialManagerField, minecraft, socialManager);
 
             // Update Splashes session
-            ReflectionHelper.setField(splashesSessionField, minecraft.getSplashManager(), session);
+            ReflectionUtils.setField(splashesSessionField, minecraft.getSplashManager(), session);
         } catch (Exception e) {
             ReAuth.log.error("Failed to update Session", e);
         }

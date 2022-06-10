@@ -5,8 +5,9 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import technicianlp.reauth.ReAuth;
+import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.authentication.flows.AuthorizationCodeFlow;
 import technicianlp.reauth.authentication.flows.DeviceCodeFlow;
 import technicianlp.reauth.authentication.flows.Flow;
@@ -17,32 +18,30 @@ import technicianlp.reauth.session.SessionHelper;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.BiFunction;
 
-/**
- * Please hold the line while this flow runs
- * - shows progress
- * - shows failure
- * - has back button
- */
 public final class FlowScreen extends AbstractScreen implements FlowCallback {
+
+    public static <F extends Flow, P> F open(BiFunction<P, FlowCallback, F> flowConstructor, P param, boolean keepParent) {
+        FlowScreen screen = new FlowScreen();
+        F flow = flowConstructor.apply(param, screen);
+        screen.flow = flow;
+        if (!keepParent) {
+            Minecraft.getInstance().popGuiLayer();
+        }
+        Minecraft.getInstance().pushGuiLayer(screen);
+        return flow;
+    }
 
     private Flow flow;
     private FlowStage stage = FlowStage.INITIAL;
     private String[] formatArgs = new String[0];
-    private boolean autoClose = true;
 
     public FlowScreen() {
         super("reauth.gui.title.flow");
-    }
-
-    public void setFlow(Flow flow) {
-        this.flow = flow;
-        flow.getSession().thenAccept(SessionHelper::setSession);
-        if (flow.hasProfile()) {
-            flow.getProfile().whenComplete(this::profileComplete);
-        }
     }
 
     @Override
@@ -56,7 +55,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         if (this.stage == FlowStage.MS_AWAIT_AUTH_CODE && this.flow instanceof AuthorizationCodeFlow) {
             try {
                 URL url = new URL(((AuthorizationCodeFlow) this.flow).getLoginUrl());
-                this.addRenderableWidget(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, new TranslatableComponent("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
+                this.addRenderableWidget(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, Component.translatable("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
             } catch (MalformedURLException e) {
                 ReAuth.log.error("Browser button failed", e);
             }
@@ -67,7 +66,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
                     String urlString = flow.getLoginUrl().join();
                     String code = flow.getCode().join();
                     URL url = new URL(urlString);
-                    this.addRenderableWidget(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, new TranslatableComponent("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
+                    this.addRenderableWidget(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, Component.translatable("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
                     this.formatArgs = new String[]{urlString, code};
                 }
             } catch (MalformedURLException e) {
@@ -105,23 +104,40 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         }
     }
 
-    private void profileComplete(Profile profile, Throwable throwable) {
+    @Override
+    public void removed() {
+        super.removed();
+        if (this.stage != FlowStage.FINISHED) {
+            this.flow.cancel();
+        }
+    }
+
+    @Override
+    public void onSessionComplete(SessionData session, Throwable throwable) {
+        if (throwable == null) {
+            SessionHelper.setSession(session);
+            ReAuth.log.info("Login complete");
+        } else {
+            if (throwable instanceof CancellationException || throwable.getCause() instanceof CancellationException) {
+                ReAuth.log.info("Login cancelled");
+            } else {
+                ReAuth.log.error("Login failed", throwable);
+            }
+        }
+    }
+
+    @Override
+    public void onProfileComplete(Profile profile, Throwable throwable) {
         if (throwable == null) {
             ReAuth.profiles.storeProfile(profile);
             ReAuth.log.info("Profile saved successfully");
         } else {
-            ReAuth.log.error("Profile failed to save", throwable);
+            if (throwable instanceof CancellationException || throwable.getCause() instanceof CancellationException) {
+                ReAuth.log.info("Profile saving cancelled");
+            } else {
+                ReAuth.log.error("Profile failed to save", throwable);
+            }
         }
-    }
-
-    public void disableAutoClose() {
-        this.autoClose = false;
-    }
-
-    @Override
-    public void removed() {
-        super.removed();
-        this.flow.cancel();
     }
 
     @Override
@@ -136,7 +152,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
             } catch (MalformedURLException e) {
                 ReAuth.log.error("Failed to open page", e);
             }
-        } else if (this.autoClose && newStage == FlowStage.FINISHED) {
+        } else if (newStage == FlowStage.FINISHED) {
             this.requestClose(true);
         }
     }

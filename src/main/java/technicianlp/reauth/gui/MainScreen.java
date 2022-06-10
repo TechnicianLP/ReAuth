@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.VersionChecker;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import technicianlp.reauth.ReAuth;
@@ -13,18 +12,6 @@ import technicianlp.reauth.configuration.Profile;
 
 import java.util.Map;
 
-/**
- * Selection screen for login method
- * <p>
- * Login with Xbox Live:
- * [Use This device] [Use other device]
- * Login with Mojang:
- * [login]
- * Play Offline:
- * [Choose Username]
- * <p>
- * - has back button (to multiplayer/prev screen)
- */
 public final class MainScreen extends AbstractScreen {
 
     private String message = null;
@@ -40,36 +27,24 @@ public final class MainScreen extends AbstractScreen {
         int buttonWidthH = BUTTON_WIDTH / 2;
         int y = this.centerY - 55;
 
-        SaveButton.ITooltip saveButtonTooltip = (button, matrixStack, mouseX, mouseY) -> this.renderTooltip(matrixStack, this.font.split(new TranslatableComponent("reauth.gui.button.save.tooltip"), 250), mouseX, mouseY);
-        SaveButton saveButton = new SaveButton(this.centerX - buttonWidthH, y + 70, new TranslatableComponent("reauth.gui.button.save"), saveButtonTooltip);
+        SaveButton.ITooltip saveButtonTooltip = (button, matrixStack, mouseX, mouseY) -> this.renderTooltip(matrixStack, this.font.split(Component.translatable("reauth.gui.button.save.tooltip"), 250), mouseX, mouseY);
+        SaveButton saveButton = new SaveButton(this.centerX - buttonWidthH, y + 70, Component.translatable("reauth.gui.button.save"), saveButtonTooltip);
         this.addRenderableWidget(saveButton);
 
         Profile profile = ReAuth.profiles.getProfile();
         if (profile != null) {
-            Component text = new TranslatableComponent("reauth.gui.profile", profile.getValue(Profile.NAME, "Steve"));
-            this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text, (b) -> {
-                FlowScreen screen = new FlowScreen();
-                screen.setFlow(Flows.loginWithProfile(profile, screen));
-                this.transitionScreen(screen);
-            }));
+            Component text = Component.translatable("reauth.gui.profile", profile.getValue(Profile.NAME, "Steve"));
+            this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text, (b) -> FlowScreen.open(Flows::loginWithProfile, profile, false)));
         } else {
-            Button profileButton = new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, new TranslatableComponent("reauth.gui.noProfile"), (b) -> {
+            Button profileButton = new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.noProfile"), (b) -> {
             });
             profileButton.active = false;
             this.addRenderableWidget(profileButton);
         }
 
-        this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20, new TranslatableComponent("This Device"), (b) -> {
-            FlowScreen screen = new FlowScreen();
-            screen.setFlow(Flows.loginWithAuthCode(saveButton.selected(), screen));
-            this.transitionScreen(screen);
-        }));
-        this.addRenderableWidget(new Button(this.centerX + 1, y + 45, buttonWidthH - 1, 20, new TranslatableComponent("Any Device"), (b) -> {
-            FlowScreen screen = new FlowScreen();
-            screen.setFlow(Flows.loginWithDeviceCode(saveButton.selected(), screen));
-            this.transitionScreen(screen);
-        }));
-        this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20, new TranslatableComponent("Choose Username"), (b) -> this.transitionScreen(new OfflineLoginScreen())));
+        this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20, Component.translatable("reauth.gui.button.authcode"), (b) -> FlowScreen.open(Flows::loginWithAuthCode, saveButton.selected(), false)));
+        this.addRenderableWidget(new Button(this.centerX + 1, y + 45, buttonWidthH - 1, 20, Component.translatable("reauth.gui.button.devicecode"), (b) -> FlowScreen.open(Flows::loginWithDeviceCode, saveButton.selected(), false)));
+        this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.button.offline"), (b) -> this.transitionScreen(new OfflineLoginScreen())));
 
 
         VersionChecker.CheckResult result = VersionChecker.getResult(ReAuth.modInfo);

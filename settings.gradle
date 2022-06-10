@@ -1,1 +1,8 @@
-rootProject.name='ReAuth Forge 1.18'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.minecraftforge.net/' }
+    }
+}
+
+rootProject.name='ReAuth Forge 1.19'
