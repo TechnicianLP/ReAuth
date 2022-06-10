@@ -3,8 +3,6 @@ package technicianlp.reauth.authentication;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
-import net.minecraft.client.network.NetHandlerLoginClient;
-import net.minecraft.network.login.server.S01PacketEncryptionRequest;
 import technicianlp.reauth.authentication.dto.yggdrasil.AuthenticateRequest;
 import technicianlp.reauth.authentication.dto.yggdrasil.AuthenticateResponse;
 import technicianlp.reauth.authentication.dto.yggdrasil.JoinServerRequest;
@@ -39,7 +37,7 @@ public final class YggdrasilAPI {
      * checks validity of accessToken by invoking the joinServer endpoint
      * <p>
      * reimplementation of {@link YggdrasilMinecraftSessionService#joinServer(GameProfile, String, String)}
-     * Server hash is generated like in {@link NetHandlerLoginClient#handleEncryptionRequest(S01PacketEncryptionRequest)}
+     * Server hash is generated like during standard login sequence
      */
     public static boolean validate(String accessToken, String uuid) throws UnreachableServiceException {
         String hash = new BigInteger(Crypto.randomBytes(20)).toString(16);

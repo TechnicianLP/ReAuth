@@ -76,7 +76,7 @@ abstract class FlowBase implements Flow {
 
     final void onProfileComplete(Profile profile, Throwable throwable) {
         if (throwable == null) {
-            if (this.getSession().isDone()) {
+            if (this.getSession().isDone() && !this.getSession().isCompletedExceptionally()) {
                 this.step(FlowStage.FINISHED);
             }
         }

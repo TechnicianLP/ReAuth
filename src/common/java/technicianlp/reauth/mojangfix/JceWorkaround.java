@@ -1,6 +1,7 @@
-package technicianlp.reauth.crypto;
+package technicianlp.reauth.mojangfix;
 
 import technicianlp.reauth.ReAuth;
+import technicianlp.reauth.crypto.CryptoException;
 import technicianlp.reauth.util.ReflectionUtils;
 
 import javax.crypto.Cipher;
@@ -9,16 +10,18 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PermissionCollection;
 import java.util.Map;
 
-public final class JceWorkaround {
+final class JceWorkaround {
 
     /**
      * check if CryptoAllPermission is in effect and try to remove Jce restrictions otherwise
      */
-    public static void ensureUnlimitedCryptography() {
+    static void ensureUnlimitedCryptography() {
         try {
             if (Cipher.getMaxAllowedKeyLength("AES") != Integer.MAX_VALUE) {
                 ReAuth.log.warn("Cryptography is restricted in this Java installation");
-                ReAuth.log.warn("Please complain to Mojang for shipping a 5 year old Java version");
+                if (!MojangJavaFix.java8) {
+                    ReAuth.log.warn("Cryptography is likely deliberately restricted!");
+                }
                 removeCryptographyRestrictions();
                 if (Cipher.getMaxAllowedKeyLength("AES") != Integer.MAX_VALUE) {
                     ReAuth.log.error("Failed to remove cryptography restriction");
@@ -38,7 +41,7 @@ public final class JceWorkaround {
      * Since update 151 (October 17, 2017) this restrictions can be disabled programmatically
      * and has since been disabled by default in update 161 (January 16, 2018).
      * <p>
-     * Since Mojang for some insane reason ships the 5 year old update 51 (July 14, 2015), installation of the policy files
+     * Since Mojang for some insane reason ships the 7 years old update 51 (July 14, 2015), installation of the policy files
      * would be necessary. Since installation of those files cannot be required of the user, a workaround has been found in
      * https://stackoverflow.com/questions/1179672 and is used to disable this restriction at runtime:
      * <p>

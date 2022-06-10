@@ -24,7 +24,7 @@ public final class MojangAuthenticationFlow extends FlowBase {
         this.registerDependantStages(this.session);
 
         if (save) {
-            CompletableFuture<ProfileEncryption> encryption = Crypto.newEncryption(this.executor);
+            CompletableFuture<ProfileEncryption> encryption = CompletableFuture.supplyAsync(Crypto::newEncryption, this.executor);
             CompletableFuture<ProfileBuilder> builder = this.session.thenCombine(encryption, ProfileBuilder::new);
             this.profile = builder.thenApply(b -> b.buildMojang(username, password));
         } else {
@@ -34,8 +34,8 @@ public final class MojangAuthenticationFlow extends FlowBase {
 
     public MojangAuthenticationFlow(Profile profile, FlowCallback callback) {
         super(callback);
-        this.step(FlowStage.CRYPTO_INIT);
-        CompletableFuture<ProfileEncryption> encryption = Crypto.getProfileEncryption(profile, callback);
+        CompletableFuture<Profile> profileFuture = CompletableFuture.completedFuture(profile);
+        CompletableFuture<ProfileEncryption> encryption = profileFuture.thenApplyAsync(this.wrapStep(FlowStage.CRYPTO_INIT, Crypto::getProfileEncryption), this.executor);
         CompletableFuture<String> usernameDec = encryption.thenCombineAsync(profile.get(Profile.USERNAME), ProfileEncryption::decryptFieldOne, this.executor);
         CompletableFuture<String> passwordDec = encryption.thenCombineAsync(profile.get(Profile.PASSWORD), ProfileEncryption::decryptFieldTwo, this.executor);
 

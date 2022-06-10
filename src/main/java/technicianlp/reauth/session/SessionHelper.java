@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public final class SessionHelper {
 
-    private static final Field sessionField = ReflectionUtils.findMcpField(Minecraft.class, "field_71449_j", "session");
+    private static final Field sessionField = ReflectionUtils.findObfuscatedField(Minecraft.class, "field_71449_j", "session");
 
     private static final Pattern usernamePattern = Pattern.compile("[A-Za-z0-9_]{2,16}");
 
