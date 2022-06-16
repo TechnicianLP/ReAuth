@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -23,12 +24,20 @@ public final class ReconnectHelper {
     private static final Field previousField = ReflectionUtils.findObfuscatedField(ConnectScreen.class, "f_95686_", "parent");
     private static ConnectScreen screen;
 
+    /**
+     * Extract the translationKey from the supplied {@link Component}
+     *
+     * @param nested whether to extract the key from the nested {@link Component} instead
+     */
     public static String getTranslationKey(Object component, boolean nested) {
         if (component instanceof MutableComponent mutableComponent) {
             ComponentContents contents = mutableComponent.getContents();
             if (contents instanceof TranslatableContents translatableContents) {
                 if (nested) {
-                    return getTranslationKey(translatableContents.getArgs()[0], false);
+                    Object[] args = translatableContents.getArgs();
+                    if (args.length >= 1) {
+                        return getTranslationKey(args[0], false);
+                    }
                 } else {
                     return translatableContents.getKey();
                 }
