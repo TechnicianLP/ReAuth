@@ -8,7 +8,6 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.network.NetworkConstants;
@@ -36,7 +35,7 @@ public final class ReAuth {
     public static final Config config;
     public static final ProfileList profiles;
 
-    public static final BiFunction<String, Object[], String> i18n = I18n::get;
+    public static final BiFunction<String, Object[], String> i18n;
 
     static {
         if (FMLEnvironment.dist == Dist.CLIENT) {
@@ -46,29 +45,28 @@ public final class ReAuth {
 
             config = new Config();
             profiles = config.getProfileList();
+            i18n = I18n::get;
         } else {
             config = null;
             profiles = null;
             executor = null;
+            i18n = null;
         }
     }
 
     public ReAuth() {
+        ModLoadingContext modLoadingContext = ModLoadingContext.get();
+        modLoadingContext.registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, config.getSpec(), "../reauth.toml");
-            modInfo = ModLoadingContext.get().getActiveContainer().getModInfo();
+            modLoadingContext.registerConfig(ModConfig.Type.CLIENT, config.getSpec(), "../reauth.toml");
+            modInfo = modLoadingContext.getActiveContainer().getModInfo();
         } else {
             log.warn("###############################");
             log.warn("# ReAuth was loaded on Server #");
             log.warn("#     Consider removing it    #");
             log.warn("###############################");
         }
-    }
-
-    @SubscribeEvent
-    public static void setup(FMLCommonSetupEvent event) {
-        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
-//        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (mc, sc) -> );
     }
 
     @SubscribeEvent
