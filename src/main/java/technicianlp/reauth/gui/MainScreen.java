@@ -9,6 +9,7 @@ import org.apache.maven.artifact.versioning.ComparableVersion;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.flows.Flows;
 import technicianlp.reauth.configuration.Profile;
+import technicianlp.reauth.configuration.ProfileConstants;
 
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public final class MainScreen extends AbstractScreen {
 
         Profile profile = ReAuth.profiles.getProfile();
         if (profile != null) {
-            Component text = Component.translatable("reauth.gui.profile", profile.getValue(Profile.NAME, "Steve"));
+            Component text = Component.translatable("reauth.gui.profile", profile.getValue(ProfileConstants.NAME, "Steve"));
             this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text, (b) -> FlowScreen.open(Flows::loginWithProfile, profile, false)));
         } else {
             Button profileButton = new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.noProfile"), (b) -> {

@@ -13,10 +13,10 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import technicianlp.reauth.configuration.Profile;
+import technicianlp.reauth.configuration.ProfileConstants;
 import technicianlp.reauth.gui.MainScreen;
 import technicianlp.reauth.session.SessionChecker;
 import technicianlp.reauth.session.SessionStatus;
@@ -30,7 +30,7 @@ public final class EventHandler {
     private static final Field disconnectMessage = ReflectionUtils.findObfuscatedField(DisconnectedScreen.class, "f_95988_", "reason");
 
     @SubscribeEvent
-    public static void onInitGui(ScreenEvent.InitScreenEvent.Post event) {
+    public static void onInitGui(ScreenEvent.Init.Post event) {
         Screen screen = event.getScreen();
         if (screen instanceof JoinMultiplayerScreen) {
             // Add Button to MultiplayerScreen
@@ -47,7 +47,7 @@ public final class EventHandler {
         }
     }
 
-    private static void handleDisconnectScreen(ScreenEvent.InitScreenEvent.Post event, Screen screen) {
+    private static void handleDisconnectScreen(ScreenEvent.Init.Post event, Screen screen) {
         if ("connect.failed".equals(ReconnectHelper.getTranslationKey(screen.getTitle(), false))) {
             if (ReconnectHelper.getTranslationKey(ReflectionUtils.getField(disconnectMessage, screen), true).startsWith("disconnect.loginFailed")) {
                 AbstractWidget menu = (AbstractWidget) event.getListenersList().get(0);
@@ -55,7 +55,7 @@ public final class EventHandler {
                 Profile profile = ReAuth.profiles.getProfile();
                 Component retryText;
                 if (profile != null) {
-                    retryText = Component.translatable("reauth.retry", profile.getValue(Profile.NAME, "Steve"));
+                    retryText = Component.translatable("reauth.retry", profile.getValue(ProfileConstants.NAME, "Steve"));
                 } else {
                     retryText = Component.translatable("reauth.retry.disabled");
                 }
@@ -73,7 +73,7 @@ public final class EventHandler {
     }
 
     @SubscribeEvent
-    public static void onDrawGui(ScreenEvent.DrawScreenEvent.Post e) {
+    public static void onDrawGui(ScreenEvent.Render.Post e) {
         if (e.getScreen() instanceof JoinMultiplayerScreen) {
             User user = Minecraft.getInstance().getUser();
             SessionStatus state = SessionChecker.getSessionStatus(user.getAccessToken(), user.getUuid());
@@ -85,7 +85,7 @@ public final class EventHandler {
      * No more IDs = No more checking for correct Button :(
      */
     @SubscribeEvent
-    public static void onOpenGui(ScreenOpenEvent e) {
+    public static void onOpenGui(ScreenEvent.Opening e) {
         if (e.getScreen() instanceof JoinMultiplayerScreen && Minecraft.getInstance().screen instanceof JoinMultiplayerScreen && Screen.hasShiftDown()) {
             SessionChecker.invalidate();
         }

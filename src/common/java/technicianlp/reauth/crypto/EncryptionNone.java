@@ -1,6 +1,7 @@
 package technicianlp.reauth.crypto;
 
 import technicianlp.reauth.configuration.Profile;
+import technicianlp.reauth.configuration.ProfileConstants;
 
 import java.util.Map;
 
@@ -28,7 +29,7 @@ final class EncryptionNone implements ProfileEncryption {
 
     @Override
     public final void saveToProfile(Map<String, String> profile) {
-        profile.put(Profile.KEY, Profile.KEY_NONE);
+        profile.put(ProfileConstants.KEY, ProfileConstants.KEY_NONE);
     }
 
     @Override

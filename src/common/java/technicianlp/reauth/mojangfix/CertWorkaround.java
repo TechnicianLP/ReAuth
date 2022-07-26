@@ -75,7 +75,7 @@ public final class CertWorkaround {
                 // no additional certificates required
                 return;
             } else {
-                ReAuth.log.warn("Certificates required for authentication are untrusted by default");
+                ReAuth.log.warn("Some Certificates required for authentication are untrusted by default");
             }
 
             X509ExtendedTrustManager defaultTrustManager = findX509ExtendedTrustManager(defaultTrust);
@@ -86,7 +86,7 @@ public final class CertWorkaround {
             context.init(null, new X509ExtendedTrustManager[]{combinedTrustManager}, null);
 
             CertWorkaround.socketFactory = context.getSocketFactory();
-            ReAuth.log.info("Successfully built SSLSocketFactory");
+            ReAuth.log.info("Successfully built SSLSocketFactory with required Certificates");
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }

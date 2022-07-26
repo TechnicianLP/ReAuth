@@ -41,7 +41,7 @@ sourceSets {
 sourceSets.main.resources { srcDir "src/generated/resources" }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19-41.0.16'
+    minecraft 'net.minecraftforge:forge:1.19-41.0.111'
     implementation "org.jetbrains:annotations:16.0.2"
 }
 

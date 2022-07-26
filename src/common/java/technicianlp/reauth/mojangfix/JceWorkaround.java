@@ -37,9 +37,9 @@ final class JceWorkaround {
     /**
      * Java had for legal reasons limited the allowed strength of cryptographic algorithms.
      * Historically to disable this restriction the so called "Java Cryptography Extension (JCE) Unlimited Strength
-     * Jurisdiction Policy Files" has to be installed within the JRE directory.
-     * Since update 151 (October 17, 2017) this restrictions can be disabled programmatically
-     * and has since been disabled by default in update 161 (January 16, 2018).
+     * Jurisdiction Policy Files" have to be installed within the JRE directory.
+     * Since update 151 (October 17, 2017) these restrictions can be disabled programmatically
+     * and have since been disabled by default in update 161 (January 16, 2018).
      * <p>
      * Since Mojang for some insane reason ships the 7 years old update 51 (July 14, 2015), installation of the policy files
      * would be necessary. Since installation of those files cannot be required of the user, a workaround has been found in

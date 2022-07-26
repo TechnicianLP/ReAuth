@@ -22,6 +22,6 @@ side = "CLIENT"
 [[dependencies.reauth]]
 modId = "forge"
 mandatory = true
-versionRange = "[36.2.9,)"
+versionRange = "[41.0.94,)"
 ordering = "NONE"
 side = "CLIENT"

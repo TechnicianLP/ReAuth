@@ -15,23 +15,23 @@ public final class ProfileBuilder {
 
     public ProfileBuilder(SessionData session, ProfileEncryption encryption) {
         this.encryption = encryption;
-        this.profile.put(Profile.NAME, session.username);
-        this.profile.put(Profile.UUID, session.uuid);
+        this.profile.put(ProfileConstants.NAME, session.username);
+        this.profile.put(ProfileConstants.UUID, session.uuid);
         encryption.saveToProfile(this.profile);
     }
 
     public final Profile buildMicrosoft(Tokens tokens) {
-        this.profile.put(Profile.PROFILE_TYPE, Profile.PROFILE_TYPE_MICROSOFT);
-        this.profile.put(Profile.XBL_TOKEN, this.encryption.encryptFieldOne(tokens.getXblToken()));
-        this.profile.put(Profile.REFRESH_TOKEN, this.encryption.encryptFieldTwo(tokens.getRefreshToken()));
+        this.profile.put(ProfileConstants.PROFILE_TYPE, ProfileConstants.PROFILE_TYPE_MICROSOFT);
+        this.profile.put(ProfileConstants.XBL_TOKEN, this.encryption.encryptFieldOne(tokens.getXblToken()));
+        this.profile.put(ProfileConstants.REFRESH_TOKEN, this.encryption.encryptFieldTwo(tokens.getRefreshToken()));
 
         return ReAuth.profiles.createProfile(this.profile);
     }
 
     public final Profile buildMojang(String username, String password) {
-        this.profile.put(Profile.PROFILE_TYPE, Profile.PROFILE_TYPE_MOJANG);
-        this.profile.put(Profile.USERNAME, this.encryption.encryptFieldOne(username));
-        this.profile.put(Profile.PASSWORD, this.encryption.encryptFieldTwo(password));
+        this.profile.put(ProfileConstants.PROFILE_TYPE, ProfileConstants.PROFILE_TYPE_MOJANG);
+        this.profile.put(ProfileConstants.USERNAME, this.encryption.encryptFieldOne(username));
+        this.profile.put(ProfileConstants.PASSWORD, this.encryption.encryptFieldTwo(password));
 
         return ReAuth.profiles.createProfile(this.profile);
     }

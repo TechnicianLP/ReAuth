@@ -50,8 +50,8 @@ public final class ProfileList {
             return null;
         }
         CommentedConfig config = list.get(0);
-        String profileType = config.getOrElse(Profile.PROFILE_TYPE, Profile.PROFILE_TYPE_NONE);
-        if (!Profile.PROFILE_TYPE_NONE.equals(profileType)) {
+        String profileType = config.getOrElse(ProfileConstants.PROFILE_TYPE, ProfileConstants.PROFILE_TYPE_NONE);
+        if (!ProfileConstants.PROFILE_TYPE_NONE.equals(profileType)) {
             return new Profile(config);
         } else {
             return null;
@@ -59,7 +59,7 @@ public final class ProfileList {
     }
 
     final Profile createProfile(Map<String, String> data) {
-        Map<String, String> orderedData = new TreeMap<>(new ProfileKeyComparator());
+        Map<String, String> orderedData = new TreeMap<>(ProfileConstants::compareProfileKeys);
         orderedData.putAll(data);
 
         CommentedConfig config = this.configSupplier.get();
@@ -98,7 +98,7 @@ public final class ProfileList {
 
     private CommentedConfig createPlaceholderConfig() {
         CommentedConfig config = this.configSupplier.get();
-        config.set(Profile.PROFILE_TYPE, Profile.PROFILE_TYPE_NONE);
+        config.set(ProfileConstants.PROFILE_TYPE, ProfileConstants.PROFILE_TYPE_NONE);
         return config;
     }
 
