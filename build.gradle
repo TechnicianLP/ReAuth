@@ -27,6 +27,13 @@ dependencies {
 	// You may need to force-disable transitiveness on them.
 }
 
+sourceSets {
+    main {
+        java.srcDirs += "src/common/java"
+        resources.srcDirs += "src/common/resources"
+    }
+}
+
 processResources {
 	inputs.property "version", project.version
 
