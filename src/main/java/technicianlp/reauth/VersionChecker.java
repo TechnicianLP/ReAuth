@@ -1,12 +1,6 @@
 package technicianlp.reauth;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.SharedConstants;
 import org.apache.commons.io.IOUtils;
@@ -15,14 +9,16 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class VersionChecker implements Runnable {
 
     private static final String MC_VERSION = SharedConstants.getGameVersion().getReleaseTarget();
-    private static final String JSON_URL = "https://github.com/TechnicianLP/ReAuth/raw/master/update.json";
-    private static final Type mapType = new TypeToken<Map<String, String>>() {}.getType();
+    private static final String JSON_URL = "https://github.com/NgoKimPhu/ReAuth/raw/master/update.json";
+    private static final Type mapType = new TypeToken<Map<String, String>>() {
+    }.getType();
 
     private Status status = Status.UNKNOWN;
     private String changes = null;
@@ -89,12 +85,8 @@ public final class VersionChecker implements Runnable {
     }
 
     private static int versionToInt(String version) {
-        String[] split = version.split("\\.", 3);
-        int ver = 0;
-        for (String s : split) {
-            ver = (ver << 8) | Integer.parseInt(s);
-        }
-        return ver;
+        return Arrays.stream(version.split("[.-]")).limit(3)
+                .mapToInt(Integer::parseInt).reduce(0, (ver, i) -> (ver << 8) | i);
     }
 
     private static class VersionJson {

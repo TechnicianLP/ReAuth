@@ -1,51 +1,39 @@
 package technicianlp.reauth.configuration;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.toml.TomlFormat;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Supplier;
 
 public final class ProfileList {
+    public static final String PROFILES_PATH = "profiles";
 
     private final Config configuration;
-    private final ForgeConfigSpec.ConfigValue<List<CommentedConfig>> profilesProperty;
+    private final List<CommentedConfig> profilesProperty;
 
-    private Supplier<CommentedConfig> configSupplier = TomlFormat::newConfig;
+    private final Supplier<CommentedConfig> configSupplier;
 
-    ProfileList(Config configuration, ForgeConfigSpec.Builder builder) {
+    ProfileList(Config configuration, CommentedConfig config) {
         this.configuration = configuration;
-        this.profilesProperty = builder
-                .comment("Saved Profiles. Check Documentation for Info & Syntax")
-                .define("profiles", this::createDefaultProfileList, this::validateProfileList);
-    }
-
-    final void updateConfig(ModConfig config) {
-        this.configSupplier = config.getConfigData()::createSubConfig;
-
-        List<CommentedConfig> list = new ArrayList<>(this.profilesProperty.get());
-        this.correctProfiles(list);
-        this.saveProfiles(list);
+        this.configSupplier = config::createSubConfig;
+        this.profilesProperty = config.getOrElse(PROFILES_PATH,
+                () -> config.set(PROFILES_PATH, new ArrayList<>()));
+        this.correctProfiles(this.profilesProperty);
+        this.saveProfiles();
     }
 
     public final void storeProfile(Profile profile) {
-        List<CommentedConfig> list = new ArrayList<>(this.profilesProperty.get());
+        List<CommentedConfig> list = this.profilesProperty;
         if (list.isEmpty()) {
             list.add(profile.getConfig());
-        } else {
+        } else { // TODO check this logic
             list.set(0, profile.getConfig());
         }
-        this.saveProfiles(list);
+        this.saveProfiles();
     }
 
     public final Profile getProfile() {
-        List<CommentedConfig> list = this.profilesProperty.get();
+        List<CommentedConfig> list = this.profilesProperty;
         if (list.isEmpty()) {
             return null;
         }
@@ -88,11 +76,11 @@ public final class ProfileList {
      * Save the list of Profiles to config
      * Add a dummy profile if the list is empty
      */
-    private void saveProfiles(List<CommentedConfig> list) {
+    private void saveProfiles() {
+        List<CommentedConfig> list = this.profilesProperty;
         if (list.isEmpty()) {
             list.add(this.createPlaceholderConfig());
         }
-        this.profilesProperty.set(list);
         this.configuration.save();
     }
 
@@ -110,8 +98,10 @@ public final class ProfileList {
     }
 
     /**
-     * checks whether the given Object is a {@link List} and all it's elements are an instance of {@link CommentedConfig}
-     * This effectively checks whether the provided {@link Object} is an Array of Tables as described by the TOML specification
+     * checks whether the given Object is a {@link List} and all it's elements are an instance of
+     * {@link CommentedConfig}
+     * This effectively checks whether the provided {@link Object} is an Array of Tables as described by the TOML
+     * specification
      */
     private boolean validateProfileList(Object el) {
         return el instanceof List && ((List<?>) el).stream().allMatch(CommentedConfig.class::isInstance);

@@ -56,6 +56,8 @@ public final class ReflectionUtils {
         }
     }
 
+    // TODO: use Mutator mixins?
+
     public static Field findObfuscatedField(Class<?> clz, String obfName, String name) {
         try {
             return findFieldInternal(clz, obfName);

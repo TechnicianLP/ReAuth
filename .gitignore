@@ -7,22 +7,21 @@ bin
 .project
 
 # idea
-out
+/.idea
+/out
 *.ipr
 *.iws
 *.iml
-.idea
 
 # gradle
-build
-.gradle
+/build
+/.gradle
+/gradle
+/gradlew
+/gradlew.bat
 
 # other
 eclipse
 run
 annotations
 logs
-scrapped
-
-# Files from Forge MDK
-forge*changelog.txt

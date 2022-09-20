@@ -1,20 +1,23 @@
 package technicianlp.reauth.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 abstract class AbstractScreen extends Screen {
 
     static final int BUTTON_WIDTH = 196;
+
+    private final Screen parent;
+
+    private final CompletableFuture<Boolean> closed = new CompletableFuture<>();
 
     private final String title;
 
@@ -26,64 +29,72 @@ abstract class AbstractScreen extends Screen {
     protected int screenHeight = 175;
 
     AbstractScreen(String title) {
-        super(Component.translatable("reauth.gui.auth.title"));
+        this(title, MinecraftClient.getInstance().currentScreen);
+    }
+
+    AbstractScreen(String title, Screen parent) {
+        super(Text.translatable(title));
         this.title = title;
+        this.parent = parent;
     }
 
     @Override
     public void init() {
         super.init();
-        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(true);
+        Objects.requireNonNull(this.client).keyboard.setRepeatEvents(true);
 
         this.centerX = this.width / 2;
         this.baseX = this.centerX - this.screenWidth / 2;
         this.centerY = this.height / 2;
         this.baseY = this.centerY - this.screenHeight / 2;
 
-        Button cancel = new Button(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, Component.translatable("reauth.gui.close"), (b) -> this.onClose());
-        this.addRenderableWidget(cancel);
+        ButtonWidget cancel = new ButtonWidget(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20,
+                Text.translatable("reauth.gui.close"), (b) -> this.close());
+        this.addDrawableChild(cancel);
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-        this.fillGradient(poseStack, 0, 0, this.width, this.height, 0xc0101010, 0xd0101010);
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        if (this.closed.isDone()) {
+            try {
+                this.requestClose(this.closed.get());
+            } catch (InterruptedException | ExecutionException e) {
+                this.requestClose(true);
+            }
+            return;
+        }
 
-        // modified renderDirtBackground(0);
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder bufferbuilder = tesselator.getBuilder();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.setShaderTexture(0, BACKGROUND_LOCATION);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        bufferbuilder.vertex(this.baseX, this.baseY + this.screenHeight, 0.0D).uv(0.0F, this.screenHeight / 32.0F).color(80, 80, 80, 255).endVertex();
-        bufferbuilder.vertex(this.baseX + this.screenWidth, this.baseY + this.screenHeight, 0.0D).uv(this.screenWidth / 32.0F, this.screenHeight / 32.0F).color(80, 80, 80, 255).endVertex();
-        bufferbuilder.vertex(this.baseX + this.screenWidth, this.baseY, 0.0D).uv(this.screenWidth / 32.0F, 0F).color(80, 80, 80, 255).endVertex();
-        bufferbuilder.vertex(this.baseX, this.baseY, 0.0D).uv(0.0F, 0F).color(80, 80, 80, 255).endVertex();
-        tesselator.end();
+        this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        super.render(poseStack, mouseX, mouseY, partialTicks);
-
-        this.font.drawShadow(poseStack, I18n.get(this.title), this.centerX - (BUTTON_WIDTH / 2f), this.baseY + 8, 0xFFFFFFFF);
+        AbstractScreen.drawCenteredText(matrixStack, this.textRenderer, I18n.translate(this.title),
+                this.centerX, this.baseY + 8, 0xFFFFFF);
     }
 
     protected final void transitionScreen(Screen newScreen) {
-        this.getMinecraft().popGuiLayer();
-        this.getMinecraft().pushGuiLayer(newScreen);
+        Objects.requireNonNull(this.client).setScreen(newScreen);
     }
 
     protected void requestClose(boolean completely) {
-        if (completely) {
-            super.onClose();
-        } else {
-            this.transitionScreen(new MainScreen());
+        if (!MinecraftClient.getInstance().isOnThread()) {
+            this.closed.complete(completely);
+            return;
         }
+
+        Screen parent = this.parent;
+        if (completely) {
+            while (parent instanceof AbstractScreen abstractScreen) {
+                parent = abstractScreen.parent;
+            }
+        }
+        transitionScreen(parent);
     }
 
     /**
      * Method called to request this Screen to close itself
      */
     @Override
-    public final void onClose() {
+    public final void close() {
         this.requestClose(false);
     }
 
@@ -93,6 +104,6 @@ abstract class AbstractScreen extends Screen {
     @Override
     public void removed() {
         super.removed();
-        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
+        Objects.requireNonNull(this.client).keyboard.setRepeatEvents(false);
     }
 }

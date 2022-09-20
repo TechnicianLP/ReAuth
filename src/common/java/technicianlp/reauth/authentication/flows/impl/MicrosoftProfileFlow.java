@@ -8,7 +8,6 @@ import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.FlowStage;
 import technicianlp.reauth.authentication.flows.Tokens;
 import technicianlp.reauth.authentication.flows.impl.util.Futures;
-import technicianlp.reauth.authentication.http.Response;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileBuilder;
 import technicianlp.reauth.configuration.ProfileConstants;
@@ -31,10 +30,10 @@ public final class MicrosoftProfileFlow extends FlowBase {
     private final CompletableFuture<Profile> profileFuture;
 
     /**
-     * tries to login using the stored accessToken.
+     * tries to log in using the stored accessToken.
      * When authentication fails due to an expired token, the stored refreshToken is used to acquire a new accessToken followed by a second login attempt
      *
-     * @see XboxAuthenticationFlow#isExpiredToken(Response, Throwable)
+     * @see XboxAuthenticationFlow#hasExpiredTokenError()
      */
     public MicrosoftProfileFlow(Profile profile, FlowCallback callback) {
         super(callback);

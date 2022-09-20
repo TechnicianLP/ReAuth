@@ -1,12 +1,12 @@
 pluginManagement {
     repositories {
-        jcenter()
         maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
         }
+        mavenCentral()
         gradlePluginPortal()
     }
 }
 
-rootProject.name='ReAuth Fabric 1.16'
+rootProject.name='ReAuth Fabric 1.19.2'
