@@ -17,12 +17,13 @@ public final class ProfileList {
         this.configuration = configuration;
         this.configSupplier = config::createSubConfig;
         this.profilesProperty = config.getOrElse(PROFILES_PATH,
-                () -> config.set(PROFILES_PATH, new ArrayList<>()));
-        this.correctProfiles(this.profilesProperty);
+            () -> config.set(PROFILES_PATH, new ArrayList<>()));
+        config.setComment(PROFILES_PATH, "Saved Profiles. Check Documentation for Info & Syntax");
+        correctProfiles(this.profilesProperty);
         this.saveProfiles();
     }
 
-    public final void storeProfile(Profile profile) {
+    public void storeProfile(Profile profile) {
         List<CommentedConfig> list = this.profilesProperty;
         if (list.isEmpty()) {
             list.add(profile.getConfig());
@@ -32,21 +33,21 @@ public final class ProfileList {
         this.saveProfiles();
     }
 
-    public final Profile getProfile() {
+    public Profile getProfile() {
         List<CommentedConfig> list = this.profilesProperty;
         if (list.isEmpty()) {
             return null;
         }
         CommentedConfig config = list.get(0);
         String profileType = config.getOrElse(ProfileConstants.PROFILE_TYPE, ProfileConstants.PROFILE_TYPE_NONE);
-        if (!ProfileConstants.PROFILE_TYPE_NONE.equals(profileType)) {
-            return new Profile(config);
-        } else {
+        if (ProfileConstants.PROFILE_TYPE_NONE.equals(profileType)) {
             return null;
+        } else {
+            return new Profile(config);
         }
     }
 
-    final Profile createProfile(Map<String, String> data) {
+    Profile createProfile(Map<String, String> data) {
         Map<String, String> orderedData = new TreeMap<>(ProfileConstants::compareProfileKeys);
         orderedData.putAll(data);
 
@@ -56,7 +57,7 @@ public final class ProfileList {
         return new Profile(config);
     }
 
-    private void correctProfiles(List<CommentedConfig> profileList) {
+    private static void correctProfiles(Collection<CommentedConfig> profileList) {
         for (CommentedConfig profile : profileList) {
             Iterator<? extends CommentedConfig.Entry> iterator;
             for (iterator = profile.entrySet().iterator(); iterator.hasNext(); ) {
@@ -73,8 +74,7 @@ public final class ProfileList {
     }
 
     /**
-     * Save the list of Profiles to config
-     * Add a dummy profile if the list is empty
+     * Save the list of Profiles to config Add a dummy profile if the list is empty
      */
     private void saveProfiles() {
         List<CommentedConfig> list = this.profilesProperty;
@@ -90,20 +90,4 @@ public final class ProfileList {
         return config;
     }
 
-
-    private List<CommentedConfig> createDefaultProfileList() {
-        List<CommentedConfig> list = new ArrayList<>();
-        list.add(this.createPlaceholderConfig());
-        return list;
-    }
-
-    /**
-     * checks whether the given Object is a {@link List} and all it's elements are an instance of
-     * {@link CommentedConfig}
-     * This effectively checks whether the provided {@link Object} is an Array of Tables as described by the TOML
-     * specification
-     */
-    private boolean validateProfileList(Object el) {
-        return el instanceof List && ((List<?>) el).stream().allMatch(CommentedConfig.class::isInstance);
-    }
 }

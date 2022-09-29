@@ -6,7 +6,8 @@ import technicianlp.reauth.authentication.http.UnreachableServiceException;
 
 import java.util.concurrent.CompletableFuture;
 
-public final class SessionChecker {
+public enum SessionChecker {
+    ;
 
     /**
      * Time for which the Validity gets cached (5 Minutes)
@@ -17,15 +18,15 @@ public final class SessionChecker {
      * Current cached Session Validity
      */
     private static SessionStatus status = SessionStatus.UNKNOWN;
-    private static long lastCheck = 0;
+    private static long lastCheck;
 
     /**
-     * Get the cached Validity Status of the accessToken
-     * Re-Validation is done if the cache expires
+     * Get the cached Validity Status of the accessToken Re-Validation is done if the cache expires
      */
     public static SessionStatus getSessionStatus(String token, String uuid) {
-        if (lastCheck + cacheTime < System.currentTimeMillis())
+        if (lastCheck + cacheTime < System.currentTimeMillis()) {
             status = SessionStatus.UNKNOWN;
+        }
 
         if (status == SessionStatus.UNKNOWN) {
             status = SessionStatus.REFRESHING;
@@ -34,7 +35,7 @@ public final class SessionChecker {
             CompletableFuture<String> tokenFuture = CompletableFuture.completedFuture(token);
             CompletableFuture<String> uuidFuture = CompletableFuture.completedFuture(uuid);
             tokenFuture.thenCombineAsync(uuidFuture, SessionChecker::getSessionStatus0, ReAuth.executor)
-                    .thenAccept(SessionChecker::setStatus);
+                .thenAccept(SessionChecker::setStatus);
         }
         return status;
     }
@@ -53,6 +54,6 @@ public final class SessionChecker {
     }
 
     private static void setStatus(SessionStatus newStatus) {
-        SessionChecker.status = newStatus;
+        status = newStatus;
     }
 }

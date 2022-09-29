@@ -9,11 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Request Payload for the /token Endpoint of the Microsoft Identity Platform.
- * Payload is used for redeeming the code received in the auth code grant flow.
+ * Request Payload for the /token Endpoint of the Microsoft Identity Platform. Payload is used for redeeming the code
+ * received in the auth code grant flow.
  *
  * @see <a href=https://wiki.vg/Microsoft_Authentication_Scheme>Microsoft Authentication Scheme on wiki.vg</a>
- * @see <a href=https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow>Microsoft Auth Code Flow</a>
+ * @see <a href=https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow>Microsoft Auth
+ * Code Flow</a>
  */
 public final class MicrosoftAuthCodeRequest implements RequestObject.Form<MicrosoftAuthResponse> {
 
@@ -32,12 +33,12 @@ public final class MicrosoftAuthCodeRequest implements RequestObject.Form<Micros
     }
 
     @Override
-    public final Class<MicrosoftAuthResponse> getResponseClass() {
+    public Class<MicrosoftAuthResponse> getResponseClass() {
         return MicrosoftAuthResponse.class;
     }
 
     @Override
-    public final Map<String, String> getFields() {
+    public Map<String, String> getFields() {
         return this.fields;
     }
 }

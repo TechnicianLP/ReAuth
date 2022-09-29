@@ -9,26 +9,26 @@ import java.util.concurrent.CompletableFuture;
 
 public final class UnknownProfileFlow extends FlowBase {
 
-    private final CompletableFuture<SessionData> future;
+    private final CompletableFuture<SessionData> sessionFuture;
 
     public UnknownProfileFlow(FlowCallback callback) {
         super(callback);
-        this.future = Futures.failed(new IllegalArgumentException("Unknown Profile Type"));
-        this.future.whenComplete(this::onSessionComplete);
+        this.sessionFuture = Futures.failed(new IllegalArgumentException("Unknown Profile Type"));
+        this.sessionFuture.whenComplete(this::onSessionComplete);
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
-        return this.future;
+    public CompletableFuture<SessionData> getSessionFuture() {
+        return this.sessionFuture;
     }
 
     @Override
-    public final boolean hasProfile() {
+    public boolean hasProfile() {
         return false;
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfileFuture() {
         throw new IllegalStateException("Profile creation not supported");
     }
 }

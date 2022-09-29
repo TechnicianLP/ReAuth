@@ -8,8 +8,9 @@ import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
 
 /**
- * Functional interface that allows a method reference to throw {@link UnreachableServiceException} or {@link InvalidResponseException}.
- * Thrown Exceptions will be wrapped with a {@link CompletionException} for use with {@link CompletableFuture}.
+ * Functional interface that allows a method reference to throw {@link UnreachableServiceException} or
+ * {@link InvalidResponseException}. Thrown Exceptions will be wrapped with a {@link CompletionException} for use with
+ * {@link CompletableFuture}.
  */
 @FunctionalInterface
 public interface AuthSupplier<T> extends Supplier<T> {

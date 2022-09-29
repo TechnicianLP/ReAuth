@@ -2,39 +2,26 @@ package technicianlp.reauth.mojangfix;
 
 import technicianlp.reauth.ReAuth;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLContextSpi;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509ExtendedTrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public final class CertWorkaround {
+public enum CertWorkaround {
+    ;
 
     private static final String MICROSOFT2017 = "microsoftrsarootcertificateauthority2017";
     private static final String AMAZON1 = "amazonrootca1";
     private static final String DIGICERT2 = "digicertglobalrootg2";
 
-    private static SSLSocketFactory socketFactory = null;
+    private static SSLSocketFactory socketFactory;
 
     public static SSLSocketFactory getSocketFactory() {
         return socketFactory;
@@ -44,10 +31,8 @@ public final class CertWorkaround {
      * The default truststore is missing some CA-Certificates required during authentication with Microsoft/XBox/Mojang
      * because Mojang for some insane reason ships the 7 years old Java 8 Update 51 (July 14, 2015).
      * <p>
-     * The following Certificates are installed if they are missing:
-     * - Microsoft RSA Root Certificate Authority 2017
-     * - DigiCert Global Root G2
-     * - Amazon Root CA 1
+     * The following Certificates are installed if they are missing: - Microsoft RSA Root Certificate Authority 2017 -
+     * DigiCert Global Root G2 - Amazon Root CA 1
      */
     static void checkCertificates() {
         try {
@@ -56,7 +41,8 @@ public final class CertWorkaround {
             X509Certificate amazon1 = loadCertificate(cf, AMAZON1);
             X509Certificate digicert2 = loadCertificate(cf, DIGICERT2);
 
-            TrustManagerFactory defaultTrust = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            TrustManagerFactory defaultTrust =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             defaultTrust.init((KeyStore) null);
 
             List<X509Certificate> trustedCerts = getTrustedCerts(defaultTrust);
@@ -79,20 +65,23 @@ public final class CertWorkaround {
             }
 
             X509ExtendedTrustManager defaultTrustManager = findX509ExtendedTrustManager(defaultTrust);
-            X509ExtendedTrustManager missingTrustManager = findX509ExtendedTrustManager(createTrustFactory(missingCerts));
-            X509ExtendedTrustManager combinedTrustManager = new CombinedX509ExtendedTrustManager(defaultTrustManager, missingTrustManager);
+            X509ExtendedTrustManager missingTrustManager =
+                findX509ExtendedTrustManager(createTrustFactory(missingCerts));
+            X509ExtendedTrustManager combinedTrustManager =
+                new CombinedX509ExtendedTrustManager(defaultTrustManager, missingTrustManager);
 
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, new X509ExtendedTrustManager[]{combinedTrustManager}, null);
 
-            CertWorkaround.socketFactory = context.getSocketFactory();
+            socketFactory = context.getSocketFactory();
             ReAuth.log.info("Successfully built SSLSocketFactory with required Certificates");
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static X509Certificate loadCertificate(CertificateFactory certFactory, String name) throws CertificateException, IOException {
+    private static X509Certificate loadCertificate(CertificateFactory certFactory, String name) throws
+        CertificateException, IOException {
         try (InputStream is = CertWorkaround.class.getResourceAsStream("/resources/reauth/certs/" + name + ".pem")) {
             if (is != null) {
                 return (X509Certificate) certFactory.generateCertificate(is);
@@ -111,7 +100,8 @@ public final class CertWorkaround {
         }
     }
 
-    private static TrustManagerFactory createTrustFactory(Map<String, X509Certificate> certificates) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+    private static TrustManagerFactory createTrustFactory(Map<String, X509Certificate> certificates) throws
+        GeneralSecurityException, IOException {
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(null);
         for (Map.Entry<String, X509Certificate> certificate : certificates.entrySet()) {
@@ -125,15 +115,15 @@ public final class CertWorkaround {
 
     private static X509ExtendedTrustManager findX509ExtendedTrustManager(TrustManagerFactory trustManagerFactory) {
         return Arrays.stream(trustManagerFactory.getTrustManagers())
-                .filter(X509ExtendedTrustManager.class::isInstance)
-                .map(X509ExtendedTrustManager.class::cast)
-                .findFirst()
-                .orElse(null);
+            .filter(X509ExtendedTrustManager.class::isInstance)
+            .map(X509ExtendedTrustManager.class::cast)
+            .findFirst()
+            .orElse(null);
     }
 
     /**
-     * required in order to combine multiple TrustManagers.
-     * The default Implementation of {@link SSLContextSpi} only considers the first {@link X509TrustManager}
+     * required in order to combine multiple TrustManagers. The default Implementation of {@link SSLContextSpi} only
+     * considers the first {@link X509TrustManager}
      */
     private static final class CombinedX509ExtendedTrustManager extends X509ExtendedTrustManager {
 
@@ -150,22 +140,26 @@ public final class CertWorkaround {
         }
 
         @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) throws
+            CertificateException {
             this.check(tm -> tm.checkClientTrusted(chain, authType, socket));
         }
 
         @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
+        public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) throws
+            CertificateException {
             this.check(tm -> tm.checkServerTrusted(chain, authType, socket));
         }
 
         @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) throws
+            CertificateException {
             this.check(tm -> tm.checkClientTrusted(chain, authType, engine));
         }
 
         @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine) throws CertificateException {
+        public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine) throws
+            CertificateException {
             this.check(tm -> tm.checkServerTrusted(chain, authType, engine));
         }
 
@@ -181,7 +175,8 @@ public final class CertWorkaround {
 
         @Override
         public X509Certificate[] getAcceptedIssuers() {
-            return this.trustManagers.stream().map(X509TrustManager::getAcceptedIssuers).flatMap(Arrays::stream).toArray(X509Certificate[]::new);
+            return this.trustManagers.stream().map(X509TrustManager::getAcceptedIssuers).flatMap(Arrays::stream)
+                .toArray(X509Certificate[]::new);
         }
 
         /**

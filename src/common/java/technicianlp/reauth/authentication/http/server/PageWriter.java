@@ -19,25 +19,27 @@ final class PageWriter {
         this.loginUrl = loginUrl;
     }
 
-    final ByteBuffer createSuccessResponsePage() throws IOException {
-        String successMessage = this.formatAndEscape("reauth.msauth.code.success");
-        String closeMessage = this.formatAndEscape("reauth.msauth.code.success.close");
-        return this.createPage(successMessage, closeMessage);
+    static ByteBuffer createSuccessResponsePage() throws IOException {
+        String successMessage = formatAndEscape("reauth.msauth.code.success");
+        String closeMessage = formatAndEscape("reauth.msauth.code.success.close");
+        return createPage(successMessage, closeMessage);
     }
 
-    final ByteBuffer createErrorResponsePage(String errorCode) throws IOException {
-        String errorMessage = this.formatAndEscape(this.getErrorMessage(errorCode));
-        String retryMessage = this.createLink(this.formatAndEscape("reauth.msauth.code.retry"), this.loginUrl);
-        return this.createPage(errorMessage, retryMessage);
+    ByteBuffer createErrorResponsePage(String errorCode) throws IOException {
+        String errorMessage = formatAndEscape(getErrorMessage(errorCode));
+        String retryMessage =
+            createLink(formatAndEscape("reauth.msauth.code.retry"), this.loginUrl);
+        return createPage(errorMessage, retryMessage);
     }
 
-    final ByteBuffer createHttpErrorResponsePage(HttpStatus error) throws IOException {
-        String errorMessage = this.formatAndEscape("reauth.msauth.code.error.http" + error.code);
-        String retryMessage = this.createLink(this.formatAndEscape("reauth.msauth.code.retry"), this.loginUrl);
-        return this.createPage(errorMessage, retryMessage);
+    ByteBuffer createHttpErrorResponsePage(HttpStatus error) throws IOException {
+        String errorMessage = formatAndEscape("reauth.msauth.code.error.http." + error.code);
+        String retryMessage =
+            createLink(formatAndEscape("reauth.msauth.code.retry"), this.loginUrl);
+        return createPage(errorMessage, retryMessage);
     }
 
-    private ByteBuffer createPage(String text1, String text2) throws IOException {
+    private static ByteBuffer createPage(String text1, String text2) throws IOException {
         try (InputStream is = AuthenticationCodeServer.class.getResourceAsStream("/resources/reauth/reauth.html")) {
             if (is != null) {
                 String page = IOUtils.toString(is, StandardCharsets.UTF_8);
@@ -51,25 +53,20 @@ final class PageWriter {
         }
     }
 
-    private String createLink(String content, String href) {
+    private static String createLink(String content, String href) {
         return "<a href=" + href + ">" + content + "</a>";
     }
 
-    private String getErrorMessage(String authError) {
-        String type = "unknown";
-        switch (authError) {
-            case "access_denied":
-                type = "cancelled";
-                break;
-            case "server_error":
-            case "temporarily_unavailable":
-                type = "server";
-                break;
-        }
+    private static String getErrorMessage(String authError) {
+        String type = switch (authError) {
+            case "access_denied" -> "cancelled";
+            case "server_error", "temporarily_unavailable" -> "server";
+            default -> "unknown";
+        };
         return "reauth.msauth.code.fail." + type;
     }
 
-    private String formatAndEscape(String key, Object... arguments) {
+    private static String formatAndEscape(String key, Object... arguments) {
         String text = ReAuth.i18n.apply(key, arguments);
         text = text.replaceAll("&", "&amp;");
         text = text.replaceAll("<", "&lt;");

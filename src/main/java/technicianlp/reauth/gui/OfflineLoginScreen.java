@@ -25,24 +25,24 @@ public final class OfflineLoginScreen extends AbstractScreen {
         super.init();
 
         this.username = new TextFieldWidget(this.textRenderer, this.centerX - BUTTON_WIDTH / 2, this.centerY - 5,
-                BUTTON_WIDTH, 20, Text.translatable("reauth.gui.auth.username"));
+            BUTTON_WIDTH, 20, Text.translatable("reauth.gui.auth.username"));
         this.username.setMaxLength(16);
         this.username.setTextFieldFocused(true);
         this.username.setText(Objects.requireNonNull(this.client).getSession().getUsername());
         this.addSelectableChild(this.username);
         this.setInitialFocus(this.username);
 
-        this.confirm = new ButtonWidget(this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42,
-                BUTTON_WIDTH, 20, Text.translatable("reauth.gui.button.username"), (b) -> this.performUsernameChange());
+        this.confirm = new ButtonWidget(this.centerX - BUTTON_WIDTH / 2, this.baseY + screenHeight - 42,
+            BUTTON_WIDTH, 20, Text.translatable("reauth.gui.button.username"), button -> this.performUsernameChange());
         this.addDrawableChild(this.confirm);
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.username.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.textRenderer.drawWithShadow(matrixStack, I18n.translate("reauth.gui.auth.username"),
-                this.centerX - (BUTTON_WIDTH / 2f), this.centerY - 15, 0xFFFFFFFF);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        this.username.render(matrices, mouseX, mouseY, delta);
+        this.textRenderer.drawWithShadow(matrices, I18n.translate("reauth.gui.auth.username"),
+            this.centerX - (BUTTON_WIDTH / 2f), this.centerY - 15, 0xFFFFFFFF);
     }
 
     @Override
@@ -52,7 +52,7 @@ public final class OfflineLoginScreen extends AbstractScreen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int p_keyPressed_2_, int p_keyPressed_3_) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
             Element focus = this.getFocused();
             if (focus == this.username) {
@@ -60,12 +60,11 @@ public final class OfflineLoginScreen extends AbstractScreen {
                 return true;
             }
         }
-        return super.keyPressed(keyCode, p_keyPressed_2_, p_keyPressed_3_);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     /**
-     * Calls the to do the Login and handles Errors
-     * Closes the Screen if successful
+     * Calls the to do the Login and handles Errors Closes the Screen if successful
      */
     private void performUsernameChange() {
         if (SessionHelper.isValidOfflineUsername(this.username.getText())) {

@@ -24,8 +24,8 @@ public final class ReAuth implements ClientModInitializer {
     public static final VersionChecker versionCheck = new VersionChecker();
     public static final Config config = new Config();
     public static ProfileList profiles;
-    public static BiFunction<String, Object[], String> i18n = I18n::translate;
-    public static ModContainer container = FabricLoader.getInstance().getModContainer("reauth").orElse(null);
+    public static final BiFunction<String, Object[], String> i18n = I18n::translate;
+    public static final ModContainer container = FabricLoader.getInstance().getModContainer("reauth").orElse(null);
 
     @Override
     public void onInitializeClient() {
@@ -40,12 +40,15 @@ public final class ReAuth implements ClientModInitializer {
         private final ThreadGroup group = new ThreadGroup("ReAuth");
 
         @Override
-        public Thread newThread(@NotNull Runnable runnable) {
+        public Thread newThread(
+            @SuppressWarnings("ParameterNameDiffersFromOverriddenParameter") @NotNull Runnable runnable) {
             Thread t = new Thread(this.group, runnable, "ReAuth-" + this.threadNumber.getAndIncrement());
-            if (t.isDaemon())
+            if (t.isDaemon()) {
                 t.setDaemon(false);
-            if (t.getPriority() != Thread.NORM_PRIORITY)
+            }
+            if (t.getPriority() != Thread.NORM_PRIORITY) {
                 t.setPriority(Thread.NORM_PRIORITY);
+            }
             return t;
         }
     }

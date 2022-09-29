@@ -24,7 +24,7 @@ public final class JoinServerRequest implements RequestObject.JSON<JoinServerRes
     }
 
     @Override
-    public final Class<JoinServerResponse> getResponseClass() {
+    public Class<JoinServerResponse> getResponseClass() {
         return JoinServerResponse.class;
     }
 }

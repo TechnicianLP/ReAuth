@@ -22,7 +22,7 @@ public final class XboxLiveAuthRequest implements RequestObject.JSON<XboxAuthRes
     }
 
     @Override
-    public final Class<XboxAuthResponse> getResponseClass() {
+    public Class<XboxAuthResponse> getResponseClass() {
         return XboxAuthResponse.class;
     }
 
@@ -31,8 +31,9 @@ public final class XboxLiveAuthRequest implements RequestObject.JSON<XboxAuthRes
      */
     public static final class Serializer implements JsonSerializer<XboxLiveAuthRequest> {
 
+        @SuppressWarnings("ParameterNameDiffersFromOverriddenParameter")
         @Override
-        public final JsonElement serialize(XboxLiveAuthRequest src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(XboxLiveAuthRequest src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject properties = new JsonObject();
             properties.addProperty("AuthMethod", "RPS");
             properties.addProperty("SiteName", "user.auth.xboxlive.com");

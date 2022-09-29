@@ -18,13 +18,14 @@ import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-public final class ReconnectHelper {
+public enum ReconnectHelper {
+    ;
 
     private static final Field managerField = ReflectionUtils.findObfuscatedField(ConnectScreen.class, "f_95684_",
-            "connection");
+        "connection");
     private static final Field previousField = ReflectionUtils.findObfuscatedField(ConnectScreen.class, "f_95686_",
-            "parent");
-    private static ConnectScreen screen;
+        "parent");
+    private static ConnectScreen connectScreen;
 
     /**
      * Extract the translationKey from the supplied {@link Text}
@@ -34,26 +35,26 @@ public final class ReconnectHelper {
     public static String getTranslationKey(Object component, boolean nested) {
         if (component instanceof MutableText mutableText) {
             TextContent contents = mutableText.getContent();
-            if (contents instanceof TranslatableTextContent translatableTextContent) {
+            if (contents instanceof TranslatableTextContent translatable) {
                 if (nested) {
-                    Object[] args = translatableTextContent.getArgs();
+                    Object[] args = translatable.getArgs();
                     if (args.length >= 1) {
                         return getTranslationKey(args[0], false);
                     }
                 } else {
-                    return translatableTextContent.getKey();
+                    return translatable.getKey();
                 }
             }
         }
         return "";
     }
 
-    public static void setConnectScreen(ConnectScreen screen) {
-        ReconnectHelper.screen = screen;
+    public static void setConnectScreen(ConnectScreen connectScreen) {
+        ReconnectHelper.connectScreen = connectScreen;
     }
 
     public static boolean hasConnectionInfo() {
-        return screen != null;
+        return connectScreen != null;
     }
 
     public static void retryLogin(Profile profile) {
@@ -62,13 +63,13 @@ public final class ReconnectHelper {
     }
 
     private static void connect() {
-        if (screen != null) {
-            SocketAddress add = ReflectionUtils.<ClientConnection>getField(managerField, screen).getAddress();
+        if (connectScreen != null) {
+            SocketAddress add = ReflectionUtils.<ClientConnection>getField(managerField, connectScreen).getAddress();
             if (add instanceof InetSocketAddress address) {
                 MinecraftClient minecraft = MinecraftClient.getInstance();
                 ServerAddress server = new ServerAddress(address.getHostString(), address.getPort());
-                ConnectScreen.connect(ReflectionUtils.getField(previousField, screen), minecraft, server,
-                        minecraft.getCurrentServerEntry());
+                ConnectScreen.connect(ReflectionUtils.getField(previousField, connectScreen), minecraft, server,
+                    minecraft.getCurrentServerEntry());
             }
         }
     }

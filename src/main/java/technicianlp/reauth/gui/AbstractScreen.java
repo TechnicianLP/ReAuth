@@ -3,7 +3,6 @@ package technicianlp.reauth.gui;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
@@ -19,14 +18,12 @@ abstract class AbstractScreen extends Screen {
 
     private final CompletableFuture<Boolean> closed = new CompletableFuture<>();
 
-    private final String title;
-
     protected int baseX;
     protected int centerX;
     protected int baseY;
     protected int centerY;
-    protected int screenWidth = 300;
-    protected int screenHeight = 175;
+    protected static final int screenWidth = 300;
+    protected static final int screenHeight = 175;
 
     AbstractScreen(String title) {
         this(title, MinecraftClient.getInstance().currentScreen);
@@ -34,7 +31,6 @@ abstract class AbstractScreen extends Screen {
 
     AbstractScreen(String title, Screen parent) {
         super(Text.translatable(title));
-        this.title = title;
         this.parent = parent;
     }
 
@@ -44,17 +40,17 @@ abstract class AbstractScreen extends Screen {
         Objects.requireNonNull(this.client).keyboard.setRepeatEvents(true);
 
         this.centerX = this.width / 2;
-        this.baseX = this.centerX - this.screenWidth / 2;
+        this.baseX = this.centerX - screenWidth / 2;
         this.centerY = this.height / 2;
-        this.baseY = this.centerY - this.screenHeight / 2;
+        this.baseY = this.centerY - screenHeight / 2;
 
-        ButtonWidget cancel = new ButtonWidget(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20,
-                Text.translatable("reauth.gui.close"), (b) -> this.close());
+        ButtonWidget cancel = new ButtonWidget(this.centerX + screenWidth / 2 - 22, this.baseY + 2, 20, 20,
+            Text.translatable("reauth.gui.close"), button -> this.close());
         this.addDrawableChild(cancel);
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (this.closed.isDone()) {
             try {
                 this.requestClose(this.closed.get());
@@ -64,11 +60,10 @@ abstract class AbstractScreen extends Screen {
             return;
         }
 
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
 
-        AbstractScreen.drawCenteredText(matrixStack, this.textRenderer, I18n.translate(this.title),
-                this.centerX, this.baseY + 8, 0xFFFFFF);
+        drawCenteredText(matrices, this.textRenderer, this.title, this.centerX, this.baseY + 8, 0xFFFFFF);
     }
 
     protected final void transitionScreen(Screen newScreen) {
@@ -87,7 +82,7 @@ abstract class AbstractScreen extends Screen {
                 parent = abstractScreen.parent;
             }
         }
-        transitionScreen(parent);
+        this.transitionScreen(parent);
     }
 
     /**

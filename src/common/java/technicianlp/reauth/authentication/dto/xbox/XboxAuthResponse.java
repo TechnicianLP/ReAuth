@@ -1,21 +1,13 @@
 package technicianlp.reauth.authentication.dto.xbox;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import org.jetbrains.annotations.Nullable;
+import com.google.gson.*;
 import technicianlp.reauth.authentication.dto.ResponseObject;
 
 import java.lang.reflect.Type;
 
 /**
- * Response Payload for:
- * the /user/authenticate Endpoint of the Xbox Live user service<br>
- * the /xsts/authorize Endpoint of the Xbox Live xsts service<br>
+ * Response Payload for: the /user/authenticate Endpoint of the Xbox Live user service<br> the /xsts/authorize Endpoint
+ * of the Xbox Live xsts service<br>
  * <br>
  * Only relevant fields are deserialized
  *
@@ -29,7 +21,7 @@ public final class XboxAuthResponse implements ResponseObject {
     public final String userHash;
 
     // Error Handling
-    public final @Nullable String error;
+    public final String error;
 
     private XboxAuthResponse(String validUntil, String token, String userHash, String error) {
         this.validUntil = validUntil;
@@ -39,16 +31,16 @@ public final class XboxAuthResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
+    public boolean isValid() {
         return this.error == null && this.validUntil != null && this.token != null && this.userHash != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public String getError() {
         return this.error;
     }
 
-    public final String getToken() {
+    public String getToken() {
         return this.token;
     }
 
@@ -58,15 +50,18 @@ public final class XboxAuthResponse implements ResponseObject {
     public static final class Deserializer implements JsonDeserializer<XboxAuthResponse> {
 
         @Override
-        public final XboxAuthResponse deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public XboxAuthResponse deserialize(JsonElement jsonElement, Type type,
+                                            @SuppressWarnings("ParameterNameDiffersFromOverriddenParameter")
+                                            JsonDeserializationContext context) throws
+            JsonParseException {
             try {
-                JsonObject root = json.getAsJsonObject();
+                JsonObject root = jsonElement.getAsJsonObject();
 
-                String validUntil = this.getString(root, "NotAfter");
-                String token = this.getString(root, "Token");
-                String userHash = this.extractUserHash(root.getAsJsonObject("DisplayClaims"));
+                String validUntil = getString(root, "NotAfter");
+                String token = getString(root, "Token");
+                String userHash = extractUserHash(root.getAsJsonObject("DisplayClaims"));
 
-                String error = this.getString(root, "XErr");
+                String error = getString(root, "XErr");
 
                 return new XboxAuthResponse(validUntil, token, userHash, error);
             } catch (IllegalStateException | ClassCastException e) {
@@ -74,7 +69,7 @@ public final class XboxAuthResponse implements ResponseObject {
             }
         }
 
-        private String getString(JsonObject root, String name) {
+        private static String getString(JsonObject root, String name) {
             JsonPrimitive primitive = root.getAsJsonPrimitive(name);
             if (primitive != null) {
                 return primitive.getAsString();
@@ -83,7 +78,7 @@ public final class XboxAuthResponse implements ResponseObject {
             }
         }
 
-        private String extractUserHash(JsonObject displayClaims) {
+        private static String extractUserHash(JsonObject displayClaims) {
             if (displayClaims != null) {
                 JsonArray xui = displayClaims.getAsJsonArray("xui");
                 if (xui != null) {

@@ -12,19 +12,19 @@ import java.util.Locale;
 
 final class ResourcesHandler extends Handler {
 
-    ResourcesHandler(PageWriter writer) {
-        super(writer);
+    ResourcesHandler(PageWriter pageWriter) {
+        super(pageWriter);
     }
 
     @Override
-    public final void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) throws IOException {
         try {
             String method = exchange.getRequestMethod().toUpperCase(Locale.ROOT);
 
             Response response;
-            if (method.equals("GET") || method.equals("HEAD")) {
-                response = this.handleResourceGet(exchange.getRequestURI().getPath());
-            } else if (method.equals("POST")) {
+            if ("GET".equals(method) || "HEAD".equals(method)) {
+                response = handleResourceGet(exchange.getRequestURI().getPath());
+            } else if ("POST".equals(method)) {
                 response = new Response(HttpStatus.Method_Not_Allowed).setHeader("Allow", "GET, HEAD");
             } else {
                 response = new Response(HttpStatus.Not_Implemented);
@@ -37,7 +37,7 @@ final class ResourcesHandler extends Handler {
         }
     }
 
-    private Response handleResourceGet(String path) throws IOException {
+    private static Response handleResourceGet(String path) throws IOException {
         String contentType = null;
         String resource = null;
         if ("/res/icon.png".equals(path)) {

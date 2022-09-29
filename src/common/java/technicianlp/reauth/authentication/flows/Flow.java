@@ -10,7 +10,7 @@ public interface Flow {
 
     void cancel();
 
-    CompletableFuture<SessionData> getSession();
+    CompletableFuture<SessionData> getSessionFuture();
 
     boolean hasProfile();
 
@@ -19,15 +19,15 @@ public interface Flow {
      *
      * @throws IllegalStateException if a profile cannot be created
      */
-    CompletableFuture<Profile> getProfile();
+    CompletableFuture<Profile> getProfileFuture();
 
-    default void thenRunAsync(Runnable runnable, Executor executor) {
+    default void thenRunAsync(Runnable action, Executor executor) {
         CompletableFuture<?> target;
-        if (!this.hasProfile()) {
-            target = this.getSession();
+        if (this.hasProfile()) {
+            target = CompletableFuture.allOf(this.getSessionFuture(), this.getProfileFuture());
         } else {
-            target = CompletableFuture.allOf(this.getSession(), this.getProfile());
+            target = this.getSessionFuture();
         }
-        target.thenRunAsync(runnable, executor);
+        target.thenRunAsync(action, executor);
     }
 }

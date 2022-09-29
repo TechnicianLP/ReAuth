@@ -8,16 +8,16 @@ public final class SaveButton extends CheckboxWidget {
 
     private final ITooltip tooltip;
 
-    public SaveButton(int x, int y, Text title, ITooltip tooltip) {
-        super(x, y, 20, 20, title, false);
+    public SaveButton(int x, int y, Text message, ITooltip tooltip) {
+        super(x, y, 20, 20, message, false);
         this.tooltip = tooltip;
     }
 
     @Override
-    public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.renderButton(matrices, mouseX, mouseY, delta);
         if (this.isHovered()) {
-            this.tooltip.onTooltip(this, matrixStack, mouseX, mouseY);
+            this.tooltip.onTooltip(this, matrices, mouseX, mouseY);
         }
     }
 

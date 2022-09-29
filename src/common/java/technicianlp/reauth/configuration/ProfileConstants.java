@@ -2,10 +2,10 @@ package technicianlp.reauth.configuration;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public final class ProfileConstants {
+public enum ProfileConstants {
+    ;
 
     // profile type
     public static final String PROFILE_TYPE = "type";
@@ -35,19 +35,15 @@ public final class ProfileConstants {
      * Used to provide consistent ordering for config entries.
      */
     private static final List<String> propertyOrder = ImmutableList.of(
-            ProfileConstants.PROFILE_TYPE,
-            ProfileConstants.NAME,
-            ProfileConstants.UUID,
-            ProfileConstants.USERNAME,
-            ProfileConstants.XBL_TOKEN,
-            ProfileConstants.PASSWORD,
-            ProfileConstants.REFRESH_TOKEN,
-            ProfileConstants.KEY,
-            ProfileConstants.SALT);
-
-    static List<String> getOrderedProfileKeys() {
-        return new ArrayList<>(propertyOrder);
-    }
+        PROFILE_TYPE,
+        NAME,
+        UUID,
+        USERNAME,
+        XBL_TOKEN,
+        PASSWORD,
+        REFRESH_TOKEN,
+        KEY,
+        SALT);
 
     static int compareProfileKeys(String key1, String key2) {
         if (key1.equals(key2)) {

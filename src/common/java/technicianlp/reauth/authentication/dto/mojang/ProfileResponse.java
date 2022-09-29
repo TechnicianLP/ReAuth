@@ -1,7 +1,6 @@
 package technicianlp.reauth.authentication.dto.mojang;
 
 import com.google.gson.annotations.SerializedName;
-import org.jetbrains.annotations.Nullable;
 import technicianlp.reauth.authentication.dto.ResponseObject;
 
 /**
@@ -21,7 +20,7 @@ public final class ProfileResponse implements ResponseObject {
 
     // Error Handling
     @SerializedName("error")
-    public final @Nullable String error;
+    public final String error;
 
     private ProfileResponse() {
         this.uuid = null;
@@ -30,12 +29,12 @@ public final class ProfileResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
+    public boolean isValid() {
         return this.error == null && this.uuid != null && this.name != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public String getError() {
         return this.error;
     }
 }

@@ -20,14 +20,16 @@ public final class MojangAuthenticationFlow extends FlowBase {
 
     public MojangAuthenticationFlow(String username, String password, boolean save, FlowCallback callback) {
         super(callback);
-        this.session = CompletableFuture.supplyAsync(this.wrapStep(FlowStage.YGG_AUTH, () -> YggdrasilAPI.login(username, password)), this.executor);
+        this.session = CompletableFuture.supplyAsync(
+            this.wrapStep(FlowStage.YGG_AUTH, () -> YggdrasilAPI.login(username, password)), this.executor);
         this.session.whenComplete(this::onSessionComplete);
         this.registerDependantStages(this.session);
 
         if (save) {
-            CompletableFuture<ProfileEncryption> encryption = CompletableFuture.supplyAsync(Crypto::newEncryption, this.executor);
-            CompletableFuture<ProfileBuilder> builder = this.session.thenCombine(encryption, ProfileBuilder::new);
-            this.profile = builder.thenApply(b -> b.buildMojang(username, password));
+            CompletableFuture<ProfileEncryption> encryption =
+                CompletableFuture.supplyAsync(Crypto::newEncryption, this.executor);
+            CompletableFuture<ProfileBuilder> builderFuture = this.session.thenCombine(encryption, ProfileBuilder::new);
+            this.profile = builderFuture.thenApply(builder -> builder.buildMojang(username, password));
         } else {
             this.profile = null;
         }
@@ -36,11 +38,18 @@ public final class MojangAuthenticationFlow extends FlowBase {
     public MojangAuthenticationFlow(Profile profile, FlowCallback callback) {
         super(callback);
         CompletableFuture<Profile> profileFuture = CompletableFuture.completedFuture(profile);
-        CompletableFuture<ProfileEncryption> encryption = profileFuture.thenApplyAsync(this.wrapStep(FlowStage.CRYPTO_INIT, Crypto::getProfileEncryption), this.executor);
-        CompletableFuture<String> usernameDec = encryption.thenCombineAsync(profile.get(ProfileConstants.USERNAME), ProfileEncryption::decryptFieldOne, this.executor);
-        CompletableFuture<String> passwordDec = encryption.thenCombineAsync(profile.get(ProfileConstants.PASSWORD), ProfileEncryption::decryptFieldTwo, this.executor);
+        CompletableFuture<ProfileEncryption> encryption =
+            profileFuture.thenApplyAsync(this.wrapStep(FlowStage.CRYPTO_INIT, Crypto::getProfileEncryption),
+                this.executor);
+        CompletableFuture<String> usernameDec =
+            encryption.thenCombineAsync(profile.get(ProfileConstants.USERNAME), ProfileEncryption::decryptFieldOne,
+                this.executor);
+        CompletableFuture<String> passwordDec =
+            encryption.thenCombineAsync(profile.get(ProfileConstants.PASSWORD), ProfileEncryption::decryptFieldTwo,
+                this.executor);
 
-        this.session = usernameDec.thenCombineAsync(passwordDec, this.wrapStep(FlowStage.YGG_AUTH, YggdrasilAPI::login), this.executor);
+        this.session = usernameDec.thenCombineAsync(passwordDec, this.wrapStep(FlowStage.YGG_AUTH, YggdrasilAPI::login),
+            this.executor);
         this.registerDependantStages(encryption, usernameDec, passwordDec, this.session);
 
         this.profile = CompletableFuture.completedFuture(profile);
@@ -48,17 +57,17 @@ public final class MojangAuthenticationFlow extends FlowBase {
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
+    public CompletableFuture<SessionData> getSessionFuture() {
         return this.session;
     }
 
     @Override
-    public final boolean hasProfile() {
+    public boolean hasProfile() {
         return this.profile != null;
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfileFuture() {
         if (this.profile != null) {
             return this.profile;
         } else {

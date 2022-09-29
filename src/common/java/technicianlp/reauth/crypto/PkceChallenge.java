@@ -30,11 +30,11 @@ public final class PkceChallenge {
         }
     }
 
-    public final String getChallenge() {
+    public String getChallenge() {
         return this.challenge;
     }
 
-    public final String getVerifier() {
+    public String getVerifier() {
         return this.verifier;
     }
 }

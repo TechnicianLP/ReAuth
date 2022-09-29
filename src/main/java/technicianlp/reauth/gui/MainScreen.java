@@ -13,10 +13,10 @@ import technicianlp.reauth.configuration.ProfileConstants;
 
 public final class MainScreen extends AbstractScreen {
 
-    private String message = null;
+    private String message;
 
-    public MainScreen(Screen screen) {
-        super("reauth.gui.title.main", screen);
+    public MainScreen(Screen parent) {
+        super("reauth.gui.title.main", parent);
     }
 
     @Override
@@ -27,35 +27,35 @@ public final class MainScreen extends AbstractScreen {
         int y = this.centerY - 55;
 
         SaveButton.ITooltip saveButtonTooltip =
-                (button, matrixStack, mouseX, mouseY) -> this.renderOrderedTooltip(matrixStack,
-                        this.textRenderer.wrapLines(Text.translatable("reauth.gui.button.save.tooltip"), 250),
-                        mouseX, mouseY);
+            (button, matrixStack, mouseX, mouseY) -> this.renderOrderedTooltip(matrixStack,
+                this.textRenderer.wrapLines(Text.translatable("reauth.gui.button.save.tooltip"), 250),
+                mouseX, mouseY);
         SaveButton saveButton = new SaveButton(this.centerX - buttonWidthH, y + 70,
-                Text.translatable("reauth.gui.button.save"), saveButtonTooltip);
+            Text.translatable("reauth.gui.button.save"), saveButtonTooltip);
         this.addDrawableChild(saveButton);
 
         Profile profile = ReAuth.profiles.getProfile();
         if (profile != null) {
             Text text = Text.translatable("reauth.gui.profile", profile.getValue(ProfileConstants.NAME, "Steve"));
             this.addDrawableChild(new ButtonWidget(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text,
-                    (b) -> FlowScreen.open(Flows::loginWithProfile, profile)));
+                button -> FlowScreen.open(Flows::loginWithProfile, profile)));
         } else {
             ButtonWidget profileButton = new ButtonWidget(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20,
-                    Text.translatable("reauth.gui.noProfile"), (b) -> {
+                Text.translatable("reauth.gui.noProfile"), button -> {
             });
             profileButton.active = false;
             this.addDrawableChild(profileButton);
         }
 
         this.addDrawableChild(new ButtonWidget(this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20,
-                Text.translatable("reauth.gui.button.authcode"), (b) -> FlowScreen.open(Flows::loginWithAuthCode,
-                saveButton.isChecked())));
+            Text.translatable("reauth.gui.button.authcode"), button -> FlowScreen.open(Flows::loginWithAuthCode,
+            saveButton.isChecked())));
         this.addDrawableChild(new ButtonWidget(this.centerX + 1, y + 45, buttonWidthH - 1, 20, Text.translatable(
-                "reauth.gui.button.devicecode"), (b) -> FlowScreen.open(Flows::loginWithDeviceCode,
-                saveButton.isChecked())));
+            "reauth.gui.button.devicecode"), button -> FlowScreen.open(Flows::loginWithDeviceCode,
+            saveButton.isChecked())));
         this.addDrawableChild(new ButtonWidget(this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20,
-                Text.translatable("reauth.gui.button.offline"),
-                (b) -> this.transitionScreen(new OfflineLoginScreen())));
+            Text.translatable("reauth.gui.button.offline"),
+            button -> this.transitionScreen(new OfflineLoginScreen())));
 
 
         VersionChecker.Status result = ReAuth.versionCheck.getStatus();
@@ -69,19 +69,19 @@ public final class MainScreen extends AbstractScreen {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
 
         int x = this.centerX - BUTTON_WIDTH / 2;
-        this.textRenderer.drawWithShadow(matrixStack, I18n.translate("reauth.gui.text.profile"),
-                x, this.centerY - 55, 0xA0A0A0);
-        this.textRenderer.drawWithShadow(matrixStack, I18n.translate("reauth.gui.text.microsoft"),
-                x, this.centerY - 20, 0xA0A0A0);
-        this.textRenderer.drawWithShadow(matrixStack, I18n.translate("reauth.gui.text.offline"),
-                x, this.centerY + 40, 0xA0A0A0);
+        this.textRenderer.drawWithShadow(matrices, I18n.translate("reauth.gui.text.profile"),
+            x, this.centerY - 55, 0xA0A0A0);
+        this.textRenderer.drawWithShadow(matrices, I18n.translate("reauth.gui.text.microsoft"),
+            x, this.centerY - 20, 0xA0A0A0);
+        this.textRenderer.drawWithShadow(matrices, I18n.translate("reauth.gui.text.offline"),
+            x, this.centerY + 40, 0xA0A0A0);
 
         if (this.message != null) {
-            this.textRenderer.drawWithShadow(matrixStack, this.message, x, this.baseY + 20, 0xFFFFFFFF);
+            this.textRenderer.drawWithShadow(matrices, this.message, x, this.baseY + 20, 0xFFFFFFFF);
         }
     }
 

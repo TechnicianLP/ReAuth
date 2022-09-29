@@ -24,10 +24,11 @@ import technicianlp.reauth.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public final class EventHandler {
+public enum EventHandler {
+    ;
 
     private static final Field disconnectMessage = ReflectionUtils.findObfuscatedField(DisconnectedScreen.class,
-            "f_95988_", "reason");
+        "f_95988_", "reason");
 
     public static void register() {
         ScreenEvents.AFTER_INIT.register(EventHandler::afterInit);
@@ -38,12 +39,12 @@ public final class EventHandler {
         if (screen instanceof MultiplayerScreen) {
             // Add Button to MultiplayerScreen
             Screens.getButtons(screen).add(new ButtonWidget(5, 5, 100, 20,
-                    Text.translatable("reauth.gui.button"), b -> openAuthenticationScreen(screen)));
+                Text.translatable("reauth.gui.button"), button -> openAuthenticationScreen(screen)));
             ScreenEvents.afterRender(screen).register(EventHandler::afterRender);
         } else if (screen instanceof TitleScreen) {
             // Support for Custom Main Menu (add button outside of viewport)
             Screens.getButtons(screen).add(new ButtonWidget(-50, -50, 20, 20,
-                    Text.translatable("reauth.gui.button"), b -> openAuthenticationScreen(screen)));
+                Text.translatable("reauth.gui.button"), button -> openAuthenticationScreen(screen)));
         } else if (screen instanceof DisconnectedScreen) {
             // Add Buttons to DisconnectedScreen if its reason is an invalid session
             handleDisconnectScreen(screen);
@@ -56,7 +57,7 @@ public final class EventHandler {
     private static void handleDisconnectScreen(Screen screen) {
         if ("connect.failed".equals(ReconnectHelper.getTranslationKey(screen.getTitle(), false))) {
             if (ReconnectHelper.getTranslationKey(ReflectionUtils.getField(disconnectMessage, screen), true)
-                    .startsWith("disconnect.loginFailed")) {
+                .startsWith("disconnect.loginFailed")) {
                 List<ClickableWidget> buttons = Screens.getButtons(screen);
                 ClickableWidget menu = buttons.get(0);
 
@@ -64,13 +65,13 @@ public final class EventHandler {
                 Text retryText;
                 if (profile != null) {
                     retryText = Text.translatable("reauth.retry", profile.getValue(ProfileConstants.NAME,
-                            "Steve"));
+                        "Steve"));
                 } else {
                     retryText = Text.translatable("reauth.retry.disabled");
                 }
                 ButtonWidget retryButton = new ButtonWidget(menu.x, menu.y + 25, 200, 20, retryText,
-                        b -> ReconnectHelper
-                                .retryLogin(profile));
+                    button -> ReconnectHelper
+                        .retryLogin(profile));
                 if (profile == null || !ReconnectHelper.hasConnectionInfo()) {
                     retryButton.active = false;
                 }
@@ -89,15 +90,15 @@ public final class EventHandler {
             Session session = client.getSession();
             SessionStatus state = SessionChecker.getSessionStatus(session.getAccessToken(), session.getUuid());
             Screens.getTextRenderer(screen).drawWithShadow(matrices, I18n.translate(state.getTranslationKey()),
-                    110, 10,
-                    0xFFFFFFFF);
+                110, 10,
+                0xFFFFFFFF);
         }
     }
 
     // TODO: add refresh on clicking status
     public static void beforeInit(MinecraftClient client, Screen screen, int scaledWidth, int scaledHeight) {
         if (screen instanceof MultiplayerScreen && MinecraftClient.getInstance().currentScreen instanceof
-                MultiplayerScreen && Screen.hasShiftDown()) {
+            MultiplayerScreen && Screen.hasShiftDown()) {
             SessionChecker.invalidate();
         }
     }

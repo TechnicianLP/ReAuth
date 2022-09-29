@@ -33,37 +33,36 @@ abstract class FlowBase implements Flow {
     }
 
     /**
-     * Register dependant {@link CompletionStage} for cancellation handling.
-     * Every major stage should be registered for handling as cancelling a completed stage does no propagate to its dependants.
+     * Register dependant {@link CompletionStage} for cancellation handling. Every major stage should be registered for
+     * handling as cancelling a completed stage does not propagate to its dependants.
      */
     final void registerDependantStages(CompletableFuture<?>... stages) {
         Collections.addAll(this.stages, stages);
     }
 
     /**
-     * Register a dependant {@link FlowBase} for cancellation handling.
-     * Used to handle potential cleanup operations as the flows stages should already have been cancelled
+     * Register a dependant {@link FlowBase} for cancellation handling. Used to handle potential cleanup operations as
+     * the flows stages should already have been cancelled
      */
     final void registerDependantFlow(FlowBase flow) {
-        this.stages.add(flow.getSession());
+        this.stages.add(flow.getSessionFuture());
         this.flows.add(flow);
     }
 
     /**
-     * Cancel the flow and its dependants.
-     * Cancels registered dependant stages in order.
-     * Requests cancellation of dependant flows.
+     * Cancel the flow and its dependants. Cancels registered dependant stages in order. Requests cancellation of
+     * dependant flows.
      */
     @Override
     public void cancel() {
         this.stages.forEach(stage -> stage.cancel(true));
         this.flows.forEach(FlowBase::cancel);
-        this.getSession().cancel(true);
+        this.getSessionFuture().cancel(true);
     }
 
-    final void onSessionComplete(SessionData data, Throwable throwable) {
+    final void onSessionComplete(SessionData session, Throwable throwable) {
         if (throwable == null) {
-            if (this.hasProfile() && !this.getProfile().isDone()) {
+            if (this.hasProfile() && !this.getProfileFuture().isDone()) {
                 this.step(FlowStage.PROFILE);
             } else {
                 this.step(FlowStage.FINISHED);
@@ -71,40 +70,40 @@ abstract class FlowBase implements Flow {
         } else {
             this.step(FlowStage.FAILED);
         }
-        this.callback.onSessionComplete(data, throwable);
+        this.callback.onSessionComplete(session, throwable);
     }
 
     final void onProfileComplete(Profile profile, Throwable throwable) {
         if (throwable == null) {
-            if (this.getSession().isDone() && !this.getSession().isCompletedExceptionally()) {
+            if (this.getSessionFuture().isDone() && !this.getSessionFuture().isCompletedExceptionally()) {
                 this.step(FlowStage.FINISHED);
             }
         }
         this.callback.onProfileComplete(profile, throwable);
     }
 
-    final <T, U, R> BiFunction<T, U, R> wrapStep(FlowStage stage, AuthBiFunction<T, U, R> step) {
+    final <T, U, R> BiFunction<T, U, R> wrapStep(FlowStage stage, AuthBiFunction<T, ? super U, ? extends R> step) {
         return (t, u) -> {
             this.step(stage);
             return step.apply(t, u);
         };
     }
 
-    final <T, R> Function<T, R> wrapStep(FlowStage stage, AuthFunction<T, R> step) {
+    final <T, R> Function<T, R> wrapStep(FlowStage stage, AuthFunction<? super T, ? extends R> step) {
         return (t) -> {
             this.step(stage);
             return step.apply(t);
         };
     }
 
-    final <T> Supplier<T> wrapStep(FlowStage stage, AuthSupplier<T> step) {
+    final <T> Supplier<T> wrapStep(FlowStage stage, AuthSupplier<? extends T> step) {
         return () -> {
             this.step(stage);
             return step.get();
         };
     }
 
-    final <T, R> Function<T, R> wrap(AuthFunction<T, R> step) {
+    static <T, R> Function<T, R> wrap(AuthFunction<T, R> step) {
         return step;
     }
 

@@ -23,37 +23,42 @@ final class XboxAuthenticationFlow extends FlowBase {
     private final CompletableFuture<SessionData> session;
     private final CompletableFuture<Response<XboxAuthResponse>> xstsAuthResponse;
 
-    public XboxAuthenticationFlow(CompletableFuture<String> xblToken, FlowCallback callback) {
+    XboxAuthenticationFlow(CompletableFuture<String> xblToken, FlowCallback callback) {
         super(callback);
 
-        this.xstsAuthResponse = xblToken.thenApplyAsync(this.wrapStep(FlowStage.MS_AUTH_XSTS, MsAuthAPI::authenticateXSTS), this.executor);
-        CompletableFuture<XboxAuthResponse> xsts = this.xstsAuthResponse.thenApply(this.wrap(Response::get));
-        CompletableFuture<MojangAuthResponse> mojang = xsts.thenApplyAsync(this.wrapStep(FlowStage.MS_AUTH_MOJANG, this::authenticateMojang), this.executor);
+        this.xstsAuthResponse =
+            xblToken.thenApplyAsync(this.wrapStep(FlowStage.MS_AUTH_XSTS, MsAuthAPI::authenticateXSTS), this.executor);
+        CompletableFuture<XboxAuthResponse> xsts = this.xstsAuthResponse.thenApply(FlowBase.wrap(Response::get));
+        CompletableFuture<MojangAuthResponse> mojang =
+            xsts.thenApplyAsync(this.wrapStep(FlowStage.MS_AUTH_MOJANG, XboxAuthenticationFlow::authenticateMojang),
+                this.executor);
         CompletableFuture<String> token = mojang.thenApply(MojangAuthResponse::getToken);
-        CompletableFuture<ProfileResponse> profile = token.thenApplyAsync(this.wrapStep(FlowStage.MS_FETCH_PROFILE, MsAuthAPI::fetchProfile), this.executor);
-        this.session = token.thenCombine(profile, this::makeSession);
+        CompletableFuture<ProfileResponse> profile =
+            token.thenApplyAsync(this.wrapStep(FlowStage.MS_FETCH_PROFILE, MsAuthAPI::fetchProfile), this.executor);
+        this.session = token.thenCombine(profile, XboxAuthenticationFlow::makeSession);
 
         this.registerDependantStages(this.xstsAuthResponse, xsts, mojang, profile, this.session);
     }
 
-    private MojangAuthResponse authenticateMojang(XboxAuthResponse xsts) throws UnreachableServiceException, InvalidResponseException {
+    private static MojangAuthResponse authenticateMojang(XboxAuthResponse xsts) throws UnreachableServiceException,
+        InvalidResponseException {
         return MsAuthAPI.authenticateMojang(xsts.token, xsts.userHash);
     }
 
-    private SessionData makeSession(String token, ProfileResponse profile) {
+    private static SessionData makeSession(String token, ProfileResponse profile) {
         return new SessionData(profile.name, profile.uuid, token, "msa");
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
+    public CompletableFuture<SessionData> getSessionFuture() {
         return this.session;
     }
 
     /**
-     * checks whether the passed response contains an error caused expired/invalid XASU-Token.
-     * If a valid response is passed or the request failed with an exception false is returned.
+     * checks whether the passed response contains an error caused expired/invalid XASU-Token. If a valid response is
+     * passed or the request failed with an exception false is returned.
      */
-    final boolean hasExpiredTokenError() {
+    boolean hasExpiredTokenError() {
         if (!this.xstsAuthResponse.isDone()) {
             ReAuth.log.warn("Cant determine token expiration on unfinished request");
             return false;
@@ -65,7 +70,7 @@ final class XboxAuthenticationFlow extends FlowBase {
         if (response.isValid()) {
             return false;
         }
-        XboxAuthResponse rawResponse = response.getUnchecked();
+        XboxAuthResponse rawResponse = response.getResponse();
         if (rawResponse != null) {
             return XSTS_ERR_TOKEN_EXPIRED.equals(rawResponse.error) || XSTS_ERR_TOKEN_INVALID.equals(rawResponse.error);
         }
@@ -73,12 +78,12 @@ final class XboxAuthenticationFlow extends FlowBase {
     }
 
     @Override
-    public final boolean hasProfile() {
+    public boolean hasProfile() {
         return false;
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfileFuture() {
         throw new IllegalStateException("Profile creation not supported");
     }
 }

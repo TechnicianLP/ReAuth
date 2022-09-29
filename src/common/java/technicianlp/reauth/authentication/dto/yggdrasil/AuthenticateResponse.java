@@ -1,7 +1,6 @@
 package technicianlp.reauth.authentication.dto.yggdrasil;
 
 import com.google.gson.annotations.SerializedName;
-import org.jetbrains.annotations.Nullable;
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.authentication.dto.ResponseObject;
 
@@ -20,7 +19,7 @@ public final class AuthenticateResponse implements ResponseObject {
     public final Profile profile;
 
     @SerializedName("error")
-    public final @Nullable String error;
+    public final String error;
 
     private AuthenticateResponse() {
         this.accessToken = null;
@@ -29,16 +28,17 @@ public final class AuthenticateResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
-        return this.error == null && this.accessToken != null && this.profile != null && this.profile.name != null && this.profile.uuid != null;
+    public boolean isValid() {
+        return this.error == null && this.accessToken != null && this.profile != null && this.profile.name != null
+            && this.profile.uuid != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public String getError() {
         return this.error;
     }
 
-    public final SessionData getSession() {
+    public SessionData getSession() {
         if (this.profile == null) {
             return null;
         }

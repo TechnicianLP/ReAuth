@@ -22,7 +22,7 @@ public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCo
 
     private final String loginUrl;
 
-    private final CompletableFuture<SessionData> session;
+    private final CompletableFuture<SessionData> sessionFuture;
     private final CompletableFuture<Profile> profile;
 
     private AuthenticationCodeServer codeServer;
@@ -34,19 +34,21 @@ public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCo
 
         CompletableFuture<String> codeStage = new CompletableFuture<>();
         CompletableFuture<String> pkceVerifier = CompletableFuture.completedFuture(pkceChallenge.getVerifier());
-        CompletableFuture<MicrosoftAuthResponse> ms = codeStage.thenCombineAsync(pkceVerifier, this.wrapStep(FlowStage.MS_REDEEM_AUTH_CODE, MsAuthAPI::redeemAuthorizationCode), this.executor);
+        CompletableFuture<MicrosoftAuthResponse> ms = codeStage.thenCombineAsync(pkceVerifier,
+            this.wrapStep(FlowStage.MS_REDEEM_AUTH_CODE, MsAuthAPI::redeemAuthorizationCode), this.executor);
         CompletableFuture<XboxAuthResponse> xasu = ms.thenApply(MicrosoftAuthResponse::getAccessToken)
-                .thenApplyAsync(this.wrapStep(FlowStage.MS_AUTH_XASU, MsAuthAPI::authenticateXASU), this.executor);
+            .thenApplyAsync(this.wrapStep(FlowStage.MS_AUTH_XASU, MsAuthAPI::authenticateXASU), this.executor);
         XboxAuthenticationFlow flow = new XboxAuthenticationFlow(xasu.thenApply(XboxAuthResponse::getToken), callback);
-        this.session = flow.getSession();
-        this.session.whenComplete(this::onSessionComplete);
-        this.registerDependantStages(codeStage, ms, xasu, this.session);
+        this.sessionFuture = flow.getSessionFuture();
+        this.sessionFuture.whenComplete(this::onSessionComplete);
+        this.registerDependantStages(codeStage, ms, xasu, this.sessionFuture);
         this.registerDependantFlow(flow);
 
         if (persist) {
             CompletableFuture<Tokens> tokens = ms.thenCombine(xasu, Tokens::new);
-            CompletableFuture<ProfileEncryption> encryption = CompletableFuture.supplyAsync(Crypto::newEncryption, this.executor);
-            CompletableFuture<ProfileBuilder> builder = this.session.thenCombine(encryption, ProfileBuilder::new);
+            CompletableFuture<ProfileEncryption> encryption =
+                CompletableFuture.supplyAsync(Crypto::newEncryption, this.executor);
+            CompletableFuture<ProfileBuilder> builder = this.sessionFuture.thenCombine(encryption, ProfileBuilder::new);
             this.profile = builder.thenCombine(tokens, ProfileBuilder::buildMicrosoft);
             this.profile.whenComplete(this::onProfileComplete);
         } else {
@@ -64,8 +66,8 @@ public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCo
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
-        return this.session;
+    public CompletableFuture<SessionData> getSessionFuture() {
+        return this.sessionFuture;
     }
 
     @Override
@@ -74,7 +76,7 @@ public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCo
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfileFuture() {
         if (this.profile != null) {
             return this.profile;
         } else {
@@ -83,12 +85,12 @@ public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCo
     }
 
     @Override
-    public final String getLoginUrl() {
+    public String getLoginUrl() {
         return this.loginUrl;
     }
 
     @Override
-    public final void cancel() {
+    public void cancel() {
         super.cancel();
         this.executor.execute(() -> this.codeServer.stop(true));
     }

@@ -19,7 +19,8 @@ import java.util.UUID;
 /**
  * cut down reimplementation version of {@link YggdrasilUserAuthentication}
  */
-public final class YggdrasilAPI {
+public enum YggdrasilAPI {
+    ;
 
     private static final String urlAuthenticate = "https://authserver.mojang.com/authenticate";
     private static final String urlJoin = "https://sessionserver.mojang.com/session/minecraft/join";
@@ -27,7 +28,8 @@ public final class YggdrasilAPI {
     /**
      * reimplementation of {@link YggdrasilUserAuthentication#logInWithPassword()}
      */
-    public static SessionData login(String username, String password) throws UnreachableServiceException, InvalidResponseException {
+    public static SessionData login(String username, String password) throws UnreachableServiceException,
+        InvalidResponseException {
         AuthenticateRequest request = new AuthenticateRequest(username, password, UUID.randomUUID().toString());
         AuthenticateResponse response = HttpUtil.performJsonRequest(urlAuthenticate, request);
         return response != null ? response.getSession() : null;
@@ -36,8 +38,8 @@ public final class YggdrasilAPI {
     /**
      * checks validity of accessToken by invoking the joinServer endpoint
      * <p>
-     * reimplementation of {@link YggdrasilMinecraftSessionService#joinServer(GameProfile, String, String)}
-     * Server hash is generated like during standard login sequence
+     * reimplementation of {@link YggdrasilMinecraftSessionService#joinServer(GameProfile, String, String)} Server hash
+     * is generated like during standard login sequence
      */
     public static boolean validate(String accessToken, String uuid) throws UnreachableServiceException {
         String hash = new BigInteger(Crypto.randomBytes(20)).toString(16);

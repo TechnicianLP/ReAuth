@@ -15,30 +15,30 @@ final class Response {
         this.headers = new HashMap<>();
     }
 
-    final Response setContent(String contentType, ByteBuffer content) {
+    Response setContent(String contentType, ByteBuffer content) {
         this.setHeader("Content-Type", contentType);
         this.pageContent = content;
         return this;
     }
 
-    final Response setHeader(String name, String value) {
-        this.getHeaders().put(name, value);
+    Response setHeader(String name, String value) {
+        this.headers.put(name, value);
         return this;
     }
 
-    final HttpStatus getHttpStatus() {
+    HttpStatus getHttpStatus() {
         return this.httpStatus;
     }
 
-    final boolean hasContent() {
+    boolean hasContent() {
         return this.pageContent != null;
     }
 
-    final ByteBuffer getPageContent() {
+    ByteBuffer getPageContent() {
         return this.pageContent;
     }
 
-    final Map<String, String> getHeaders() {
+    Map<String, String> getHeaders() {
         return this.headers;
     }
 }

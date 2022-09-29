@@ -23,7 +23,7 @@ abstract class Handler implements HttpHandler {
         Headers responseHeaders = exchange.getResponseHeaders();
         response.getHeaders().forEach(responseHeaders::set);
 
-        if (exchange.getRequestMethod().equals("HEAD")) {
+        if ("HEAD".equals(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(response.getHttpStatus().code, -1);
         } else {
             if (!response.hasContent()) {

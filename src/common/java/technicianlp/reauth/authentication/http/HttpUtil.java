@@ -13,19 +13,15 @@ import technicianlp.reauth.mojangfix.CertWorkaround;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class HttpUtil {
+public enum HttpUtil {
+    ;
 
     private static final Gson GSON;
 
@@ -38,28 +34,38 @@ public final class HttpUtil {
         GSON = builder.create();
     }
 
-    public static <R extends ResponseObject> R performFormRequest(String url, RequestObject.Form<R> form) throws UnreachableServiceException, InvalidResponseException {
+    public static <R extends ResponseObject> R performFormRequest(String url, RequestObject.Form<R> form) throws
+        UnreachableServiceException, InvalidResponseException {
         return performWrappedFormRequest(url, form).get();
     }
 
-    public static <R extends ResponseObject> Response<R> performWrappedFormRequest(String url, RequestObject.Form<R> form) throws UnreachableServiceException {
+    public static <R extends ResponseObject> Response<R> performWrappedFormRequest(String url,
+                                                                                   RequestObject.Form<R> form) throws
+        UnreachableServiceException {
         String body = form.getFields().entrySet().stream().map(HttpUtil::urlEncode).collect(Collectors.joining("&"));
         return performRequest(url, body, "application/x-www-form-urlencoded", null, form.getResponseClass());
     }
 
-    public static <R extends ResponseObject> R performJsonRequest(String url, RequestObject.JSON<R> payload) throws UnreachableServiceException, InvalidResponseException {
+    public static <R extends ResponseObject> R performJsonRequest(String url, RequestObject.JSON<R> payload) throws
+        UnreachableServiceException, InvalidResponseException {
         return performWrappedJsonRequest(url, payload).get();
     }
 
-    public static <R extends ResponseObject> Response<R> performWrappedJsonRequest(String url, RequestObject.JSON<R> payload) throws UnreachableServiceException {
+    public static <R extends ResponseObject> Response<R> performWrappedJsonRequest(String url,
+                                                                                   RequestObject.JSON<R> payload) throws
+        UnreachableServiceException {
         return performRequest(url, GSON.toJson(payload), "application/json", null, payload.getResponseClass());
     }
 
-    public static <R extends ResponseObject> R performGetRequest(String url, String bearer, Class<R> responseType) throws UnreachableServiceException, InvalidResponseException {
+    public static <R extends ResponseObject> R performGetRequest(String url, String bearer,
+                                                                 Class<R> responseType) throws
+        UnreachableServiceException, InvalidResponseException {
         return performWrappedGetRequest(url, bearer, responseType).get();
     }
 
-    public static <R extends ResponseObject> Response<R> performWrappedGetRequest(String url, String bearer, Class<R> responseType) throws UnreachableServiceException {
+    public static <R extends ResponseObject> Response<R> performWrappedGetRequest(String url, String bearer,
+                                                                                  Class<R> responseType) throws
+        UnreachableServiceException {
         return performRequest(url, null, null, bearer, responseType);
     }
 
@@ -68,7 +74,9 @@ public final class HttpUtil {
      * <p>
      * {@link IllegalStateException} can occur in GSON when type-mismatches are encountered
      */
-    private static <R extends ResponseObject> Response<R> performRequest(String url, String body, String contentType, String token, Class<R> responseType) throws UnreachableServiceException {
+    private static <R extends ResponseObject> Response<R> performRequest(String url, String body, String contentType,
+                                                                         String token, Class<R> responseType) throws
+        UnreachableServiceException {
         try {
             HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
 
@@ -117,10 +125,7 @@ public final class HttpUtil {
     }
 
     private static String urlEncode(Map.Entry<String, String> entry) {
-        try {
-            return URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + URLEncoder.encode(entry.getValue(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("UTF-8 unsupported", e);
-        }
+        return URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" + URLEncoder.encode(entry.getValue(),
+            StandardCharsets.UTF_8);
     }
 }

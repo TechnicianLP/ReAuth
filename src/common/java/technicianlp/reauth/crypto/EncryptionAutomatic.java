@@ -1,6 +1,5 @@
 package technicianlp.reauth.crypto;
 
-import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileConstants;
 
 import javax.crypto.Cipher;
@@ -11,7 +10,9 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.Map;
@@ -27,7 +28,7 @@ final class EncryptionAutomatic implements ProfileEncryption {
     private final String path;
     private final byte[] salt;
 
-    public EncryptionAutomatic(String path) {
+    EncryptionAutomatic(String path) {
         this(path, Crypto.randomBytes(16));
     }
 
@@ -48,19 +49,19 @@ final class EncryptionAutomatic implements ProfileEncryption {
     }
 
     @Override
-    public final String decryptFieldOne(String encrypted) throws CryptoException {
+    public String decryptFieldOne(String encrypted) throws CryptoException {
         return this.decrypt(encrypted, IV1_OFFSET);
     }
 
     @Override
-    public final String decryptFieldTwo(String encrypted) throws CryptoException {
+    public String decryptFieldTwo(String encrypted) throws CryptoException {
         return this.decrypt(encrypted, IV2_OFFSET);
     }
 
     private String decrypt(String encrypted, int ivOffset) throws CryptoException {
         try {
             byte[] raw = Base64.getDecoder().decode(encrypted);
-            byte[] dec = this.crypt(raw, Cipher.DECRYPT_MODE, this.keyData, ivOffset);
+            byte[] dec = crypt(raw, Cipher.DECRYPT_MODE, this.keyData, ivOffset);
             return new String(dec, StandardCharsets.UTF_8);
         } catch (GeneralSecurityException e) {
             throw new CryptoException("Decryption failed", e);
@@ -68,19 +69,19 @@ final class EncryptionAutomatic implements ProfileEncryption {
     }
 
     @Override
-    public final String encryptFieldOne(String value) throws CryptoException {
+    public String encryptFieldOne(String value) throws CryptoException {
         return this.encrypt(value, IV1_OFFSET);
     }
 
     @Override
-    public final String encryptFieldTwo(String value) throws CryptoException {
+    public String encryptFieldTwo(String value) throws CryptoException {
         return this.encrypt(value, IV2_OFFSET);
     }
 
     private String encrypt(String value, int ivOffset) throws CryptoException {
         try {
             byte[] raw = value.getBytes(StandardCharsets.UTF_8);
-            byte[] enc = this.crypt(raw, Cipher.ENCRYPT_MODE, this.keyData, ivOffset);
+            byte[] enc = crypt(raw, Cipher.ENCRYPT_MODE, this.keyData, ivOffset);
             return Base64.getEncoder().encodeToString(enc);
         } catch (GeneralSecurityException e) {
             throw new CryptoException("Encryption failed", e);
@@ -90,9 +91,9 @@ final class EncryptionAutomatic implements ProfileEncryption {
     /**
      * Encrypt or decrypt the supplied data with the given Key and IV
      */
-    private byte[] crypt(byte[] data, int mode, byte[] keyData, int ivOffset) throws GeneralSecurityException {
-        SecretKeySpec secretKey = new SecretKeySpec(keyData, 0, 32, "AES");
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(keyData, ivOffset, 16);
+    private static byte[] crypt(byte[] data, int mode, byte[] keyData, int ivOffset) throws GeneralSecurityException {
+        Key secretKey = new SecretKeySpec(keyData, 0, 32, "AES");
+        AlgorithmParameterSpec ivParameterSpec = new IvParameterSpec(keyData, ivOffset, 16);
 
         Cipher aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
         aes.init(mode, secretKey, ivParameterSpec);
@@ -100,13 +101,13 @@ final class EncryptionAutomatic implements ProfileEncryption {
     }
 
     @Override
-    public final void saveToProfile(Map<String, String> profile) {
+    public void saveToProfile(Map<String, String> profile) {
         profile.put(ProfileConstants.KEY, ProfileConstants.KEY_AUTO);
         profile.put(ProfileConstants.SALT, Base64.getEncoder().encodeToString(this.salt));
     }
 
     @Override
-    public final ProfileEncryption randomizedCopy() {
+    public ProfileEncryption randomizedCopy() {
         return new EncryptionAutomatic(this.path);
     }
 }

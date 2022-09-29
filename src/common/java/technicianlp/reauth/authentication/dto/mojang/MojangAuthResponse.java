@@ -1,7 +1,6 @@
 package technicianlp.reauth.authentication.dto.mojang;
 
 import com.google.gson.annotations.SerializedName;
-import org.jetbrains.annotations.Nullable;
 import technicianlp.reauth.authentication.dto.ResponseObject;
 
 /**
@@ -21,7 +20,7 @@ public final class MojangAuthResponse implements ResponseObject {
 
     // Error Handling
     @SerializedName("error")
-    public final @Nullable String error;
+    public final String error;
 
     private MojangAuthResponse() {
         this.token = null;
@@ -30,16 +29,16 @@ public final class MojangAuthResponse implements ResponseObject {
     }
 
     @Override
-    public final boolean isValid() {
+    public boolean isValid() {
         return this.error == null && this.token != null && this.expiry != null;
     }
 
     @Override
-    public final @Nullable String getError() {
+    public String getError() {
         return this.error;
     }
 
-    public final String getToken() {
+    public String getToken() {
         return this.token;
     }
 }

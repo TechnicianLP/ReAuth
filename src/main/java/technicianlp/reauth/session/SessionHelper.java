@@ -19,16 +19,17 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-public final class SessionHelper {
+public enum SessionHelper {
+    ;
 
     private static final Field sessionField = ReflectionUtils.findObfuscatedField(MinecraftClient.class, "f_90998_",
-            "session");
+        "session");
     private static final Field userApiServiceField = ReflectionUtils.findObfuscatedField(MinecraftClient.class,
-            "f_193584_", "userApiService");
+        "f_193584_", "userApiService");
     private static final Field socialManagerField = ReflectionUtils.findObfuscatedField(MinecraftClient.class,
-            "f_91006_", "socialInteractionsManager");
+        "f_91006_", "socialInteractionsManager");
     private static final Field splashesSessionField =
-            ReflectionUtils.findObfuscatedField(SplashTextResourceSupplier.class, "f_118863_", "session");
+        ReflectionUtils.findObfuscatedField(SplashTextResourceSupplier.class, "f_118863_", "session");
 
     private static final Pattern usernamePattern = Pattern.compile("\\w{2,16}");
 
@@ -49,19 +50,20 @@ public final class SessionHelper {
 
     /**
      * Set the Session and update dependant fields
-     * <p>
+     * <ul>
      * <li>Clear ProfileProperties and repopulate them
      * <li>Recreate {@link UserApiService}, using logic from
      * {@link MinecraftClient#createUserApiService(YggdrasilAuthenticationService, RunArgs)}
      * <li>Recreate {@link SocialInteractionsManager} with the new SocialInteractionsService
      * <li>Update {@link SplashTextResourceSupplier#session}
+     * </ul>
      */
     private static void setSession(SessionData data, boolean online) {
         try {
             MinecraftClient minecraft = MinecraftClient.getInstance();
 
-            Session session = new Session(data.username, data.uuid, data.accessToken, Optional.empty(),
-                    Optional.empty(), Session.AccountType.byName(data.type));
+            Session session = new Session(data.username(), data.uuid(), data.accessToken(), Optional.empty(),
+                Optional.empty(), Session.AccountType.byName(data.type()));
 
             ReflectionUtils.setField(sessionField, minecraft, session);
             SessionChecker.invalidate();
@@ -78,12 +80,12 @@ public final class SessionHelper {
             UserApiService userApiService = null;
             if (online) {
                 YggdrasilMinecraftSessionService sessionService =
-                        (YggdrasilMinecraftSessionService) minecraft.getSessionService();
+                    (YggdrasilMinecraftSessionService) minecraft.getSessionService();
                 YggdrasilAuthenticationService authService = sessionService.getAuthenticationService();
                 try {
                     userApiService = authService.createUserApiService(session.getAccessToken());
-                } catch (AuthenticationException authenticationexception) {
-                    ReAuth.log.error("Failed to create UserApiService", authenticationexception);
+                } catch (AuthenticationException authException) {
+                    ReAuth.log.error("Failed to create UserApiService", authException);
                 }
             }
             if (userApiService == null) {

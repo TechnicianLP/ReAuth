@@ -24,10 +24,10 @@ import java.util.concurrent.TimeUnit;
 
 public final class MicrosoftDeviceFlow extends FlowBase implements DeviceCodeFlow {
 
-    private final CompletableFuture<SessionData> session;
+    private final CompletableFuture<SessionData> sessionFuture;
     private final CompletableFuture<Profile> profile;
 
-    private final CompletableFuture<String> url;
+    private final CompletableFuture<String> loginUrl;
     private final CompletableFuture<String> code;
 
     private final CompletableFuture<MicrosoftAuthResponse> auth;
@@ -36,23 +36,25 @@ public final class MicrosoftDeviceFlow extends FlowBase implements DeviceCodeFlo
         super(callback);
 
         CompletableFuture<MicrosoftAuthDeviceResponse> deviceResponse = CompletableFuture.completedFuture(persist)
-                .thenApplyAsync(this.wrapStep(FlowStage.MS_REQUEST_DEVICE_CODE, MsAuthAPI::requestDeviceCode), this.executor);
-        this.url = deviceResponse.thenApply(MicrosoftAuthDeviceResponse::getVerificationUri);
+            .thenApplyAsync(this.wrapStep(FlowStage.MS_REQUEST_DEVICE_CODE, MsAuthAPI::requestDeviceCode),
+                this.executor);
+        this.loginUrl = deviceResponse.thenApply(MicrosoftAuthDeviceResponse::getVerificationUri);
         this.code = deviceResponse.thenApply(MicrosoftAuthDeviceResponse::getUserCode);
         this.auth = deviceResponse.thenApplyAsync(this::pollForCode, this.executor);
         CompletableFuture<XboxAuthResponse> xasu = this.auth.thenApply(MicrosoftAuthResponse::getAccessToken)
-                .thenApplyAsync(this.wrapStep(FlowStage.MS_AUTH_XASU, MsAuthAPI::authenticateXASU), this.executor);
+            .thenApplyAsync(this.wrapStep(FlowStage.MS_AUTH_XASU, MsAuthAPI::authenticateXASU), this.executor);
 
         XboxAuthenticationFlow flow = new XboxAuthenticationFlow(xasu.thenApply(XboxAuthResponse::getToken), callback);
-        this.session = flow.getSession();
-        this.session.whenComplete(this::onSessionComplete);
-        this.registerDependantStages(deviceResponse, this.auth, xasu, this.session);
+        this.sessionFuture = flow.getSessionFuture();
+        this.sessionFuture.whenComplete(this::onSessionComplete);
+        this.registerDependantStages(deviceResponse, this.auth, xasu, this.sessionFuture);
         this.registerDependantFlow(flow);
 
         if (persist) {
             CompletableFuture<Tokens> tokens = this.auth.thenCombine(xasu, Tokens::new);
-            CompletableFuture<ProfileEncryption> encryption = CompletableFuture.supplyAsync(Crypto::newEncryption, this.executor);
-            CompletableFuture<ProfileBuilder> builder = this.session.thenCombine(encryption, ProfileBuilder::new);
+            CompletableFuture<ProfileEncryption> encryption =
+                CompletableFuture.supplyAsync(Crypto::newEncryption, this.executor);
+            CompletableFuture<ProfileBuilder> builder = this.sessionFuture.thenCombine(encryption, ProfileBuilder::new);
             this.profile = builder.thenCombine(tokens, ProfileBuilder::buildMicrosoft);
             this.profile.whenComplete(this::onProfileComplete);
         } else {
@@ -61,8 +63,8 @@ public final class MicrosoftDeviceFlow extends FlowBase implements DeviceCodeFlo
     }
 
     /**
-     * Poll the Microsoft Token Endpoint until the user has completed authentication.
-     * Interval between Polls is specified by {@link MicrosoftAuthDeviceResponse#interval}.
+     * Poll the Microsoft Token Endpoint until the user has completed authentication. Interval between Polls is
+     * specified by {@link MicrosoftAuthDeviceResponse#interval}.
      */
     private MicrosoftAuthResponse pollForCode(MicrosoftAuthDeviceResponse deviceResponse) {
         this.step(FlowStage.MS_POLL_DEVICE_CODE);
@@ -74,11 +76,11 @@ public final class MicrosoftDeviceFlow extends FlowBase implements DeviceCodeFlo
                     ReAuth.log.info("Authorization received");
                     return response.get();
                 } else {
-                    MicrosoftAuthResponse responseError = response.getUnchecked();
+                    MicrosoftAuthResponse responseError = response.getResponse();
                     if ("authorization_pending".equals(responseError.getError())) {
                         ReAuth.log.debug("Authorization is still pending - continue polling");
                     } else {
-                        ReAuth.log.info("Authorization failed: " + responseError.getError());
+                        ReAuth.log.info("Authorization failed: {}", responseError.getError());
                         // will throw InvalidResponseException
                         return response.get();
                     }
@@ -97,17 +99,17 @@ public final class MicrosoftDeviceFlow extends FlowBase implements DeviceCodeFlo
     }
 
     @Override
-    public final CompletableFuture<SessionData> getSession() {
-        return this.session;
+    public CompletableFuture<SessionData> getSessionFuture() {
+        return this.sessionFuture;
     }
 
     @Override
-    public final boolean hasProfile() {
+    public boolean hasProfile() {
         return this.profile != null;
     }
 
     @Override
-    public final CompletableFuture<Profile> getProfile() {
+    public CompletableFuture<Profile> getProfileFuture() {
         if (this.profile != null) {
             return this.profile;
         } else {
@@ -116,12 +118,12 @@ public final class MicrosoftDeviceFlow extends FlowBase implements DeviceCodeFlo
     }
 
     @Override
-    public final CompletableFuture<String> getLoginUrl() {
-        return this.url;
+    public CompletableFuture<String> getLoginUrl() {
+        return this.loginUrl;
     }
 
     @Override
-    public final CompletableFuture<String> getCode() {
+    public CompletableFuture<String> getCode() {
         return this.code;
     }
 }

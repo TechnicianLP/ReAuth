@@ -5,7 +5,6 @@ import org.apache.commons.io.IOUtils;
 import technicianlp.reauth.ReAuth;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -17,13 +16,13 @@ final class CodeHandler extends Handler {
 
     private final CompletableFuture<String> codeFuture;
 
-    CodeHandler(PageWriter writer, CompletableFuture<String> codeFuture) {
-        super(writer);
+    CodeHandler(PageWriter pageWriter, CompletableFuture<String> codeFuture) {
+        super(pageWriter);
         this.codeFuture = codeFuture;
     }
 
     @Override
-    public final void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) throws IOException {
         try {
 
             String method = exchange.getRequestMethod().toUpperCase(Locale.ROOT);
@@ -50,45 +49,43 @@ final class CodeHandler extends Handler {
         }
 
         String body = IOUtils.toString(exchange.getRequestBody(), StandardCharsets.UTF_8);
-        Map<String, String> formFields = (this.parseFormFields(body));
+        Map<String, String> formFields = (parseFormFields(body));
 
         if (formFields.containsKey("code")) {
             ReAuth.log.info("Received Microsoft Authentication Code");
             this.codeFuture.complete(formFields.get("code"));
-            return new Response(HttpStatus.OK).setContent(CONTENT_TYPE_HTML, this.pageWriter.createSuccessResponsePage());
+            return new Response(HttpStatus.OK).setContent(CONTENT_TYPE_HTML,
+                PageWriter.createSuccessResponsePage());
         } else {
             String error = formFields.getOrDefault("error", "unknown");
-            ReAuth.log.error("Received Error from Microsoft Authentication: " + error);
-            return new Response(HttpStatus.Bad_Request).setContent(CONTENT_TYPE_HTML, this.pageWriter.createErrorResponsePage(error));
+            ReAuth.log.error("Received Error from Microsoft Authentication: {}", error);
+            return new Response(HttpStatus.Bad_Request).setContent(CONTENT_TYPE_HTML,
+                this.pageWriter.createErrorResponsePage(error));
         }
     }
 
     /**
-     * Decodes the Contents of a application/x-www-form-urlencoded request.
-     * Duplicate field names are discarded.
+     * Decodes the Contents of an application/x-www-form-urlencoded request. Duplicate field names are discarded.
      */
-    private Map<String, String> parseFormFields(String formUrlEncoded) {
+    private static Map<String, String> parseFormFields(String formUrlEncoded) {
         Map<String, String> formFields = new HashMap<>();
         String[] fields = formUrlEncoded.split("&");
 
-        try {
-            for (String field : fields) {
-                if (field.isEmpty()) {
-                    continue;
-                }
-                String key = field;
-                String value = "";
-
-                int delimiter = field.indexOf('=');
-                if (delimiter != -1) {
-                    key = field.substring(0, delimiter);
-                    value = field.substring(delimiter + 1);
-                }
-
-                formFields.putIfAbsent(URLDecoder.decode(key, "UTF-8"), URLDecoder.decode(value, "UTF-8"));
+        for (String field : fields) {
+            if (field.isEmpty()) {
+                continue;
             }
-        } catch (UnsupportedEncodingException exception) {
-            throw new RuntimeException("UTF-8 unsupported", exception);
+            String key = field;
+            String value = "";
+
+            int delimiter = field.indexOf('=');
+            if (delimiter != -1) {
+                key = field.substring(0, delimiter);
+                value = field.substring(delimiter + 1);
+            }
+
+            formFields.putIfAbsent(URLDecoder.decode(key, StandardCharsets.UTF_8), URLDecoder.decode(value,
+                StandardCharsets.UTF_8));
         }
         return formFields;
     }

@@ -8,11 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Request Payload for the /devicecode Endpoint of the Microsoft Identity Platform.
- * Payload is used for requesting a devicecode for the device code flow.
+ * Request Payload for the /devicecode Endpoint of the Microsoft Identity Platform. Payload is used for requesting a
+ * devicecode for the device code flow.
  *
  * @see <a href=https://wiki.vg/Microsoft_Authentication_Scheme>Microsoft Authentication Scheme on wiki.vg</a>
- * @see <a href=https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-device-code>Microsoft Device Code Flow</a>
+ * @see <a href=https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-device-code>Microsoft Device
+ * Code Flow</a>
  */
 public final class MicrosoftAuthDeviceRequest implements RequestObject.Form<MicrosoftAuthDeviceResponse> {
 
@@ -28,12 +29,12 @@ public final class MicrosoftAuthDeviceRequest implements RequestObject.Form<Micr
     }
 
     @Override
-    public final Class<MicrosoftAuthDeviceResponse> getResponseClass() {
+    public Class<MicrosoftAuthDeviceResponse> getResponseClass() {
         return MicrosoftAuthDeviceResponse.class;
     }
 
     @Override
-    public final Map<String, String> getFields() {
+    public Map<String, String> getFields() {
         return this.fields;
     }
 }

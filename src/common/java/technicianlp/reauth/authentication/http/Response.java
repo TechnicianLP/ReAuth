@@ -14,7 +14,7 @@ public final class Response<R extends ResponseObject> {
         this.response = response;
     }
 
-    public final boolean isValid() {
+    public boolean isValid() {
         if (!(200 <= this.statusCode && this.statusCode < 300)) {
             return false;
         }
@@ -25,17 +25,18 @@ public final class Response<R extends ResponseObject> {
         }
     }
 
-    public final R get() throws InvalidResponseException {
+    public R get() throws InvalidResponseException {
         if (this.isValid()) {
             return this.response;
         } else if (this.response != null) {
-            throw new InvalidResponseException("Error received with code " + this.statusCode + ": " + this.response.getError());
+            throw new InvalidResponseException(
+                "Error received with code " + this.statusCode + ": " + this.response.getError());
         } else {
             throw new InvalidResponseException("Received error code " + this.statusCode);
         }
     }
 
-    public final R getUnchecked() {
+    public R getResponse() {
         return this.response;
     }
 }

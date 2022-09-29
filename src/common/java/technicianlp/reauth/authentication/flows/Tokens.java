@@ -13,11 +13,11 @@ public final class Tokens {
         this.refreshToken = microsoft.getRefreshToken();
     }
 
-    public final String getXblToken() {
+    public String getXblToken() {
         return this.xblToken;
     }
 
-    public final String getRefreshToken() {
+    public String getRefreshToken() {
         return this.refreshToken;
     }
 }
