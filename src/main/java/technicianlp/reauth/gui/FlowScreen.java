@@ -100,8 +100,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
                 y += 18;
                 matrices.pop();
             } else {
-                this.textRenderer.drawWithShadow(matrices, line,
-                    this.centerX - this.textRenderer.getWidth(line) / 2f, y, 0xFFFFFFFF);
+                drawCenteredText(matrices, this.textRenderer, line, this.centerX, y, 0xFFFFFFFF);
                 y += 9;
             }
         }

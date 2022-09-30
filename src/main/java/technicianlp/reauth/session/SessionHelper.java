@@ -11,9 +11,9 @@ import net.minecraft.client.resource.SplashTextResourceSupplier;
 import net.minecraft.client.util.Session;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.SessionData;
-import technicianlp.reauth.util.ReflectionUtils;
+import technicianlp.reauth.mixin.MinecraftClientMixin;
+import technicianlp.reauth.mixin.SplashTextResourceSupplierMixin;
 
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,15 +21,6 @@ import java.util.regex.Pattern;
 
 public enum SessionHelper {
     ;
-
-    private static final Field sessionField = ReflectionUtils.findObfuscatedField(MinecraftClient.class, "f_90998_",
-        "session");
-    private static final Field userApiServiceField = ReflectionUtils.findObfuscatedField(MinecraftClient.class,
-        "f_193584_", "userApiService");
-    private static final Field socialManagerField = ReflectionUtils.findObfuscatedField(MinecraftClient.class,
-        "f_91006_", "socialInteractionsManager");
-    private static final Field splashesSessionField =
-        ReflectionUtils.findObfuscatedField(SplashTextResourceSupplier.class, "f_118863_", "session");
 
     private static final Pattern usernamePattern = Pattern.compile("\\w{2,16}");
 
@@ -65,7 +56,7 @@ public enum SessionHelper {
             Session session = new Session(data.username(), data.uuid(), data.accessToken(), Optional.empty(),
                 Optional.empty(), Session.AccountType.byName(data.type()));
 
-            ReflectionUtils.setField(sessionField, minecraft, session);
+            ((MinecraftClientMixin) minecraft).setSession(session);
             SessionChecker.invalidate();
 
             // Update things depending on the Session.
@@ -91,14 +82,14 @@ public enum SessionHelper {
             if (userApiService == null) {
                 userApiService = UserApiService.OFFLINE;
             }
-            ReflectionUtils.setField(userApiServiceField, minecraft, userApiService);
+            ((MinecraftClientMixin) minecraft).setUserApiService(userApiService);
 
             // Recreate FilterManager
             SocialInteractionsManager socialManager = new SocialInteractionsManager(minecraft, userApiService);
-            ReflectionUtils.setField(socialManagerField, minecraft, socialManager);
+            ((MinecraftClientMixin) minecraft).setSocialInteractionsManager(socialManager);
 
             // Update Splashes session
-            ReflectionUtils.setField(splashesSessionField, minecraft.getSplashTextLoader(), session);
+            ((SplashTextResourceSupplierMixin) minecraft.getSplashTextLoader()).setSession(session);
         } catch (Exception e) {
             ReAuth.log.error("Failed to update Session", e);
         }

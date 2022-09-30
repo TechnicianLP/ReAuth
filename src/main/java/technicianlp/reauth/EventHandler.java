@@ -17,18 +17,14 @@ import net.minecraft.text.Text;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileConstants;
 import technicianlp.reauth.gui.MainScreen;
+import technicianlp.reauth.mixin.DisconnectedScreenMixin;
 import technicianlp.reauth.session.SessionChecker;
 import technicianlp.reauth.session.SessionStatus;
-import technicianlp.reauth.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 public enum EventHandler {
     ;
-
-    private static final Field disconnectMessage = ReflectionUtils.findObfuscatedField(DisconnectedScreen.class,
-        "f_95988_", "reason");
 
     public static void register() {
         ScreenEvents.AFTER_INIT.register(EventHandler::afterInit);
@@ -56,7 +52,7 @@ public enum EventHandler {
 
     private static void handleDisconnectScreen(Screen screen) {
         if ("connect.failed".equals(ReconnectHelper.getTranslationKey(screen.getTitle(), false))) {
-            if (ReconnectHelper.getTranslationKey(ReflectionUtils.getField(disconnectMessage, screen), true)
+            if (ReconnectHelper.getTranslationKey(((DisconnectedScreenMixin) screen).getReason(), true)
                 .startsWith("disconnect.loginFailed")) {
                 List<ClickableWidget> buttons = Screens.getButtons(screen);
                 ClickableWidget menu = buttons.get(0);
@@ -70,8 +66,7 @@ public enum EventHandler {
                     retryText = Text.translatable("reauth.retry.disabled");
                 }
                 ButtonWidget retryButton = new ButtonWidget(menu.x, menu.y + 25, 200, 20, retryText,
-                    button -> ReconnectHelper
-                        .retryLogin(profile));
+                    button -> ReconnectHelper.retryLogin(profile));
                 if (profile == null || !ReconnectHelper.hasConnectionInfo()) {
                     retryButton.active = false;
                 }

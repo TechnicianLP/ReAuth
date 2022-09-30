@@ -3,7 +3,6 @@ package technicianlp.reauth;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.network.ServerAddress;
-import net.minecraft.network.ClientConnection;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextContent;
@@ -12,19 +11,13 @@ import technicianlp.reauth.authentication.flows.Flow;
 import technicianlp.reauth.authentication.flows.Flows;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.gui.FlowScreen;
-import technicianlp.reauth.util.ReflectionUtils;
+import technicianlp.reauth.mixin.ConnectScreenMixin;
 
-import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 public enum ReconnectHelper {
     ;
 
-    private static final Field managerField = ReflectionUtils.findObfuscatedField(ConnectScreen.class, "f_95684_",
-        "connection");
-    private static final Field previousField = ReflectionUtils.findObfuscatedField(ConnectScreen.class, "f_95686_",
-        "parent");
     private static ConnectScreen connectScreen;
 
     /**
@@ -63,13 +56,11 @@ public enum ReconnectHelper {
     }
 
     private static void connect() {
-        if (connectScreen != null) {
-            SocketAddress add = ReflectionUtils.<ClientConnection>getField(managerField, connectScreen).getAddress();
-            if (add instanceof InetSocketAddress address) {
+        if (connectScreen instanceof ConnectScreenMixin screenMixin) {
+            if (screenMixin.getConnection().getAddress() instanceof InetSocketAddress address) {
                 MinecraftClient minecraft = MinecraftClient.getInstance();
                 ServerAddress server = new ServerAddress(address.getHostString(), address.getPort());
-                ConnectScreen.connect(ReflectionUtils.getField(previousField, connectScreen), minecraft, server,
-                    minecraft.getCurrentServerEntry());
+                ConnectScreen.connect(screenMixin.getParent(), minecraft, server, minecraft.getCurrentServerEntry());
             }
         }
     }

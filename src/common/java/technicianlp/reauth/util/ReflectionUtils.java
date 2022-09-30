@@ -20,21 +20,6 @@ public enum ReflectionUtils {
         }
     }
 
-    // TODO: use Mutator mixins?
-
-    public static Field findObfuscatedField(Class<?> clz, String obfName, String name) {
-        try {
-            return findFieldInternal(clz, obfName);
-        } catch (NoSuchFieldException suppressed) {
-            try {
-                return findFieldInternal(clz, name);
-            } catch (NoSuchFieldException exception) {
-                exception.addSuppressed(suppressed);
-                throw new UncheckedReflectiveOperationException("Unable to find Obfuscated Field: " + name, exception);
-            }
-        }
-    }
-
     public static void unlockFinalField(Field field) {
         try {
             Field fieldModifiers = findField(Field.class, "modifiers");
@@ -62,7 +47,6 @@ public enum ReflectionUtils {
     }
 
     public static class UncheckedReflectiveOperationException extends RuntimeException {
-
         public UncheckedReflectiveOperationException(String message, ReflectiveOperationException cause) {
             super(message, cause);
         }
