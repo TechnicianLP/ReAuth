@@ -1,8 +1,10 @@
 package technicianlp.reauth;
 
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -26,6 +28,9 @@ import java.util.List;
 public enum EventHandler {
     ;
 
+    public static final int STATE_X = 110;
+    public static final int STATE_Y = 10;
+
     public static void register() {
         ScreenEvents.AFTER_INIT.register(EventHandler::afterInit);
         ScreenEvents.BEFORE_INIT.register(EventHandler::beforeInit);
@@ -37,6 +42,7 @@ public enum EventHandler {
             Screens.getButtons(screen).add(new ButtonWidget(5, 5, 100, 20,
                 Text.translatable("reauth.gui.button"), button -> openAuthenticationScreen(screen)));
             ScreenEvents.afterRender(screen).register(EventHandler::afterRender);
+            ScreenMouseEvents.afterMouseClick(screen).register(EventHandler::afterMouseClick);
         } else if (screen instanceof TitleScreen) {
             // Support for Custom Main Menu (add button outside of viewport)
             Screens.getButtons(screen).add(new ButtonWidget(-50, -50, 20, 20,
@@ -84,13 +90,26 @@ public enum EventHandler {
             MinecraftClient client = Screens.getClient(screen);
             Session session = client.getSession();
             SessionStatus state = SessionChecker.getSessionStatus(session.getAccessToken(), session.getUuid());
-            Screens.getTextRenderer(screen).drawWithShadow(matrices, I18n.translate(state.getTranslationKey()),
-                110, 10,
-                0xFFFFFFFF);
+            String stateText = I18n.translate(state.getTranslationKey());
+
+            TextRenderer textRenderer = Screens.getTextRenderer(screen);
+            textRenderer.drawWithShadow(matrices, stateText, STATE_X, STATE_Y, 0xFFFFFFFF);
+            statusTextWidth = textRenderer.getWidth(stateText);
         }
     }
 
-    // TODO: add refresh on clicking status
+    private static int statusTextWidth;
+
+    private static boolean withinTextBox(double x, double y) {
+        return x >= STATE_X && x < (STATE_X + statusTextWidth) && y >= STATE_Y && y < STATE_Y + 9;
+    }
+
+    private static void afterMouseClick(Screen screen, double mouseX, double mouseY, int button) {
+        if (withinTextBox(mouseX, mouseY)) {
+            SessionChecker.invalidate();
+        }
+    }
+
     public static void beforeInit(MinecraftClient client, Screen screen, int scaledWidth, int scaledHeight) {
         if (screen instanceof MultiplayerScreen && MinecraftClient.getInstance().currentScreen instanceof
             MultiplayerScreen && Screen.hasShiftDown()) {
