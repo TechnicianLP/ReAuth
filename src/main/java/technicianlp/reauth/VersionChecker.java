@@ -1,12 +1,6 @@
 package technicianlp.reauth;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.SharedConstants;
 import org.apache.commons.io.IOUtils;
@@ -15,29 +9,33 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public final class VersionChecker implements Runnable {
 
     private static final String MC_VERSION = SharedConstants.getGameVersion().getReleaseTarget();
-    private static final String JSON_URL = "https://github.com/TechnicianLP/ReAuth/raw/master/update.json";
-    private static final Type mapType = new TypeToken<Map<String, String>>() {}.getType();
+    private static final String JSON_URL = "https://github.com/NgoKimPhu/ReAuth/raw/master/update.json";
+    private static final Type mapType = new TypeToken<Map<String, String>>() {
+    }.getType();
+    private static final Pattern PATTERN_VERSION_DELIMS = Pattern.compile("[.-]");
 
     private Status status = Status.UNKNOWN;
-    private String changes = null;
+    private String changes;
 
     private final Gson gson;
 
     public VersionChecker() {
-        gson = new GsonBuilder()
-                .registerTypeAdapter(VersionJson.class, new VersionJsonDeserializer())
-                .create();
+        this.gson = new GsonBuilder()
+            .registerTypeAdapter(VersionJson.class, new VersionJsonDeserializer())
+            .create();
     }
 
     public void runVersionCheck() {
-        status = Status.UNKNOWN;
-        changes = null;
+        this.status = Status.UNKNOWN;
+        this.changes = null;
         new Thread(this, "ReAuth Version Check").start();
     }
 
@@ -50,7 +48,7 @@ public final class VersionChecker implements Runnable {
             String data = IOUtils.toString(inputstream, StandardCharsets.UTF_8);
             inputstream.close();
 
-            VersionJson json = gson.fromJson(data, VersionJson.class);
+            VersionJson json = this.gson.fromJson(data, VersionJson.class);
 
             String latest = json.versions.get(MC_VERSION + "-recommended");
             String current = ReAuth.container.getMetadata().getVersion().getFriendlyString();
@@ -59,9 +57,9 @@ public final class VersionChecker implements Runnable {
             if (latest != null) {
                 int latestVer = versionToInt(latest);
                 if (currentId < latestVer) {
-                    status = Status.OUTDATED;
+                    this.status = Status.OUTDATED;
                 } else {
-                    status = Status.OK;
+                    this.status = Status.OK;
                 }
             }
 
@@ -70,52 +68,55 @@ public final class VersionChecker implements Runnable {
                 int versionId = versionToInt(entry.getKey());
                 if (versionId > currentLatest) {
                     currentLatest = versionId;
-                    changes = entry.getValue();
+                    this.changes = entry.getValue();
                 }
             }
             ReAuth.log.info("Version check complete");
         } catch (Exception e) {
             ReAuth.log.warn("Failed to process update information", e);
-            status = Status.FAILED;
+            this.status = Status.FAILED;
         }
     }
 
     public Status getStatus() {
-        return status;
+        return this.status;
     }
 
     public String getChanges() {
-        return changes;
+        return this.changes;
     }
 
     private static int versionToInt(String version) {
-        String[] split = version.split("\\.", 3);
-        int ver = 0;
-        for (String s : split) {
-            ver = (ver << 8) | Integer.parseInt(s);
-        }
-        return ver;
+        return Arrays.stream(PATTERN_VERSION_DELIMS.split(version)).limit(3)
+            .mapToInt(Integer::parseInt).reduce(0, (ver, i) -> (ver << 8) | i);
     }
 
-    private static class VersionJson {
-        Map<String, String> versions = new HashMap<>();
-        Map<String, String> changelog = new HashMap<>();
+    private static final class VersionJson {
+        final Map<String, String> versions = new HashMap<>();
+        final Map<String, String> changelog = new HashMap<>();
 
-        public VersionJson(Map<String, String> versions, Map<String, String> changelog) {
-            if (versions != null)
+        private VersionJson(Map<String, String> versions, Map<String, String> changelog) {
+            if (versions != null) {
                 this.versions.putAll(versions);
-            if (changelog != null)
+            }
+            if (changelog != null) {
                 this.changelog.putAll(changelog);
+            }
         }
     }
 
     private static class VersionJsonDeserializer implements JsonDeserializer<VersionJson> {
         @Override
-        public VersionJson deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.isJsonObject()) {
-                JsonObject object = (JsonObject) json;
-                Map<String, String> versions = context.deserialize(object.get("promos-fabric"), mapType);
-                Map<String, String> changelog = context.deserialize(object.get(MC_VERSION + "-fabric"), mapType);
+        public VersionJson deserialize(JsonElement jsonElement, Type type,
+                                       @SuppressWarnings("ParameterNameDiffersFromOverriddenParameter")
+                                       JsonDeserializationContext context) throws
+            JsonParseException {
+            if (jsonElement.isJsonObject()) {
+                JsonObject object = (JsonObject) jsonElement;
+                Map<String, String> versions =
+                    context.deserialize(object.get("promos-fabric"), mapType);
+                Map<String, String> changelog =
+                    context.deserialize(object.get(MC_VERSION + "-fabric"), mapType);
                 return new VersionJson(versions, changelog);
             }
             return null;

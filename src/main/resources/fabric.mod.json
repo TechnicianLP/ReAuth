@@ -2,22 +2,22 @@
   "schemaVersion": 1,
   "id": "reauth",
   "version": "${version}",
-
   "name": "ReAuth",
   "description": "A Mod to renew your Session",
   "authors": [
-    "TechnicianLP"
+    "TechnicianLP",
+    "NgoKimPhu"
   ],
   "contact": {
-    "homepage": "https://github.com/TechnicianLP/ReAuth",
-    "sources": "https://github.com/TechnicianLP/ReAuth",
-    "issues": "https://github.com/TechnicianLP/ReAuth/issues"
+    "homepage": "https://github.com/NgoKimPhu/ReAuth",
+    "sources": "https://github.com/NgoKimPhu/ReAuth",
+    "issues": "https://github.com/NgoKimPhu/ReAuth/issues"
   },
   "license": "All rights reserved",
-
+  "icon": "reauth/icon.png",
   "environment": "client",
   "entrypoints": {
-    "main": [
+    "client": [
       "technicianlp.reauth.ReAuth"
     ],
     "modmenu": [
@@ -27,16 +27,16 @@
   "mixins": [
     "reauth.mixins.json"
   ],
-
   "depends": {
-    "fabricloader": ">=0.7.4",
+    "fabricloader": ">=0.14.9",
     "fabric": "*",
-    "minecraft": "1.16.*",
-    "autoconfig1u": "*"
+    "minecraft": "~1.19",
+    "java": ">=17"
   },
   "recommends": {
-    "cloth-config2": "*",
     "modmenu": "*"
   },
-  "custom": { "modmenu:clientsideOnly": true }
+  "custom": {
+    "modmenu:clientsideOnly": true
+  }
 }
