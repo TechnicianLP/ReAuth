@@ -14,6 +14,7 @@
     "issues": "https://github.com/NgoKimPhu/ReAuth/issues"
   },
   "license": "All rights reserved",
+  "icon": "reauth/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [

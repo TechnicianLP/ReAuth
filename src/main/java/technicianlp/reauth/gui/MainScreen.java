@@ -11,8 +11,10 @@ import technicianlp.reauth.authentication.flows.Flows;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileConstants;
 
-public final class MainScreen extends AbstractScreen {
+import java.util.List;
+import java.util.stream.Collectors;
 
+public final class MainScreen extends AbstractScreen {
     private String message;
 
     public MainScreen(Screen parent) {
@@ -32,19 +34,20 @@ public final class MainScreen extends AbstractScreen {
                 mouseX, mouseY);
         SaveButton saveButton = new SaveButton(this.centerX - buttonWidthH, y + 70,
             Text.translatable("reauth.gui.button.save"), saveButtonTooltip);
-        this.addDrawableChild(saveButton);
 
-        Profile profile = ReAuth.profiles.getProfile();
-        if (profile != null) {
-            Text text = Text.translatable("reauth.gui.profile", profile.getValue(ProfileConstants.NAME, "Steve"));
-            this.addDrawableChild(new ButtonWidget(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text,
-                button -> FlowScreen.open(Flows::loginWithProfile, profile)));
-        } else {
+        List<Profile> profiles = ReAuth.profiles.getProfiles();
+        if (profiles.isEmpty()) {
             ButtonWidget profileButton = new ButtonWidget(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20,
                 Text.translatable("reauth.gui.noProfile"), button -> {
             });
             profileButton.active = false;
             this.addDrawableChild(profileButton);
+        } else {
+            List<Text> texts = profiles.stream().map(profile -> Text.translatable("reauth.gui.profile",
+                profile.getValue(ProfileConstants.NAME, "Steve"))).collect(Collectors.toList());
+            this.addDrawableChild(
+                new MultiOptionButton(this, this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20,
+                    texts, idx -> FlowScreen.open(Flows::loginWithProfile, profiles.get(idx))));
         }
 
         this.addDrawableChild(new ButtonWidget(this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20,
@@ -53,10 +56,10 @@ public final class MainScreen extends AbstractScreen {
         this.addDrawableChild(new ButtonWidget(this.centerX + 1, y + 45, buttonWidthH - 1, 20, Text.translatable(
             "reauth.gui.button.devicecode"), button -> FlowScreen.open(Flows::loginWithDeviceCode,
             saveButton.isChecked())));
+        this.addDrawableChild(saveButton);
         this.addDrawableChild(new ButtonWidget(this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20,
             Text.translatable("reauth.gui.button.offline"),
             button -> this.transitionScreen(new OfflineLoginScreen())));
-
 
         VersionChecker.Status result = ReAuth.versionCheck.getStatus();
         if (result == VersionChecker.Status.OUTDATED) {

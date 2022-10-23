@@ -4,6 +4,8 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class ProfileList {
     public static final String PROFILES_PATH = "profiles";
@@ -17,7 +19,11 @@ public final class ProfileList {
         this.configuration = configuration;
         this.configSupplier = config::createSubConfig;
         this.profilesProperty = config.getOrElse(PROFILES_PATH,
-            () -> config.set(PROFILES_PATH, new ArrayList<>()));
+            () -> {
+                List<CommentedConfig> newList = new ArrayList<>();
+                config.set(PROFILES_PATH, newList);
+                return newList;
+            });
         config.setComment(PROFILES_PATH, "Saved Profiles. Check Documentation for Info & Syntax");
         correctProfiles(this.profilesProperty);
         this.saveProfiles();
@@ -25,26 +31,25 @@ public final class ProfileList {
 
     public void storeProfile(Profile profile) {
         List<CommentedConfig> list = this.profilesProperty;
-        if (list.isEmpty()) {
-            list.add(profile.getConfig());
-        } else { // TODO check this logic
-            list.set(0, profile.getConfig());
-        }
+        CommentedConfig profileConfig = profile.getConfig();
+        list.removeIf(profileConfig::equals);
+        list.add(0, profileConfig);
         this.saveProfiles();
     }
 
     public Profile getProfile() {
-        List<CommentedConfig> list = this.profilesProperty;
-        if (list.isEmpty()) {
-            return null;
-        }
-        CommentedConfig config = list.get(0);
-        String profileType = config.getOrElse(ProfileConstants.PROFILE_TYPE, ProfileConstants.PROFILE_TYPE_NONE);
-        if (ProfileConstants.PROFILE_TYPE_NONE.equals(profileType)) {
-            return null;
-        } else {
-            return new Profile(config);
-        }
+        return this.getProfileStream().findFirst().orElse(null);
+    }
+
+    public List<Profile> getProfiles() {
+        return this.getProfileStream().collect(Collectors.toList());
+    }
+
+    private Stream<Profile> getProfileStream() {
+        return this.profilesProperty.stream()
+            .filter(profile -> !ProfileConstants.PROFILE_TYPE_NONE.equals(
+                profile.getOrElse(ProfileConstants.PROFILE_TYPE, ProfileConstants.PROFILE_TYPE_NONE)))
+            .map(Profile::new);
     }
 
     Profile createProfile(Map<String, String> data) {

@@ -82,7 +82,7 @@ public enum CertWorkaround {
 
     private static X509Certificate loadCertificate(CertificateFactory certFactory, String name) throws
         CertificateException, IOException {
-        try (InputStream is = CertWorkaround.class.getResourceAsStream("/resources/reauth/certs/" + name + ".pem")) {
+        try (InputStream is = CertWorkaround.class.getResourceAsStream("/reauth/certs/" + name + ".pem")) {
             if (is != null) {
                 return (X509Certificate) certFactory.generateCertificate(is);
             } else {

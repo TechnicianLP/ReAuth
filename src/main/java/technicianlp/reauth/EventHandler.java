@@ -39,14 +39,14 @@ public enum EventHandler {
     public static void afterInit(MinecraftClient client, Screen screen, int scaledWidth, int scaledHeight) {
         if (screen instanceof MultiplayerScreen) {
             // Add Button to MultiplayerScreen
-            Screens.getButtons(screen).add(new ButtonWidget(5, 5, 100, 20,
-                Text.translatable("reauth.gui.button"), button -> openAuthenticationScreen(screen)));
+            Screens.getButtons(screen).add(new ButtonWidget(5, 5, 100, 20, Text.translatable("reauth.gui.button"),
+                button -> openAuthenticationScreen(screen)));
             ScreenEvents.afterRender(screen).register(EventHandler::afterRender);
             ScreenMouseEvents.afterMouseClick(screen).register(EventHandler::afterMouseClick);
         } else if (screen instanceof TitleScreen) {
             // Support for Custom Main Menu (add button outside of viewport)
-            Screens.getButtons(screen).add(new ButtonWidget(-50, -50, 20, 20,
-                Text.translatable("reauth.gui.button"), button -> openAuthenticationScreen(screen)));
+            Screens.getButtons(screen).add(new ButtonWidget(-50, -50, 20, 20, Text.translatable("reauth.gui.button"),
+                button -> openAuthenticationScreen(screen)));
         } else if (screen instanceof DisconnectedScreen) {
             // Add Buttons to DisconnectedScreen if its reason is an invalid session
             handleDisconnectScreen(screen);
@@ -66,8 +66,7 @@ public enum EventHandler {
                 Profile profile = ReAuth.profiles.getProfile();
                 Text retryText;
                 if (profile != null) {
-                    retryText = Text.translatable("reauth.retry", profile.getValue(ProfileConstants.NAME,
-                        "Steve"));
+                    retryText = Text.translatable("reauth.retry", profile.getValue(ProfileConstants.NAME, "Steve"));
                 } else {
                     retryText = Text.translatable("reauth.retry.disabled");
                 }
@@ -111,8 +110,8 @@ public enum EventHandler {
     }
 
     public static void beforeInit(MinecraftClient client, Screen screen, int scaledWidth, int scaledHeight) {
-        if (screen instanceof MultiplayerScreen && MinecraftClient.getInstance().currentScreen instanceof
-            MultiplayerScreen && Screen.hasShiftDown()) {
+        if (screen instanceof MultiplayerScreen &&
+            MinecraftClient.getInstance().currentScreen instanceof MultiplayerScreen && Screen.hasShiftDown()) {
             SessionChecker.invalidate();
         }
     }

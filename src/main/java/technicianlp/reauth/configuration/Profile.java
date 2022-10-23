@@ -27,4 +27,14 @@ public final class Profile {
     CommentedConfig getConfig() {
         return this.config;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj || obj instanceof Profile && this.config.equals(((Profile) obj).config);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.config == null ? 0 : this.config.hashCode();
+    }
 }

@@ -40,7 +40,7 @@ final class PageWriter {
     }
 
     private static ByteBuffer createPage(String text1, String text2) throws IOException {
-        try (InputStream is = AuthenticationCodeServer.class.getResourceAsStream("/resources/reauth/reauth.html")) {
+        try (InputStream is = AuthenticationCodeServer.class.getResourceAsStream("/reauth/reauth.html")) {
             if (is != null) {
                 String page = IOUtils.toString(is, StandardCharsets.UTF_8);
                 page = page.replace("$text1", text1).replace("$text2", text2);
@@ -48,7 +48,7 @@ final class PageWriter {
                 buffer.put(page.getBytes(StandardCharsets.UTF_8));
                 return buffer;
             } else {
-                throw new FileNotFoundException("Resource /resources/reauth/reauth.html is unavailable");
+                throw new FileNotFoundException("Resource /reauth/reauth.html is unavailable");
             }
         }
     }

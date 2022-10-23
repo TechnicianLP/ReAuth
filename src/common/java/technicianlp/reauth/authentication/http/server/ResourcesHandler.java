@@ -42,10 +42,10 @@ final class ResourcesHandler extends Handler {
         String resource = null;
         if ("/res/icon.png".equals(path)) {
             contentType = "image/png";
-            resource = "/resources/reauth/icon.png";
+            resource = "/reauth/icon.png";
         } else if ("/res/logo.png".equals(path)) {
             contentType = "image/png";
-            resource = "/resources/reauth/logo.png";
+            resource = "/reauth/logo.png";
         }
 
         if (resource != null) {
