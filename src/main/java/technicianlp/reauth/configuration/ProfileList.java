@@ -1,6 +1,5 @@
 package technicianlp.reauth.configuration;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -16,7 +15,6 @@ import java.util.Map;
 public final class ProfileList {
 
     private static final String PROFILES_CATEGORY = "profiles" + Configuration.CATEGORY_SPLITTER;
-    private static final List<String> propertyOrder = ImmutableList.of(Profile.PROFILE_TYPE, Profile.NAME, Profile.UUID, Profile.USERNAME, Profile.XBL_TOKEN, Profile.PASSWORD, Profile.REFRESH_TOKEN, Profile.KEY, Profile.SALT);
 
     private final Config config;
 
@@ -51,7 +49,7 @@ public final class ProfileList {
         ConfigCategory category = configuration.getCategory(this.findNewProfileName());
         Map<String, String> profileData = profile.getConfig();
         profileData.forEach((key, value) -> configuration.get(category.getQualifiedName(), key, "").set(value));
-        category.setPropertyOrder(new ArrayList<>(propertyOrder));
+        category.setPropertyOrder(ProfileConstants.getOrderedProfileKeys());
 
         this.saveProfiles();
     }
@@ -64,8 +62,8 @@ public final class ProfileList {
         Map<String, String> values = new HashMap<>();
         category.forEach((k, v) -> values.put(k, v.getString()));
 
-        String profileType = values.getOrDefault(Profile.PROFILE_TYPE, Profile.PROFILE_TYPE_NONE);
-        if (!Profile.PROFILE_TYPE_NONE.equals(profileType)) {
+        String profileType = values.getOrDefault(ProfileConstants.PROFILE_TYPE, ProfileConstants.PROFILE_TYPE_NONE);
+        if (!ProfileConstants.PROFILE_TYPE_NONE.equals(profileType)) {
             return new Profile(values, true);
         } else {
             return null;
@@ -96,7 +94,7 @@ public final class ProfileList {
         }
         newProps.forEach(entry -> profile.put(entry.getName(), entry));
 
-        profile.setPropertyOrder(new ArrayList<>(propertyOrder));
+        profile.setPropertyOrder(ProfileConstants.getOrderedProfileKeys());
     }
 
     /**

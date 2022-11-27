@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.ModContainer;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.flows.Flows;
 import technicianlp.reauth.configuration.Profile;
+import technicianlp.reauth.configuration.ProfileConstants;
 
 import java.io.IOException;
 
@@ -38,7 +39,7 @@ public final class MainScreen extends AbstractScreen {
 
         Profile profile = ReAuth.profiles.getProfile();
         if (profile != null) {
-            String text = I18n.format("reauth.gui.profile", profile.getValue(Profile.NAME, "Steve"));
+            String text = I18n.format("reauth.gui.profile", profile.getValue(ProfileConstants.NAME, "Steve"));
             this.addButton(new GuiButton(2, this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text));
         } else {
             GuiButton profileButton = new GuiButton(0, this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, I18n.format("reauth.gui.noProfile"));
