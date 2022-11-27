@@ -29,7 +29,7 @@ public final class AuthenticationCodeServer {
     private boolean running = true;
 
     public AuthenticationCodeServer(int port, String loginUrl, CompletableFuture<String> codeFuture, Executor executor) throws IOException, NoClassDefFoundError {
-        InetSocketAddress localAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), port);
+        InetSocketAddress localAddress = new InetSocketAddress(InetAddress.getByAddress("localhost", new byte[]{127, 0, 0, 1}), port);
         HttpServer server = HttpServer.create(localAddress, 0);
         server.setExecutor(executor);
 

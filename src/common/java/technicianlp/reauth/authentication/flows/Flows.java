@@ -6,14 +6,15 @@ import technicianlp.reauth.authentication.flows.impl.MicrosoftProfileFlow;
 import technicianlp.reauth.authentication.flows.impl.MojangAuthenticationFlow;
 import technicianlp.reauth.authentication.flows.impl.UnknownProfileFlow;
 import technicianlp.reauth.configuration.Profile;
+import technicianlp.reauth.configuration.ProfileConstants;
 
 public final class Flows {
 
     public static Flow loginWithProfile(Profile profile, FlowCallback callback) {
-        switch (profile.getValue(Profile.PROFILE_TYPE)) {
-            case Profile.PROFILE_TYPE_MICROSOFT:
+        switch (profile.getValue(ProfileConstants.PROFILE_TYPE)) {
+            case ProfileConstants.PROFILE_TYPE_MICROSOFT:
                 return new MicrosoftProfileFlow(profile, callback);
-            case Profile.PROFILE_TYPE_MOJANG:
+            case ProfileConstants.PROFILE_TYPE_MOJANG:
                 return new MojangAuthenticationFlow(profile, callback);
             default:
                 return new UnknownProfileFlow(callback);
