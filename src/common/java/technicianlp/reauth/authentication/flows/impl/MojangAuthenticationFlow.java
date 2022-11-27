@@ -6,6 +6,7 @@ import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.FlowStage;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileBuilder;
+import technicianlp.reauth.configuration.ProfileConstants;
 import technicianlp.reauth.crypto.Crypto;
 import technicianlp.reauth.crypto.ProfileEncryption;
 
@@ -36,8 +37,8 @@ public final class MojangAuthenticationFlow extends FlowBase {
         super(callback);
         CompletableFuture<Profile> profileFuture = CompletableFuture.completedFuture(profile);
         CompletableFuture<ProfileEncryption> encryption = profileFuture.thenApplyAsync(this.wrapStep(FlowStage.CRYPTO_INIT, Crypto::getProfileEncryption), this.executor);
-        CompletableFuture<String> usernameDec = encryption.thenCombineAsync(profile.get(Profile.USERNAME), ProfileEncryption::decryptFieldOne, this.executor);
-        CompletableFuture<String> passwordDec = encryption.thenCombineAsync(profile.get(Profile.PASSWORD), ProfileEncryption::decryptFieldTwo, this.executor);
+        CompletableFuture<String> usernameDec = encryption.thenCombineAsync(profile.get(ProfileConstants.USERNAME), ProfileEncryption::decryptFieldOne, this.executor);
+        CompletableFuture<String> passwordDec = encryption.thenCombineAsync(profile.get(ProfileConstants.PASSWORD), ProfileEncryption::decryptFieldTwo, this.executor);
 
         this.session = usernameDec.thenCombineAsync(passwordDec, this.wrapStep(FlowStage.YGG_AUTH, YggdrasilAPI::login), this.executor);
         this.registerDependantStages(encryption, usernameDec, passwordDec, this.session);
