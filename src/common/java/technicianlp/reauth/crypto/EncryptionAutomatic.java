@@ -1,6 +1,5 @@
 package technicianlp.reauth.crypto;
 
-import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileConstants;
 
 import javax.crypto.Cipher;
