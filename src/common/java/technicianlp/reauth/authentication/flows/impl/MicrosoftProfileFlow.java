@@ -11,6 +11,7 @@ import technicianlp.reauth.authentication.flows.impl.util.Futures;
 import technicianlp.reauth.authentication.http.Response;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileBuilder;
+import technicianlp.reauth.configuration.ProfileConstants;
 import technicianlp.reauth.crypto.Crypto;
 import technicianlp.reauth.crypto.ProfileEncryption;
 
@@ -44,13 +45,13 @@ public final class MicrosoftProfileFlow extends FlowBase {
         this.encryption = profileFuture.thenApplyAsync(this.wrapStep(FlowStage.CRYPTO_INIT, Crypto::getProfileEncryption), this.executor);
         this.refreshRequired = new CompletableFuture<>();
 
-        CompletableFuture<String> xblTokenDec = this.encryption.thenCombineAsync(profile.get(Profile.XBL_TOKEN), ProfileEncryption::decryptFieldOne, this.executor);
+        CompletableFuture<String> xblTokenDec = this.encryption.thenCombineAsync(profile.get(ProfileConstants.XBL_TOKEN), ProfileEncryption::decryptFieldOne, this.executor);
         this.xboxFlow1 = new XboxAuthenticationFlow(xblTokenDec, callback);
         this.xboxFlow1.getSession().whenComplete(this::onComplete);
         this.registerDependantStages(this.encryption, xblTokenDec);
         this.registerDependantFlow(this.xboxFlow1);
 
-        CompletableFuture<String> refreshTokenEnc = this.refreshRequired.thenCompose(Futures.conditional(profile.get(Profile.REFRESH_TOKEN), Futures.cancelled()));
+        CompletableFuture<String> refreshTokenEnc = this.refreshRequired.thenCompose(Futures.conditional(profile.get(ProfileConstants.REFRESH_TOKEN), Futures.cancelled()));
         CompletableFuture<String> refreshTokenDec = this.encryption.thenCombineAsync(refreshTokenEnc, ProfileEncryption::decryptFieldTwo, this.executor);
         CompletableFuture<MicrosoftAuthResponse> auth = refreshTokenDec.thenApplyAsync(this.wrapStep(FlowStage.MS_REDEEM_REFRESH_TOKEN, MsAuthAPI::redeemRefreshToken), this.executor);
         CompletableFuture<XboxAuthResponse> xasu = auth.thenApply(MicrosoftAuthResponse::getAccessToken)
