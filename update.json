@@ -2,26 +2,29 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/reauth",
   "homepage-fabric": "https://www.curseforge.com/minecraft/mc-mods/reauth-fabric",
   "promos": {
-    "1.19-latest": "4.0.3",
-    "1.18.2-latest": "4.0.3",
-    "1.18.2-recommended": "4.0.3",
-    "1.16.5-latest": "4.0.3",
-    "1.16.5-recommended": "4.0.3",
-    "1.15.2-latest": "4.0.3",
-    "1.15.2-recommended": "4.0.3",
-    "1.14.4-latest": "4.0.3",
-    "1.14.4-recommended": "4.0.3",
-    "1.12.2-latest": "4.0.3",
-    "1.12.2-recommended": "4.0.3",
-    "1.11.2-latest": "4.0.3",
-    "1.11.2-recommended": "4.0.3",
-    "1.10.2-latest": "4.0.3",
-    "1.10.2-recommended": "4.0.3",
-    "1.9.4-latest": "4.0.3",
-    "1.9.4-recommended": "4.0.3",
-    "1.8.9-latest": "4.0.3",
-    "1.8.9-recommended": "4.0.3",
-    "1.7.10-recommended": "4.0.3"
+    "1.19.3-latest": "4.0.6",
+    "1.19.2-latest": "4.0.6",
+    "1.19.1-latest": "4.0.6",
+    "1.19-latest": "4.0.6",
+    "1.18.2-latest": "4.0.6",
+    "1.18.2-recommended": "4.0.6",
+    "1.16.5-latest": "4.0.6",
+    "1.16.5-recommended": "4.0.6",
+    "1.15.2-latest": "4.0.6",
+    "1.15.2-recommended": "4.0.6",
+    "1.14.4-latest": "4.0.6",
+    "1.14.4-recommended": "4.0.6",
+    "1.12.2-latest": "4.0.6",
+    "1.12.2-recommended": "4.0.6",
+    "1.11.2-latest": "4.0.6",
+    "1.11.2-recommended": "4.0.6",
+    "1.10.2-latest": "4.0.6",
+    "1.10.2-recommended": "4.0.6",
+    "1.9.4-latest": "4.0.6",
+    "1.9.4-recommended": "4.0.6",
+    "1.8.9-latest": "4.0.6",
+    "1.8.9-recommended": "4.0.6",
+    "1.7.10-recommended": "4.0.6"
   },
   "promos-fabric": {
     "1.16.4-recommended": "3.9.3",
@@ -31,19 +34,32 @@
     "1.16.1-recommended": "3.9.3",
     "1.16-latest": "3.9.3"
   },
+  "1.19.3": {
+    "4.0.6": "Fix Issues with IPv6"
+  },
+  "1.19.2": {
+    "4.0.6": "Fix Issues with IPv6"
+  },
+  "1.19.1": {
+    "4.0.6": "Fix Issues with IPv6"
+  },
   "1.19": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "1.19 Compat"
   },
   "1.18.2": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.0": "Microsoft Accounts & 1.18 Compat"
   },
   "1.16.5": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.1": "Small bugfix",
     "4.0.0": "Microsoft Accounts"
   },
   "1.16.4": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "3.9.3": "1.16.4 Compat"
   },
@@ -51,6 +67,7 @@
     "3.9.3": "1.16.4 Compat"
   },
   "1.16.3": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "3.9.3": "1.16.4 Compat",
     "3.9.2": "1.16.x Compat"
@@ -60,6 +77,7 @@
     "3.9.2": "1.16.x Compat"
   },
   "1.16.2": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "3.9.3": "1.16.4 Compat",
     "3.9.2": "1.16.x Compat",
@@ -71,6 +89,7 @@
     "3.9.1": "Port to 1.16.2"
   },
   "1.16.1": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "3.9.3": "1.16.4 Compat",
     "3.9.2": "1.16.x Compat",
@@ -88,11 +107,13 @@
     "3.8.1": "Initial Port to Fabric"
   },
   "1.15.2": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.0": "Microsoft Authentication",
     "3.8.1": "Fixed Credentials saving for Mojangs Java Version"
   },
   "1.14.4": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.0": "Microsoft Authentication",
     "3.8.1": "Fixed Credentials saving for Mojangs Java Version",
@@ -100,26 +121,32 @@
     "3.7.0": "Port to 1.14"
   },
   "1.12.2": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.0": "Microsoft Authentication"
   },
   "1.11.2": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.0": "Microsoft Authentication"
   },
   "1.10.2": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.0": "Microsoft Authentication"
   },
   "1.9.4": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.0": "Microsoft Authentication"
   },
   "1.8.9": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.0": "Microsoft Authentication"
   },
   "1.7.10": {
+    "4.0.6": "Fix Issues with IPv6",
     "4.0.3": "Fixed several bugs",
     "4.0.2": "Fix Login on Mojang Launcher",
     "4.0.0": "Microsoft Authentication"
