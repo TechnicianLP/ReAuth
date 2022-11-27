@@ -1,6 +1,6 @@
 package technicianlp.reauth.crypto;
 
-import technicianlp.reauth.configuration.Profile;
+import technicianlp.reauth.configuration.ProfileConstants;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -100,8 +100,8 @@ final class EncryptionAutomatic implements ProfileEncryption {
 
     @Override
     public final void saveToProfile(Map<String, String> profile) {
-        profile.put(Profile.KEY, Profile.KEY_AUTO);
-        profile.put(Profile.SALT, Base64.getEncoder().encodeToString(this.salt));
+        profile.put(ProfileConstants.KEY, ProfileConstants.KEY_AUTO);
+        profile.put(ProfileConstants.SALT, Base64.getEncoder().encodeToString(this.salt));
     }
 
     @Override
