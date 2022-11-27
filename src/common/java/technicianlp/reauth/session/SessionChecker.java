@@ -34,7 +34,7 @@ public final class SessionChecker {
             CompletableFuture<String> tokenFuture = CompletableFuture.completedFuture(token);
             CompletableFuture<String> uuidFuture = CompletableFuture.completedFuture(uuid);
             tokenFuture.thenCombineAsync(uuidFuture, SessionChecker::getSessionStatus0, ReAuth.executor)
-                    .thenAccept(status -> SessionChecker.status = status);
+                    .thenAccept(SessionChecker::setStatus);
         }
         return status;
     }
@@ -50,5 +50,9 @@ public final class SessionChecker {
             ReAuth.log.error("Failed to check session validity", e);
             return SessionStatus.ERROR;
         }
+    }
+
+    private static void setStatus(SessionStatus newStatus) {
+        SessionChecker.status = newStatus;
     }
 }

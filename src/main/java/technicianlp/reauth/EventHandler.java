@@ -18,6 +18,7 @@ import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import technicianlp.reauth.configuration.Profile;
+import technicianlp.reauth.configuration.ProfileConstants;
 import technicianlp.reauth.gui.MainScreen;
 import technicianlp.reauth.session.SessionChecker;
 import technicianlp.reauth.session.SessionStatus;
@@ -56,7 +57,7 @@ public final class EventHandler {
                 Profile profile = ReAuth.profiles.getProfile();
                 Component retryText;
                 if (profile != null) {
-                    retryText = new TranslatableComponent("reauth.retry", profile.getValue(Profile.NAME, "Steve"));
+                    retryText = new TranslatableComponent("reauth.retry", profile.getValue(ProfileConstants.NAME, "Steve"));
                 } else {
                     retryText = new TranslatableComponent("reauth.retry.disabled");
                 }

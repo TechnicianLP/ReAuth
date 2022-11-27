@@ -1,7 +1,8 @@
 package technicianlp.reauth.authentication.http;
 
-import org.apache.http.HttpStatus;
 import technicianlp.reauth.authentication.dto.ResponseObject;
+
+import java.net.HttpURLConnection;
 
 public final class Response<R extends ResponseObject> {
 
@@ -14,10 +15,13 @@ public final class Response<R extends ResponseObject> {
     }
 
     public final boolean isValid() {
+        if (!(200 <= this.statusCode && this.statusCode < 300)) {
+            return false;
+        }
         if (this.response != null) {
             return this.response.isValid();
         } else {
-            return this.statusCode == HttpStatus.SC_NO_CONTENT;
+            return this.statusCode == HttpURLConnection.HTTP_NO_CONTENT;
         }
     }
 

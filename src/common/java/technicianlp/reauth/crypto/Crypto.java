@@ -1,6 +1,7 @@
 package technicianlp.reauth.crypto;
 
 import technicianlp.reauth.configuration.Profile;
+import technicianlp.reauth.configuration.ProfileConstants;
 
 import java.security.SecureRandom;
 
@@ -9,10 +10,10 @@ public final class Crypto {
     private static String configPath = "";
 
     public static ProfileEncryption getProfileEncryption(Profile profile) {
-        switch (profile.getValue(Profile.KEY)) {
-            case Profile.KEY_AUTO:
-                return new EncryptionAutomatic(configPath, profile.getValue(Profile.SALT));
-            case Profile.KEY_NONE:
+        switch (profile.getValue(ProfileConstants.KEY)) {
+            case ProfileConstants.KEY_AUTO:
+                return new EncryptionAutomatic(configPath, profile.getValue(ProfileConstants.SALT));
+            case ProfileConstants.KEY_NONE:
                 return new EncryptionNone();
             default:
                 throw new IllegalArgumentException("Unknown Encryption Type");
