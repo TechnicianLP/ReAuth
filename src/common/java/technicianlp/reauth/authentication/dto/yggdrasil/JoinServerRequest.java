@@ -1,6 +1,7 @@
 package technicianlp.reauth.authentication.dto.yggdrasil;
 
 import com.google.gson.annotations.SerializedName;
+
 import technicianlp.reauth.authentication.dto.RequestObject;
 
 /**

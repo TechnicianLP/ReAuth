@@ -1,13 +1,14 @@
 package technicianlp.reauth.authentication.http.server;
 
-import org.apache.commons.io.IOUtils;
-import technicianlp.reauth.ReAuth;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
+
+import technicianlp.reauth.ReAuth;
 
 final class PageWriter {
 

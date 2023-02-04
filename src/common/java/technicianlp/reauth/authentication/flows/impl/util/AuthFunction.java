@@ -1,11 +1,11 @@
 package technicianlp.reauth.authentication.flows.impl.util;
 
-import technicianlp.reauth.authentication.http.InvalidResponseException;
-import technicianlp.reauth.authentication.http.UnreachableServiceException;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Function;
+
+import technicianlp.reauth.authentication.http.InvalidResponseException;
+import technicianlp.reauth.authentication.http.UnreachableServiceException;
 
 /**
  * Functional interface that allows a method reference to throw {@link UnreachableServiceException} or {@link InvalidResponseException}.

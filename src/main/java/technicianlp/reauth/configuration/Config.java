@@ -1,11 +1,11 @@
 package technicianlp.reauth.configuration;
 
+import java.io.IOException;
+
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.crypto.Crypto;
-
-import java.io.IOException;
 
 public final class Config {
 

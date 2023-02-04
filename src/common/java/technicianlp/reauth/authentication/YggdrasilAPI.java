@@ -1,8 +1,12 @@
 package technicianlp.reauth.authentication;
 
+import java.math.BigInteger;
+import java.util.UUID;
+
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
+
 import technicianlp.reauth.authentication.dto.yggdrasil.AuthenticateRequest;
 import technicianlp.reauth.authentication.dto.yggdrasil.AuthenticateResponse;
 import technicianlp.reauth.authentication.dto.yggdrasil.JoinServerRequest;
@@ -12,9 +16,6 @@ import technicianlp.reauth.authentication.http.InvalidResponseException;
 import technicianlp.reauth.authentication.http.Response;
 import technicianlp.reauth.authentication.http.UnreachableServiceException;
 import technicianlp.reauth.crypto.Crypto;
-
-import java.math.BigInteger;
-import java.util.UUID;
 
 /**
  * cut down reimplementation version of {@link YggdrasilUserAuthentication}

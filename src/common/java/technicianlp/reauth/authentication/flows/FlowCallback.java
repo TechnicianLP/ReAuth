@@ -1,9 +1,9 @@
 package technicianlp.reauth.authentication.flows;
 
+import java.util.concurrent.Executor;
+
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.configuration.Profile;
-
-import java.util.concurrent.Executor;
 
 public interface FlowCallback {
 

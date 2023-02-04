@@ -1,14 +1,15 @@
 package technicianlp.reauth.authentication.http.server;
 
-import com.sun.net.httpserver.HttpExchange;
-import technicianlp.reauth.ReAuth;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.util.Locale;
+
+import com.sun.net.httpserver.HttpExchange;
+
+import technicianlp.reauth.ReAuth;
 
 final class ResourcesHandler extends Handler {
 

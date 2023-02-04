@@ -1,14 +1,15 @@
 package technicianlp.reauth.mojangfix;
 
-import technicianlp.reauth.ReAuth;
-import technicianlp.reauth.crypto.CryptoException;
-import technicianlp.reauth.util.ReflectionUtils;
-
-import javax.crypto.Cipher;
 import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.security.PermissionCollection;
 import java.util.Map;
+
+import javax.crypto.Cipher;
+
+import technicianlp.reauth.ReAuth;
+import technicianlp.reauth.crypto.CryptoException;
+import technicianlp.reauth.util.ReflectionUtils;
 
 final class JceWorkaround {
 

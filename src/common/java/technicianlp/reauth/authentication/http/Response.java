@@ -1,8 +1,8 @@
 package technicianlp.reauth.authentication.http;
 
-import technicianlp.reauth.authentication.dto.ResponseObject;
-
 import java.net.HttpURLConnection;
+
+import technicianlp.reauth.authentication.dto.ResponseObject;
 
 public final class Response<R extends ResponseObject> {
 

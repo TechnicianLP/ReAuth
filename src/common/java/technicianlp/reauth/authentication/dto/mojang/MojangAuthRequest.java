@@ -1,6 +1,7 @@
 package technicianlp.reauth.authentication.dto.mojang;
 
 import com.google.gson.annotations.SerializedName;
+
 import technicianlp.reauth.authentication.dto.RequestObject;
 
 /**

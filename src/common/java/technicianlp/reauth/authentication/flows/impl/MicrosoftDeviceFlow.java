@@ -1,5 +1,9 @@
 package technicianlp.reauth.authentication.flows.impl;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
+
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.MsAuthAPI;
 import technicianlp.reauth.authentication.SessionData;
@@ -17,10 +21,6 @@ import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileBuilder;
 import technicianlp.reauth.crypto.Crypto;
 import technicianlp.reauth.crypto.ProfileEncryption;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
 
 public final class MicrosoftDeviceFlow extends FlowBase implements DeviceCodeFlow {
 

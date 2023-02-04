@@ -1,5 +1,7 @@
 package technicianlp.reauth.authentication.flows.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.authentication.YggdrasilAPI;
 import technicianlp.reauth.authentication.flows.FlowCallback;
@@ -9,8 +11,6 @@ import technicianlp.reauth.configuration.ProfileBuilder;
 import technicianlp.reauth.configuration.ProfileConstants;
 import technicianlp.reauth.crypto.Crypto;
 import technicianlp.reauth.crypto.ProfileEncryption;
-
-import java.util.concurrent.CompletableFuture;
 
 public final class MojangAuthenticationFlow extends FlowBase {
 

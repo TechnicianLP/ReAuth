@@ -1,9 +1,9 @@
 package technicianlp.reauth.crypto;
 
+import java.security.SecureRandom;
+
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.configuration.ProfileConstants;
-
-import java.security.SecureRandom;
 
 public final class Crypto {
 

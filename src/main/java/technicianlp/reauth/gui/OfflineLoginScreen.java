@@ -1,12 +1,15 @@
 package technicianlp.reauth.gui;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
+import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.session.SessionHelper;
 
 public final class OfflineLoginScreen extends AbstractScreen {
@@ -29,7 +32,7 @@ public final class OfflineLoginScreen extends AbstractScreen {
         this.setFocused(this.username);
         this.addRenderableWidget(this.username);
 
-        this.confirm = new Button(this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.button.username"), (b) -> this.performUsernameChange());
+        this.confirm = ReAuth.button(this.centerX - BUTTON_WIDTH / 2, this.baseY + this.screenHeight - 42, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.button.username"), (b) -> this.performUsernameChange());
         this.addRenderableWidget(this.confirm);
     }
 

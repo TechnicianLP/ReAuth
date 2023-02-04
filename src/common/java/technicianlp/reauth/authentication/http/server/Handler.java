@@ -1,12 +1,12 @@
 package technicianlp.reauth.authentication.http.server;
 
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 
 abstract class Handler implements HttpHandler {
 

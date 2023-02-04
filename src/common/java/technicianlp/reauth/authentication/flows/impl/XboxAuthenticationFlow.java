@@ -1,5 +1,7 @@
 package technicianlp.reauth.authentication.flows.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.MsAuthAPI;
 import technicianlp.reauth.authentication.SessionData;
@@ -12,8 +14,6 @@ import technicianlp.reauth.authentication.http.InvalidResponseException;
 import technicianlp.reauth.authentication.http.Response;
 import technicianlp.reauth.authentication.http.UnreachableServiceException;
 import technicianlp.reauth.configuration.Profile;
-
-import java.util.concurrent.CompletableFuture;
 
 final class XboxAuthenticationFlow extends FlowBase {
 

@@ -1,6 +1,18 @@
 package technicianlp.reauth;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Button.OnPress;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint;
@@ -11,17 +23,9 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.network.NetworkConstants;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import technicianlp.reauth.configuration.Config;
 import technicianlp.reauth.configuration.ProfileList;
 import technicianlp.reauth.mojangfix.MojangJavaFix;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
 
 @Mod("reauth")
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -72,6 +76,10 @@ public final class ReAuth {
     @SubscribeEvent
     public static void setup(ModConfigEvent event) {
         config.updateConfig(event.getConfig());
+    }
+    
+    public static final Button button(int x, int y, int width, int height, Component text, OnPress onpress) {
+	    return Button.builder(text, onpress).pos(x, y).size(width, height).build();
     }
 
     private static final class ReAuthThreadFactory implements ThreadFactory {

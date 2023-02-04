@@ -1,11 +1,11 @@
 package technicianlp.reauth.mojangfix;
 
-import technicianlp.reauth.ReAuth;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
 import java.time.ZoneOffset;
+
+import technicianlp.reauth.ReAuth;
 
 public final class MojangJavaFix {
 

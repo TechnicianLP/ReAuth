@@ -1,12 +1,13 @@
 package technicianlp.reauth.authentication.dto.xbox;
 
+import java.lang.reflect.Type;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import technicianlp.reauth.authentication.dto.RequestObject;
 
-import java.lang.reflect.Type;
+import technicianlp.reauth.authentication.dto.RequestObject;
 
 /**
  * Request Payload for the /user/authenticate Endpoint of the Xbox Live user services<br>
