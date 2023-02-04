@@ -1,18 +1,5 @@
 package technicianlp.reauth.authentication.http;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
-import technicianlp.reauth.authentication.dto.RequestObject;
-import technicianlp.reauth.authentication.dto.ResponseObject;
-import technicianlp.reauth.authentication.dto.xbox.XboxAuthResponse;
-import technicianlp.reauth.authentication.dto.xbox.XboxLiveAuthRequest;
-import technicianlp.reauth.authentication.dto.xbox.XboxXstsAuthRequest;
-import technicianlp.reauth.authentication.dto.yggdrasil.AuthenticateRequest;
-import technicianlp.reauth.mojangfix.CertWorkaround;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +11,21 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+
+import technicianlp.reauth.authentication.dto.RequestObject;
+import technicianlp.reauth.authentication.dto.ResponseObject;
+import technicianlp.reauth.authentication.dto.xbox.XboxAuthResponse;
+import technicianlp.reauth.authentication.dto.xbox.XboxLiveAuthRequest;
+import technicianlp.reauth.authentication.dto.xbox.XboxXstsAuthRequest;
+import technicianlp.reauth.authentication.dto.yggdrasil.AuthenticateRequest;
+import technicianlp.reauth.mojangfix.CertWorkaround;
 
 public final class HttpUtil {
 

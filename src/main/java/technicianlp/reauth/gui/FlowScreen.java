@@ -1,9 +1,16 @@
 package technicianlp.reauth.gui;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.BiFunction;
+
 import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import technicianlp.reauth.ReAuth;
@@ -15,13 +22,6 @@ import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.FlowStage;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.session.SessionHelper;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.function.BiFunction;
 
 public final class FlowScreen extends AbstractScreen implements FlowCallback {
 
@@ -55,7 +55,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         if (this.stage == FlowStage.MS_AWAIT_AUTH_CODE && this.flow instanceof AuthorizationCodeFlow) {
             try {
                 URL url = new URL(((AuthorizationCodeFlow) this.flow).getLoginUrl());
-                this.addRenderableWidget(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, Component.translatable("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
+                this.addRenderableWidget(ReAuth.button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, Component.translatable("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
             } catch (MalformedURLException e) {
                 ReAuth.log.error("Browser button failed", e);
             }
@@ -66,7 +66,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
                     String urlString = flow.getLoginUrl().join();
                     String code = flow.getCode().join();
                     URL url = new URL(urlString);
-                    this.addRenderableWidget(new Button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, Component.translatable("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
+                    this.addRenderableWidget(ReAuth.button(this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, Component.translatable("reauth.msauth.button.browser"), (b) -> Util.getPlatform().openUrl((url))));
                     this.formatArgs = new String[]{urlString, code};
                 }
             } catch (MalformedURLException e) {

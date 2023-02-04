@@ -1,12 +1,13 @@
 package technicianlp.reauth.authentication.dto.microsoft.device;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.common.collect.ImmutableMap;
+
 import technicianlp.reauth.authentication.MsAuthAPI;
 import technicianlp.reauth.authentication.dto.RequestObject;
 import technicianlp.reauth.authentication.dto.microsoft.MicrosoftAuthResponse;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Request Payload for the /token Endpoint of the Microsoft Identity Platform.

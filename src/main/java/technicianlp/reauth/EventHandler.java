@@ -1,5 +1,7 @@
 package technicianlp.reauth;
 
+import java.lang.reflect.Field;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -22,8 +24,6 @@ import technicianlp.reauth.session.SessionChecker;
 import technicianlp.reauth.session.SessionStatus;
 import technicianlp.reauth.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
-
 @Mod.EventBusSubscriber(modid = "reauth", value = Dist.CLIENT)
 public final class EventHandler {
 
@@ -34,10 +34,10 @@ public final class EventHandler {
         Screen screen = event.getScreen();
         if (screen instanceof JoinMultiplayerScreen) {
             // Add Button to MultiplayerScreen
-            event.addListener(new Button(5, 5, 100, 20, Component.translatable("reauth.gui.button"), b -> openAuthenticationScreen()));
+            event.addListener(ReAuth.button(5, 5, 100, 20, Component.translatable("reauth.gui.button"), b -> openAuthenticationScreen()));
         } else if (screen instanceof TitleScreen) {
             // Support for Custom Main Menu (add button outside of viewport)
-            event.addListener(new Button(-50, -50, 20, 20, Component.translatable("reauth.gui.button"), b -> openAuthenticationScreen()));
+            event.addListener(ReAuth.button(-50, -50, 20, 20, Component.translatable("reauth.gui.button"), b -> openAuthenticationScreen()));
         } else if (screen instanceof DisconnectedScreen) {
             // Add Buttons to DisconnectedScreen if its reason is an invalid session
             handleDisconnectScreen(event, screen);
@@ -59,7 +59,7 @@ public final class EventHandler {
                 } else {
                     retryText = Component.translatable("reauth.retry.disabled");
                 }
-                Button retryButton = new Button(menu.x, menu.y + 25, 200, 20, retryText, b -> ReconnectHelper.retryLogin(profile));
+                Button retryButton = ReAuth.button(menu.getX(), menu.getY() + 25, 200, 20, retryText, b -> ReconnectHelper.retryLogin(profile));
                 if (profile == null || !ReconnectHelper.hasConnectionInfo()) {
                     retryButton.active = false;
                 }
@@ -72,6 +72,7 @@ public final class EventHandler {
         Minecraft.getInstance().pushGuiLayer(new MainScreen());
     }
 
+    @SuppressWarnings("resource")
     @SubscribeEvent
     public static void onDrawGui(ScreenEvent.Render.Post e) {
         if (e.getScreen() instanceof JoinMultiplayerScreen) {

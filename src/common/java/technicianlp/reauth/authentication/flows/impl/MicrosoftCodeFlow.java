@@ -1,5 +1,8 @@
 package technicianlp.reauth.authentication.flows.impl;
 
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+
 import technicianlp.reauth.authentication.MsAuthAPI;
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.authentication.dto.microsoft.MicrosoftAuthResponse;
@@ -14,9 +17,6 @@ import technicianlp.reauth.configuration.ProfileBuilder;
 import technicianlp.reauth.crypto.Crypto;
 import technicianlp.reauth.crypto.PkceChallenge;
 import technicianlp.reauth.crypto.ProfileEncryption;
-
-import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
 
 public final class MicrosoftCodeFlow extends FlowBase implements AuthorizationCodeFlow {
 

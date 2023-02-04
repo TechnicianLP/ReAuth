@@ -1,11 +1,11 @@
 package technicianlp.reauth.authentication.flows.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.impl.util.Futures;
 import technicianlp.reauth.configuration.Profile;
-
-import java.util.concurrent.CompletableFuture;
 
 public final class UnknownProfileFlow extends FlowBase {
 

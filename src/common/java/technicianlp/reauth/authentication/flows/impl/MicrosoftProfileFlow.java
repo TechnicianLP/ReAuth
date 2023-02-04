@@ -1,5 +1,10 @@
 package technicianlp.reauth.authentication.flows.impl;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
 import technicianlp.reauth.authentication.MsAuthAPI;
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.authentication.dto.microsoft.MicrosoftAuthResponse;
@@ -14,11 +19,6 @@ import technicianlp.reauth.configuration.ProfileBuilder;
 import technicianlp.reauth.configuration.ProfileConstants;
 import technicianlp.reauth.crypto.Crypto;
 import technicianlp.reauth.crypto.ProfileEncryption;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public final class MicrosoftProfileFlow extends FlowBase {
 

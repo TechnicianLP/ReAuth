@@ -1,8 +1,8 @@
 package technicianlp.reauth.crypto;
 
-import technicianlp.reauth.configuration.ProfileConstants;
-
 import java.util.Map;
+
+import technicianlp.reauth.configuration.ProfileConstants;
 
 final class EncryptionNone implements ProfileEncryption {
 

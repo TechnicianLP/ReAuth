@@ -1,7 +1,9 @@
 package technicianlp.reauth.authentication.dto.microsoft;
 
-import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
+
+import com.google.gson.annotations.SerializedName;
+
 import technicianlp.reauth.authentication.dto.ResponseObject;
 
 /**

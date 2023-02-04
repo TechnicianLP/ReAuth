@@ -1,8 +1,5 @@
 package technicianlp.reauth.authentication.http.server;
 
-import com.sun.net.httpserver.HttpServer;
-import technicianlp.reauth.ReAuth;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -10,6 +7,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import com.sun.net.httpserver.HttpServer;
+
+import technicianlp.reauth.ReAuth;
 
 /**
  * Authentication with Microsoft requires a webserver on localhost to receive the issued authentication code.

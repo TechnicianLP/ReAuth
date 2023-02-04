@@ -1,10 +1,10 @@
 package technicianlp.reauth.session;
 
+import java.util.concurrent.CompletableFuture;
+
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.YggdrasilAPI;
 import technicianlp.reauth.authentication.http.UnreachableServiceException;
-
-import java.util.concurrent.CompletableFuture;
 
 public final class SessionChecker {
 

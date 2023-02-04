@@ -1,12 +1,12 @@
 package technicianlp.reauth.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.authentication.flows.Tokens;
 import technicianlp.reauth.crypto.ProfileEncryption;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public final class ProfileBuilder {
 

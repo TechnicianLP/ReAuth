@@ -6,11 +6,13 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import technicianlp.reauth.ReAuth;
 
 abstract class AbstractScreen extends Screen {
 
@@ -33,14 +35,13 @@ abstract class AbstractScreen extends Screen {
     @Override
     public void init() {
         super.init();
-        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(true);
 
         this.centerX = this.width / 2;
         this.baseX = this.centerX - this.screenWidth / 2;
         this.centerY = this.height / 2;
         this.baseY = this.centerY - this.screenHeight / 2;
 
-        Button cancel = new Button(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, Component.translatable("reauth.gui.close"), (b) -> this.onClose());
+        Button cancel = ReAuth.button(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, Component.translatable("reauth.gui.close"), (b) -> this.onClose());
         this.addRenderableWidget(cancel);
     }
 
@@ -87,12 +88,4 @@ abstract class AbstractScreen extends Screen {
         this.requestClose(false);
     }
 
-    /**
-     * Called once this Screen is closed
-     */
-    @Override
-    public void removed() {
-        super.removed();
-        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
-    }
 }

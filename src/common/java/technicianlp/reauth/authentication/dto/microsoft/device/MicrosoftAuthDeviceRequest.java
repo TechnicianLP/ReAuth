@@ -1,11 +1,12 @@
 package technicianlp.reauth.authentication.dto.microsoft.device;
 
-import com.google.common.collect.ImmutableMap;
-import technicianlp.reauth.authentication.MsAuthAPI;
-import technicianlp.reauth.authentication.dto.RequestObject;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+
+import technicianlp.reauth.authentication.MsAuthAPI;
+import technicianlp.reauth.authentication.dto.RequestObject;
 
 /**
  * Request Payload for the /devicecode Endpoint of the Microsoft Identity Platform.

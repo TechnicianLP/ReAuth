@@ -1,14 +1,5 @@
 package technicianlp.reauth.authentication.flows.impl;
 
-import technicianlp.reauth.authentication.SessionData;
-import technicianlp.reauth.authentication.flows.Flow;
-import technicianlp.reauth.authentication.flows.FlowCallback;
-import technicianlp.reauth.authentication.flows.FlowStage;
-import technicianlp.reauth.authentication.flows.impl.util.AuthBiFunction;
-import technicianlp.reauth.authentication.flows.impl.util.AuthFunction;
-import technicianlp.reauth.authentication.flows.impl.util.AuthSupplier;
-import technicianlp.reauth.configuration.Profile;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +9,15 @@ import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import technicianlp.reauth.authentication.SessionData;
+import technicianlp.reauth.authentication.flows.Flow;
+import technicianlp.reauth.authentication.flows.FlowCallback;
+import technicianlp.reauth.authentication.flows.FlowStage;
+import technicianlp.reauth.authentication.flows.impl.util.AuthBiFunction;
+import technicianlp.reauth.authentication.flows.impl.util.AuthFunction;
+import technicianlp.reauth.authentication.flows.impl.util.AuthSupplier;
+import technicianlp.reauth.configuration.Profile;
 
 abstract class FlowBase implements Flow {
 

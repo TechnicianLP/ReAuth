@@ -1,5 +1,9 @@
 package technicianlp.reauth;
 
+import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -13,10 +17,6 @@ import technicianlp.reauth.authentication.flows.Flows;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.gui.FlowScreen;
 import technicianlp.reauth.util.ReflectionUtils;
-
-import java.lang.reflect.Field;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 public final class ReconnectHelper {
 

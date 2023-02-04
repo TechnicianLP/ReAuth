@@ -1,9 +1,5 @@
 package technicianlp.reauth.authentication.http.server;
 
-import com.sun.net.httpserver.HttpExchange;
-import org.apache.commons.io.IOUtils;
-import technicianlp.reauth.ReAuth;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -12,6 +8,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+
+import org.apache.commons.io.IOUtils;
+
+import com.sun.net.httpserver.HttpExchange;
+
+import technicianlp.reauth.ReAuth;
 
 final class CodeHandler extends Handler {
 

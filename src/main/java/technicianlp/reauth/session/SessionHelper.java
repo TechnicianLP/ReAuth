@@ -1,9 +1,16 @@
 package technicianlp.reauth.session;
 
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.regex.Pattern;
+
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.minecraft.UserApiService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
 import net.minecraft.client.gui.screens.social.PlayerSocialManager;
@@ -12,12 +19,6 @@ import net.minecraft.client.resources.SplashManager;
 import technicianlp.reauth.ReAuth;
 import technicianlp.reauth.authentication.SessionData;
 import technicianlp.reauth.util.ReflectionUtils;
-
-import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.regex.Pattern;
 
 public final class SessionHelper {
 

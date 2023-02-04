@@ -1,8 +1,8 @@
 package technicianlp.reauth.configuration;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
-
 import java.util.concurrent.CompletableFuture;
+
+import com.electronwill.nightconfig.core.CommentedConfig;
 
 public final class Profile {
 
