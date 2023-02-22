@@ -17,9 +17,6 @@ import java.util.concurrent.CompletableFuture;
 
 final class XboxAuthenticationFlow extends FlowBase {
 
-    private static final String XSTS_ERR_TOKEN_EXPIRED = Integer.toUnsignedString(0x8015DC22);
-    private static final String XSTS_ERR_TOKEN_INVALID = Integer.toUnsignedString(0x8015DC26);
-
     private final CompletableFuture<SessionData> session;
     private final CompletableFuture<Response<XboxAuthResponse>> xstsAuthResponse;
 
@@ -67,7 +64,7 @@ final class XboxAuthenticationFlow extends FlowBase {
         }
         XboxAuthResponse rawResponse = response.getUnchecked();
         if (rawResponse != null) {
-            return XSTS_ERR_TOKEN_EXPIRED.equals(rawResponse.error) || XSTS_ERR_TOKEN_INVALID.equals(rawResponse.error);
+            return rawResponse.isExpiredTokenError();
         }
         return false;
     }

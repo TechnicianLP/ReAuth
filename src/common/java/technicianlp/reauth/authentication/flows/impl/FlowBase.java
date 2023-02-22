@@ -6,7 +6,6 @@ import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.FlowStage;
 import technicianlp.reauth.authentication.flows.impl.util.AuthBiFunction;
 import technicianlp.reauth.authentication.flows.impl.util.AuthFunction;
-import technicianlp.reauth.authentication.flows.impl.util.AuthSupplier;
 import technicianlp.reauth.configuration.Profile;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 abstract class FlowBase implements Flow {
 
@@ -34,7 +32,7 @@ abstract class FlowBase implements Flow {
 
     /**
      * Register dependant {@link CompletionStage} for cancellation handling.
-     * Every major stage should be registered for handling as cancelling a completed stage does no propagate to its dependants.
+     * Every major stage should be registered for handling as cancelling a completed stage does not propagate to its dependants.
      */
     final void registerDependantStages(CompletableFuture<?>... stages) {
         Collections.addAll(this.stages, stages);
@@ -94,13 +92,6 @@ abstract class FlowBase implements Flow {
         return (t) -> {
             this.step(stage);
             return step.apply(t);
-        };
-    }
-
-    final <T> Supplier<T> wrapStep(FlowStage stage, AuthSupplier<T> step) {
-        return () -> {
-            this.step(stage);
-            return step.get();
         };
     }
 

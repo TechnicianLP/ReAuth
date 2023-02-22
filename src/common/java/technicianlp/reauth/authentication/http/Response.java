@@ -29,9 +29,9 @@ public final class Response<R extends ResponseObject> {
         if (this.isValid()) {
             return this.response;
         } else if (this.response != null) {
-            throw new InvalidResponseException("Error received with code " + this.statusCode + ": " + this.response.getError());
+            throw new InvalidResponseException("Error received with code " + this.statusCode + ": " + this.response.getError(), this);
         } else {
-            throw new InvalidResponseException("Received error code " + this.statusCode);
+            throw new InvalidResponseException("Received error code " + this.statusCode, this);
         }
     }
 
