@@ -38,4 +38,12 @@ public final class ProfileResponse implements ResponseObject {
     public final @Nullable String getError() {
         return this.error;
     }
+
+    @Override
+    public @Nullable String getErrorDescription() {
+        if("NOT_FOUND".equals(this.error)) {
+            return "reauth.error.minecraft";
+        }
+        return null;
+    }
 }
