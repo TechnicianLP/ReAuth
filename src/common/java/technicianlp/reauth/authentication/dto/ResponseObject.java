@@ -16,4 +16,12 @@ public interface ResponseObject {
      * returns the errormessage returned by the service for a failed request
      */
     @Nullable String getError();
+
+    /**
+     * returns an errormessage that can be translated and shown to the user
+     */
+    @Nullable
+    default String getErrorDescription() {
+        return null;
+    }
 }

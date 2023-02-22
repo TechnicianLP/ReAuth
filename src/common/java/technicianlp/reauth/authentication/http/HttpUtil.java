@@ -8,7 +8,6 @@ import technicianlp.reauth.authentication.dto.ResponseObject;
 import technicianlp.reauth.authentication.dto.xbox.XboxAuthResponse;
 import technicianlp.reauth.authentication.dto.xbox.XboxLiveAuthRequest;
 import technicianlp.reauth.authentication.dto.xbox.XboxXstsAuthRequest;
-import technicianlp.reauth.authentication.dto.yggdrasil.AuthenticateRequest;
 import technicianlp.reauth.mojangfix.CertWorkaround;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -31,7 +30,6 @@ public final class HttpUtil {
 
     static {
         GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(AuthenticateRequest.class, new AuthenticateRequest.Serializer());
         builder.registerTypeAdapter(XboxLiveAuthRequest.class, new XboxLiveAuthRequest.Serializer());
         builder.registerTypeAdapter(XboxXstsAuthRequest.class, new XboxXstsAuthRequest.Serializer());
         builder.registerTypeAdapter(XboxAuthResponse.class, new XboxAuthResponse.Deserializer());
