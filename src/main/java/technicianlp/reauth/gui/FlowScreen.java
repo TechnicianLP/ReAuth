@@ -13,11 +13,15 @@ import technicianlp.reauth.authentication.flows.DeviceCodeFlow;
 import technicianlp.reauth.authentication.flows.Flow;
 import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.FlowStage;
+import technicianlp.reauth.authentication.flows.Flows;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.session.SessionHelper;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -36,6 +40,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
     private Flow flow;
     private FlowStage stage = FlowStage.INITIAL;
     private String[] formatArgs = new String[0];
+    private String errorText = null;
 
     public FlowScreen(Screen background) {
         super("reauth.gui.title.flow", background);
@@ -49,6 +54,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         int buttonWidthH = buttonWidth / 2;
 
         this.formatArgs = new String[0];
+        this.errorText = null;
         if (this.stage == FlowStage.MS_AWAIT_AUTH_CODE && this.flow instanceof AuthorizationCodeFlow) {
             try {
                 URL url = new URL(((AuthorizationCodeFlow) this.flow).getLoginUrl());
@@ -69,6 +75,8 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
             } catch (MalformedURLException e) {
                 ReAuth.log.error("Browser button failed", e);
             }
+        } else if (this.stage == FlowStage.FAILED) {
+            this.errorText = Flows.getFailureReason(this.flow);
         }
     }
 
@@ -77,8 +85,15 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         super.render(mouseX, mouseY, partialTicks);
 
         String text = I18n.format(this.stage.getRawName(), (Object[]) this.formatArgs);
-        String[] lines = text.split("\\R");
-        int height = lines.length * 9;
+        List<String> lines = new ArrayList<>();
+
+        Collections.addAll(lines, text.split("\\R"));
+        if(this.errorText != null) {
+            lines.add("");
+            Collections.addAll(lines, I18n.format(this.errorText).split("\\R"));
+        }
+
+        int height = lines.size() * 9;
         for (String s : lines) {
             if (s.startsWith("$")) {
                 height += 9;
