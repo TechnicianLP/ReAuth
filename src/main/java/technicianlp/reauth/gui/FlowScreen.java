@@ -12,6 +12,7 @@ import technicianlp.reauth.authentication.flows.DeviceCodeFlow;
 import technicianlp.reauth.authentication.flows.Flow;
 import technicianlp.reauth.authentication.flows.FlowCallback;
 import technicianlp.reauth.authentication.flows.FlowStage;
+import technicianlp.reauth.authentication.flows.Flows;
 import technicianlp.reauth.configuration.Profile;
 import technicianlp.reauth.session.SessionHelper;
 import technicianlp.reauth.util.ReflectionUtils;
@@ -20,6 +21,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -40,6 +44,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
     private Flow flow;
     private FlowStage stage = FlowStage.INITIAL;
     private String[] formatArgs = new String[0];
+    private String errorText = null;
 
     private FlowScreen(GuiScreen background) {
         super("reauth.gui.title.flow", background);
@@ -53,6 +58,7 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         int buttonWidthH = buttonWidth / 2;
 
         this.formatArgs = new String[0];
+        this.errorText = null;
         if (this.stage == FlowStage.MS_AWAIT_AUTH_CODE && this.flow instanceof AuthorizationCodeFlow) {
             this.addButton(new GuiButton(2, this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, I18n.format("reauth.msauth.button.browser")));
         } else if (this.stage == FlowStage.MS_POLL_DEVICE_CODE && this.flow instanceof DeviceCodeFlow) {
@@ -61,6 +67,8 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
                 this.addButton(new GuiButton(3, this.centerX - buttonWidthH, this.baseY + this.screenHeight - 42, buttonWidth, 20, I18n.format("reauth.msauth.button.browser")));
                 this.formatArgs = new String[]{flow.getLoginUrl().join(), flow.getCode().join()};
             }
+        } else if (this.stage == FlowStage.FAILED) {
+            this.errorText = Flows.getFailureReason(this.flow);
         }
     }
 
@@ -69,8 +77,15 @@ public final class FlowScreen extends AbstractScreen implements FlowCallback {
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         String text = I18n.format(this.stage.getRawName(), (Object[]) this.formatArgs);
-        String[] lines = text.split("\\\\n");
-        int height = lines.length * 9;
+        List<String> lines = new ArrayList<>();
+
+        Collections.addAll(lines, text.split("\\\\n"));
+        if(this.errorText != null) {
+            lines.add("");
+            Collections.addAll(lines, I18n.format(this.errorText).split("\\\\n"));
+        }
+
+        int height = lines.size() * 9;
         for (String s : lines) {
             if (s.startsWith("$")) {
                 height += 9;

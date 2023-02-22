@@ -51,7 +51,7 @@ public final class MicrosoftProfileFlow extends FlowBase {
         this.registerDependantStages(this.encryption, xblTokenDec);
         this.registerDependantFlow(this.xboxFlow1);
 
-        CompletableFuture<String> refreshTokenEnc = this.refreshRequired.thenCompose(Futures.conditional(profile.get(ProfileConstants.REFRESH_TOKEN), Futures.cancelled()));
+        CompletableFuture<String> refreshTokenEnc = Futures.composeConditional(this.refreshRequired, profile.get(ProfileConstants.REFRESH_TOKEN), Futures.cancelled());
         CompletableFuture<String> refreshTokenDec = this.encryption.thenCombineAsync(refreshTokenEnc, ProfileEncryption::decryptFieldTwo, this.executor);
         CompletableFuture<MicrosoftAuthResponse> auth = refreshTokenDec.thenApplyAsync(this.wrapStep(FlowStage.MS_REDEEM_REFRESH_TOKEN, MsAuthAPI::redeemRefreshToken), this.executor);
         CompletableFuture<XboxAuthResponse> xasu = auth.thenApply(MicrosoftAuthResponse::getAccessToken)
@@ -63,7 +63,7 @@ public final class MicrosoftProfileFlow extends FlowBase {
         this.registerDependantFlow(xboxFlow2);
 
         CompletableFuture<Tokens> tokens = auth.thenCombine(xasu, Tokens::new);
-        this.profileFuture = this.refreshRequired.thenComposeAsync(Futures.conditional(() -> this.constructProfile(tokens), CompletableFuture.completedFuture(profile)), this.executor);
+        this.profileFuture = Futures.composeConditional(this.refreshRequired, () -> this.constructProfile(tokens), CompletableFuture.completedFuture(profile));
         this.profileFuture.whenComplete(this::onProfileComplete);
     }
 
@@ -84,12 +84,13 @@ public final class MicrosoftProfileFlow extends FlowBase {
         } else {
             if (this.refreshRequired.isDone()) {
                 this.session.completeExceptionally(throwable);
+                this.profileFuture.cancel(true);
             }
             if (this.xboxFlow1.hasExpiredTokenError()) {
                 this.refreshRequired.complete(true);
             } else {
                 this.session.completeExceptionally(throwable);
-                this.refreshRequired.complete(false);
+                this.refreshRequired.cancel(true);
             }
         }
     }
