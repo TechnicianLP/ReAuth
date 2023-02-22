@@ -35,17 +35,17 @@ public final class MainScreen extends AbstractScreen {
         Profile profile = ReAuth.profiles.getProfile();
         if (profile != null) {
             Component text = Component.translatable("reauth.gui.profile", profile.getValue(ProfileConstants.NAME, "Steve"));
-            this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text, (b) -> FlowScreen.open(Flows::loginWithProfile, profile, false)));
+            this.addRenderableWidget(ReAuth.buttonFactory.createButton(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, text, (b) -> FlowScreen.open(Flows::loginWithProfile, profile, false)));
         } else {
-            Button profileButton = new Button(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.noProfile"), (b) -> {
+            Button profileButton = ReAuth.buttonFactory.createButton(this.centerX - buttonWidthH, y + 10, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.noProfile"), (b) -> {
             });
             profileButton.active = false;
             this.addRenderableWidget(profileButton);
         }
 
-        this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20, Component.translatable("reauth.gui.button.authcode"), (b) -> FlowScreen.open(Flows::loginWithAuthCode, saveButton.selected(), false)));
-        this.addRenderableWidget(new Button(this.centerX + 1, y + 45, buttonWidthH - 1, 20, Component.translatable("reauth.gui.button.devicecode"), (b) -> FlowScreen.open(Flows::loginWithDeviceCode, saveButton.selected(), false)));
-        this.addRenderableWidget(new Button(this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.button.offline"), (b) -> this.transitionScreen(new OfflineLoginScreen())));
+        this.addRenderableWidget(ReAuth.buttonFactory.createButton(this.centerX - buttonWidthH, y + 45, buttonWidthH - 1, 20, Component.translatable("reauth.gui.button.authcode"), (b) -> FlowScreen.open(Flows::loginWithAuthCode, saveButton.selected(), false)));
+        this.addRenderableWidget(ReAuth.buttonFactory.createButton(this.centerX + 1, y + 45, buttonWidthH - 1, 20, Component.translatable("reauth.gui.button.devicecode"), (b) -> FlowScreen.open(Flows::loginWithDeviceCode, saveButton.selected(), false)));
+        this.addRenderableWidget(ReAuth.buttonFactory.createButton(this.centerX - buttonWidthH, y + 105, BUTTON_WIDTH, 20, Component.translatable("reauth.gui.button.offline"), (b) -> this.transitionScreen(new OfflineLoginScreen())));
 
 
         VersionChecker.CheckResult result = VersionChecker.getResult(ReAuth.modInfo);
@@ -62,8 +62,8 @@ public final class MainScreen extends AbstractScreen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-        super.render(poseStack, mouseX, mouseY, partialTicks);
+    public void renderBackground(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        super.renderBackground(poseStack, mouseX, mouseY, partialTicks);
 
         int x = this.centerX - BUTTON_WIDTH / 2;
         this.font.drawShadow(poseStack, I18n.get("reauth.gui.text.profile"), x, this.centerY - 55, 0xFFFFFFFF);

@@ -11,9 +11,16 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import technicianlp.reauth.ReAuth;
+import technicianlp.reauth.util.ReflectionUtils;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 
 abstract class AbstractScreen extends Screen {
 
+    private static MethodHandle renderSuper = null;
     static final int BUTTON_WIDTH = 196;
 
     private final String title;
@@ -33,19 +40,45 @@ abstract class AbstractScreen extends Screen {
     @Override
     public void init() {
         super.init();
-        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(true);
 
         this.centerX = this.width / 2;
         this.baseX = this.centerX - this.screenWidth / 2;
         this.centerY = this.height / 2;
         this.baseY = this.centerY - this.screenHeight / 2;
 
-        Button cancel = new Button(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, Component.translatable("reauth.gui.close"), (b) -> this.onClose());
+        Button cancel = ReAuth.buttonFactory.createButton(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, Component.translatable("reauth.gui.close"), (b) -> this.onClose());
         this.addRenderableWidget(cancel);
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    public final void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(poseStack, mouseX, mouseY, partialTicks);
+
+        super.render(poseStack, mouseX, mouseY, partialTicks);
+
+        this.font.drawShadow(poseStack, I18n.get(this.title), this.centerX - (BUTTON_WIDTH / 2f), this.baseY + 8, 0xFFFFFFFF);
+    }
+
+    /**
+     * Render Method pre 1.19.3. Call to super via MethodHandle
+     */
+    public final void m_6305_(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) throws Throwable {
+        this.renderBackground(poseStack, mouseX, mouseY, partialTicks);
+
+        try {
+            if (renderSuper == null) {
+                MethodType signature = MethodType.methodType(void.class, PoseStack.class, int.class, int.class, float.class);
+                renderSuper = MethodHandles.lookup().findSpecial(Screen.class, "m_6305_", signature, AbstractScreen.class);
+            }
+            renderSuper.invoke(this, poseStack, mouseX, mouseY, partialTicks);
+        } catch (ReflectiveOperationException e) {
+            throw new ReflectionUtils.UncheckedReflectiveOperationException("Unable to call super.render (m_6305_)", e);
+        }
+
+        this.font.drawShadow(poseStack, I18n.get(this.title), this.centerX - (BUTTON_WIDTH / 2f), this.baseY + 8, 0xFFFFFFFF);
+    }
+
+    public void renderBackground(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
         this.fillGradient(poseStack, 0, 0, this.width, this.height, 0xc0101010, 0xd0101010);
 
         // modified renderDirtBackground(0);
@@ -60,10 +93,6 @@ abstract class AbstractScreen extends Screen {
         bufferbuilder.vertex(this.baseX + this.screenWidth, this.baseY, 0.0D).uv(this.screenWidth / 32.0F, 0F).color(80, 80, 80, 255).endVertex();
         bufferbuilder.vertex(this.baseX, this.baseY, 0.0D).uv(0.0F, 0F).color(80, 80, 80, 255).endVertex();
         tesselator.end();
-
-        super.render(poseStack, mouseX, mouseY, partialTicks);
-
-        this.font.drawShadow(poseStack, I18n.get(this.title), this.centerX - (BUTTON_WIDTH / 2f), this.baseY + 8, 0xFFFFFFFF);
     }
 
     protected final void transitionScreen(Screen newScreen) {
@@ -85,14 +114,5 @@ abstract class AbstractScreen extends Screen {
     @Override
     public final void onClose() {
         this.requestClose(false);
-    }
-
-    /**
-     * Called once this Screen is closed
-     */
-    @Override
-    public void removed() {
-        super.removed();
-        this.getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
     }
 }

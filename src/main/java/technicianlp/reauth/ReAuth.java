@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import technicianlp.reauth.configuration.Config;
 import technicianlp.reauth.configuration.ProfileList;
+import technicianlp.reauth.gui.ButtonFactory;
 import technicianlp.reauth.mojangfix.MojangJavaFix;
 
 import java.util.concurrent.ExecutorService;
@@ -37,6 +38,8 @@ public final class ReAuth {
 
     public static final BiFunction<String, Object[], String> i18n;
 
+    public static final ButtonFactory buttonFactory;
+
     static {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             MojangJavaFix.fixMojangJava();
@@ -46,11 +49,21 @@ public final class ReAuth {
             config = new Config();
             profiles = config.getProfileList();
             i18n = I18n::get;
+
+            ButtonFactory factory;
+            try {
+                factory = new ButtonFactory.ButtonFactoryMc19();
+            } catch (ReflectiveOperationException e) {
+                log.info("Button constructor not found - using 1.19.3 Builder instead");
+                factory = new ButtonFactory.ButtonFactoryMc19_3();
+            }
+            buttonFactory = factory;
         } else {
             config = null;
             profiles = null;
             executor = null;
             i18n = null;
+            buttonFactory = null;
         }
     }
 

@@ -28,16 +28,18 @@ import java.lang.reflect.Field;
 public final class EventHandler {
 
     private static final Field disconnectMessage = ReflectionUtils.findObfuscatedField(DisconnectedScreen.class, "f_95988_", "reason");
+    private static final Field widgetX = ReflectionUtils.findObfuscatedField(AbstractWidget.class, "f_93620_", "x");
+    private static final Field widgetY = ReflectionUtils.findObfuscatedField(AbstractWidget.class, "f_93621_", "y");
 
     @SubscribeEvent
     public static void onInitGui(ScreenEvent.Init.Post event) {
         Screen screen = event.getScreen();
         if (screen instanceof JoinMultiplayerScreen) {
             // Add Button to MultiplayerScreen
-            event.addListener(new Button(5, 5, 100, 20, Component.translatable("reauth.gui.button"), b -> openAuthenticationScreen()));
+            event.addListener(ReAuth.buttonFactory.createButton(5, 5, 100, 20, Component.translatable("reauth.gui.button"), b -> openAuthenticationScreen()));
         } else if (screen instanceof TitleScreen) {
             // Support for Custom Main Menu (add button outside of viewport)
-            event.addListener(new Button(-50, -50, 20, 20, Component.translatable("reauth.gui.button"), b -> openAuthenticationScreen()));
+            event.addListener(ReAuth.buttonFactory.createButton(-50, -50, 20, 20, Component.translatable("reauth.gui.button"), b -> openAuthenticationScreen()));
         } else if (screen instanceof DisconnectedScreen) {
             // Add Buttons to DisconnectedScreen if its reason is an invalid session
             handleDisconnectScreen(event, screen);
@@ -59,7 +61,7 @@ public final class EventHandler {
                 } else {
                     retryText = Component.translatable("reauth.retry.disabled");
                 }
-                Button retryButton = new Button(menu.x, menu.y + 25, 200, 20, retryText, b -> ReconnectHelper.retryLogin(profile));
+                Button retryButton = ReAuth.buttonFactory.createButton(ReflectionUtils.getField(widgetX, menu), ReflectionUtils.<Integer>getField(widgetY, menu) + 25, 200, 20, retryText, b -> ReconnectHelper.retryLogin(profile));
                 if (profile == null || !ReconnectHelper.hasConnectionInfo()) {
                     retryButton.active = false;
                 }
