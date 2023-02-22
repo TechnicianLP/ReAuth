@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
-@Mod(modid = "reauth", name = "ReAuth", version = "4.0.3", canBeDeactivated = true,
+@Mod(modid = "reauth", name = "ReAuth", version = "4.0.7", canBeDeactivated = true,
         acceptedMinecraftVersions = "[1.7.10]",
         guiFactory = "technicianlp.reauth.gui.GuiFactory",
         certificateFingerprint = "daba0ec4df71b6da841768c49fb873def208a1e3")
