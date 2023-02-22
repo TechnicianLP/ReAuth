@@ -8,9 +8,15 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.client.ForgeHooksClient;
+import technicianlp.reauth.util.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.util.Collection;
 
 abstract class AbstractScreen extends Screen {
 
+    static final Field FORGE_GUI_LAYERS = ReflectionUtils.findField(ForgeHooksClient.class, "guiLayers");
     static final int BUTTON_WIDTH = 196;
 
     private final String title;
@@ -21,6 +27,8 @@ abstract class AbstractScreen extends Screen {
     protected int centerY;
     protected int screenWidth = 300;
     protected int screenHeight = 175;
+
+    private boolean hasBackgroundLayers = false;
 
     AbstractScreen(String title) {
         super(new TranslationTextComponent("reauth.gui.auth.title"));
@@ -39,10 +47,16 @@ abstract class AbstractScreen extends Screen {
 
         Button cancel = new Button(this.centerX + this.screenWidth / 2 - 22, this.baseY + 2, 20, 20, new TranslationTextComponent("reauth.gui.close"), (b) -> this.closeScreen());
         this.addButton(cancel);
+
+        this.hasBackgroundLayers = ReflectionUtils.<Collection<?>>getField(FORGE_GUI_LAYERS, null).size() > 0;
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+        if (this.hasBackgroundLayers) {
+            // Optifine workaround for near-plane clipping issue
+            matrices.translate(0, 0, -1900);
+        }
         this.fillGradient(matrices, 0, 0, this.width, this.height, 0xc0101010, 0xd0101010);
 
         // modified renderDirtBackground(0);

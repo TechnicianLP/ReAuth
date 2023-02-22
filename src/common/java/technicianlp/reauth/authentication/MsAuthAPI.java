@@ -44,7 +44,7 @@ public final class MsAuthAPI {
                 "&redirect_uri=" + redirectUriEncoded +
                 "&scope=" + (persist ? scopePersistUrl : scopeBasic) +
                 "&response_type=code" +
-                "&response_mode=form_post" +
+                "&response_mode=query" +
                 "&prompt=select_account" +
                 "&code_challenge=" + pkceChallenge +
                 "&code_challenge_method=S256";

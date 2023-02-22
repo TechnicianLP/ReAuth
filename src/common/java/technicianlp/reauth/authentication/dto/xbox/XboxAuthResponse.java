@@ -23,6 +23,10 @@ import java.lang.reflect.Type;
  */
 public final class XboxAuthResponse implements ResponseObject {
 
+    private static final String XSTS_ERR_MISSING_ACCOUNT = "8015dc09";
+    private static final String XSTS_ERR_TOKEN_EXPIRED = "8015dc22";
+    private static final String XSTS_ERR_TOKEN_INVALID = "8015dc26";
+
     // Normal Handling
     public final String validUntil;
     public final String token;
@@ -48,8 +52,20 @@ public final class XboxAuthResponse implements ResponseObject {
         return this.error;
     }
 
+    @Override
+    public final @Nullable String getErrorDescription() {
+        if (XSTS_ERR_MISSING_ACCOUNT.equals(this.error)) {
+            return "reauth.error.xbox";
+        }
+        return null;
+    }
+
     public final String getToken() {
         return this.token;
+    }
+
+    public final boolean isExpiredTokenError() {
+        return XSTS_ERR_TOKEN_EXPIRED.equals(this.error) || XSTS_ERR_TOKEN_INVALID.equals(this.error);
     }
 
     /**
@@ -67,6 +83,12 @@ public final class XboxAuthResponse implements ResponseObject {
                 String userHash = this.extractUserHash(root.getAsJsonObject("DisplayClaims"));
 
                 String error = this.getString(root, "XErr");
+                if(error != null) {
+                    try {
+                        error = Integer.toHexString(Integer.parseUnsignedInt(error));
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
 
                 return new XboxAuthResponse(validUntil, token, userHash, error);
             } catch (IllegalStateException | ClassCastException e) {

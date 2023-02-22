@@ -25,13 +25,12 @@ final class CodeHandler extends Handler {
     @Override
     public final void handle(HttpExchange exchange) throws IOException {
         try {
-
             String method = exchange.getRequestMethod().toUpperCase(Locale.ROOT);
             Response response;
             if ("POST".equals(method)) {
                 response = this.handlePostRequest(exchange);
             } else if ("HEAD".equals(method) || "GET".equals(method)) {
-                response = new Response(HttpStatus.Method_Not_Allowed).setHeader("Allow", "POST");
+                response = this.handleQueryRequest(exchange);
             } else {
                 response = new Response(HttpStatus.Not_Implemented);
             }
@@ -43,33 +42,42 @@ final class CodeHandler extends Handler {
         }
     }
 
+    private Response handleQueryRequest(HttpExchange exchange) throws IOException {
+        return this.handleRequest(exchange.getRequestURI().getRawQuery());
+    }
+
     private Response handlePostRequest(HttpExchange exchange) throws IOException {
         String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
         if (!contentType.startsWith("application/x-www-form-urlencoded")) {
             return new Response(HttpStatus.Unsupported_Media_Type);
         }
 
-        String body = IOUtils.toString(exchange.getRequestBody(), StandardCharsets.UTF_8);
-        Map<String, String> formFields = (this.parseFormFields(body));
+        return this.handleRequest(IOUtils.toString(exchange.getRequestBody(), StandardCharsets.UTF_8));
+    }
 
-        if (formFields.containsKey("code")) {
+    private Response handleRequest(String urlEncodedParameters) throws IOException {
+        Map<String, String> parameters = this.parseUrlEncodedParameters(urlEncodedParameters);
+
+        if (parameters.containsKey("code")) {
             ReAuth.log.info("Received Microsoft Authentication Code");
-            this.codeFuture.complete(formFields.get("code"));
+            this.codeFuture.complete(parameters.get("code"));
             return new Response(HttpStatus.OK).setContent(CONTENT_TYPE_HTML, this.pageWriter.createSuccessResponsePage());
         } else {
-            String error = formFields.getOrDefault("error", "unknown");
+            String error = parameters.getOrDefault("error", "unknown");
             ReAuth.log.error("Received Error from Microsoft Authentication: " + error);
             return new Response(HttpStatus.Bad_Request).setContent(CONTENT_TYPE_HTML, this.pageWriter.createErrorResponsePage(error));
         }
     }
 
     /**
-     * Decodes the Contents of a application/x-www-form-urlencoded request.
+     * Decodes the Contents of an application/x-www-form-urlencoded request or a query String.
      * Duplicate field names are discarded.
      */
-    private Map<String, String> parseFormFields(String formUrlEncoded) {
-        Map<String, String> formFields = new HashMap<>();
-        String[] fields = formUrlEncoded.split("&");
+    private Map<String, String> parseUrlEncodedParameters(String urlEncodedParameters) {
+        Map<String, String> parameters = new HashMap<>();
+        if (urlEncodedParameters == null)
+            return parameters;
+        String[] fields = urlEncodedParameters.split("&");
 
         try {
             for (String field : fields) {
@@ -85,11 +93,11 @@ final class CodeHandler extends Handler {
                     value = field.substring(delimiter + 1);
                 }
 
-                formFields.putIfAbsent(URLDecoder.decode(key, "UTF-8"), URLDecoder.decode(value, "UTF-8"));
+                parameters.putIfAbsent(URLDecoder.decode(key, "UTF-8"), URLDecoder.decode(value, "UTF-8"));
             }
         } catch (UnsupportedEncodingException exception) {
             throw new RuntimeException("UTF-8 unsupported", exception);
         }
-        return formFields;
+        return parameters;
     }
 }

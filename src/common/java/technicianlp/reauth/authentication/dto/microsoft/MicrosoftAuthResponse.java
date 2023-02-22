@@ -16,8 +16,6 @@ import technicianlp.reauth.authentication.dto.ResponseObject;
 public final class MicrosoftAuthResponse implements ResponseObject {
 
     // Normal Handling
-    @SerializedName("expires_in")
-    public final String expires_in;
     @SerializedName("access_token")
     public final String accessToken;
     @SerializedName("refresh_token")
@@ -28,7 +26,6 @@ public final class MicrosoftAuthResponse implements ResponseObject {
     public final @Nullable String error;
 
     private MicrosoftAuthResponse() {
-        this.expires_in = null;
         this.accessToken = null;
         this.refreshToken = null;
 
@@ -37,12 +34,30 @@ public final class MicrosoftAuthResponse implements ResponseObject {
 
     @Override
     public final boolean isValid() {
-        return this.error == null && this.expires_in != null && this.accessToken != null;
+        return this.error == null && this.accessToken != null;
     }
 
     @Override
     public final @Nullable String getError() {
         return this.error;
+    }
+
+    @Override
+    public @Nullable String getErrorDescription() {
+        if (this.error == null) {
+            return null;
+        }
+        switch (this.error) {
+            case "invalid_grant":
+                return "reauth.error.expired";
+            case "temporarily_unavailable":
+                return "reauth.error.network";
+            case "authorization_declined":
+            case "expired_token":
+                return "reauth.error.cancelled";
+            default:
+                return null;
+        }
     }
 
     public final String getAccessToken() {
