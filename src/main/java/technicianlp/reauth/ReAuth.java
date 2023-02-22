@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
-@Mod(modid = "reauth", name = "ReAuth", version = "4.0.3", canBeDeactivated = true, clientSideOnly = true,
+@Mod(modid = "reauth", name = "ReAuth", version = "4.0.7", canBeDeactivated = true, clientSideOnly = true,
         acceptedMinecraftVersions = "[1.8.0,1.8.9]",
         guiFactory = "technicianlp.reauth.gui.GuiFactory",
         updateJSON = "https://raw.githubusercontent.com/TechnicianLP/ReAuth/master/update.json",

@@ -30,5 +30,4 @@ public final class MojangJavaFix {
         JceWorkaround.ensureUnlimitedCryptography();
         CertWorkaround.checkCertificates();
     }
-
 }
