@@ -24,19 +24,8 @@ If the list of profiles is empty, a placeholder entry is inserted.
 ###Type declaration
 Each entry requires a field `type` denoting the type of profile.  
 Known profile-types are:
-* `mojang` denoting a Mojang profile
 * `microsoft` denoting a Microsoft profile
 * `none` denoting a placeholder entry
-
-###Mojang Profiles
-Mojang profiles require the field `username` and `password`.
-They contain the users encrypted credentials for their Mojang account (see [Encryption](#Encryption)).
-```toml
-[[profiles]]
-    type = "mojang"
-    username = "username"
-    password = "password"
-```
 
 ###Microsoft Profiles
 Microsoft profiles require the fields `refresh-token` and `xbl-token`.
